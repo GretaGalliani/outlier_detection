@@ -1,7 +1,5 @@
 ##### UPDATE SIGMA
 
-# Import functions used for updating Beta
-#source('Update_beta/Update_beta.R')
 
 # Function to update the sigma parameter
 # NB input variable freq is a vector containing the frequencies of the unique

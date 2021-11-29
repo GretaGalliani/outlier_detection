@@ -1,6 +1,5 @@
 ##### UPDATE SIGMA
 
-
 # Function to update the sigma parameter
 # NB input variable freq is a vector containing the frequencies of the unique
 # values xi* for i=1,...,k
@@ -46,7 +45,7 @@ calcolo_alpha_sigma <- function(x, y, k, m1_bar, theta, freq) {
 # INPUT: x (which is already inverted so that x is in (0,1))
 # DA TESTARE
 dens_sigma <- function(x, k, m1_bar, theta, freq) {
-  return ( x^(k - m1_bar) * prod(gamma(freq-x)/gamma(1-x)*gamma(theta/x + k - m1_bar)/gamma(theta/x)) * 1/(x*(1-x)))
+  return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^k * prod(gamma(freq-x)/gamma(1-x)) * 1/(x*(1-x)))
 }
 
 

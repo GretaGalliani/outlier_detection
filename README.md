@@ -8,3 +8,4 @@ Collaborators:
 - Greta Galliani
 - Nicole Fontana
 - Lorenzo Gruppi
+- Riccardo Sparacino

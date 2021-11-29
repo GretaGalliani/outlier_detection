@@ -1,11 +1,19 @@
 ToDo:
 
 ALGORITMO:
-- Implementare update_theta, update_sigma
-- PENSARE AD ALTRI PUNTI (DIFFICILE)
+- Continuare punto (a)
+- Fare punto (b)
+- Aggiungere acceptance rate per (b), (c), (d)
 
 CODICE:
-- Commentare tutte le cose fatte e scrivere documentazione
+Commentare tutte le cose fatte e scrivere documentazione
+Commentare codice + scrivere help di ogni funzione che dice input e output
+Per variabili input e output: aggiornare file con definizioni di variabili
+- update_sigma
+- update_beta
+- update_theta
+- auxiliary functions
 
 REPORT:
-- Buttare giù scheletro delle cose fatte
+1 Introduzione teorica: discorso + formule
+2 Algoritmo

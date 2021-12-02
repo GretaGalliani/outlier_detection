@@ -1,5 +1,7 @@
 ##### UPDATE BETA
 
+#Importing some auxiliary functions
+source("Auxiliary_functions/Auxiliary_functions.R")
 
 # Function to update the beta parameter
 # INPUT: n -> number of data points

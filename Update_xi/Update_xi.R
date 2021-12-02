@@ -1,7 +1,10 @@
 ##### UPDATE XIs
 
 
-update_xi <- function(Y, S, k, xi_old_mean, xi_old_sd, mu0, k0, lambda0, nu0){
+update_xi <- function(Y, S, k, mu0, k0, lambda0, nu0){
+  xi_mu = list()
+  xi_sigma = list()
+  
   for (j in 1:k){
     Yj = Y[S==j]    # select data belonging to cluster j
     sample_cov = cov(Yj)
@@ -13,13 +16,13 @@ update_xi <- function(Y, S, k, xi_old_mean, xi_old_sd, mu0, k0, lambda0, nu0){
     nu_n = nu0 + n
     lambda_n = lambda_0 + sample_cov + k0*n/k_n*(mean(Yj)-mu0)%*%t((mean(Yj)-mu0))
     
-    xi_sd = rinvwishart(nu_n, inv(lambda_n))
-    
     df = nu_n-d+1
-    xi_mu = rmvt(1, mu_n, lambda_n/k_n/df, df)
+    xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
+    xi_sigma_j = rinvwishart(nu_n, inv(lambda_n))
     
+    xi_mu <- list(xi_mu, list(xi_mu_j))
+    xi_sigma <- list(xi_sigma, list(xi_sigma_j))
   }
   
-  
-  
+  return(list("xi_mean" = xi_mu, "xi_sigma" = xi_sigma))
 }

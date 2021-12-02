@@ -1,13 +1,10 @@
 ##### UPDATE BETA
 
-#Importing some auxiliary functions
-source("Auxiliary_functions/Auxiliary_functions.R")
-
 # Function to update the beta parameter
 # INPUT: n -> number of data points
 #        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
 #        beta_old -> beta at the previous iteration
-#        sd -> standard deviation for the proposal density in the MHRW 
+#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 #        n_acc -> number of accepted proposals in the previous iterations
 
 # OUTPUT: beta -> value of the parameter beta at the r iteration

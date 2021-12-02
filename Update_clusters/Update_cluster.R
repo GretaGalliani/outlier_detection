@@ -53,7 +53,7 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
     #j=1:K
     for (t in (2:k_new+1)) 
     {
-      n_j <- table(curr[-i])
+      n_j <- table(which(curr[-i]!=0))
       
       prob[t] <- dens_cluster_old(Y[i],n_j, m1_bar, sigma_old, theta_old, beta_old, Xi_mu_star[[t]],
                                  Xi_cov_star[[t]])

@@ -186,7 +186,7 @@ construct_mu_new <- function(data,Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
   sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
                           
   mu_new <- rmvt(1, mu = mu_n, sigma = sigma, df = nu_n-p+1)
-  Xi_mu_star<-list(Xi_mu_star,mu_new)
+  Xi_mu_star<-append(Xi_mu_star,mu_new)
   return (Xi_mu_star)
 }
 
@@ -202,7 +202,7 @@ construct_cov_new <- function(data,Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
   cov_inv <- inv(lambda_n)                        
   cov_new <-  rinvwishart(nu_n, cov_inv)
   
-  Xi_cov_star<-list(Xi_cov_star,cov_new)
+  Xi_cov_star<-append(Xi_cov_star,cov_new)
   return (Xi_cov_star)
 }
 

@@ -1,19 +1,23 @@
 ##### UPDATE SIGMA
 
+# MAIN IMPLEMENTATION: pass as input for sigma_old and n_acc the element of
+# the list using $
+
 # Function to update the sigma parameter
 # NB input variable freq is a vector containing the frequencies of the unique
 # values xi* for i=1,...,k
-update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, sd = 2) { 
+update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, sd = 2, n_acc) { 
   y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
   print(y)
   aprob <- calcolo_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
   print(aprob)
   u <- runif(1) # If condition "(u < aprob)" is NOT met, we'll skip command "x <- y", #  so that the MC does not move from x                 
   if (u < aprob){
-    return(y)
+    n_acc = n_acc+1
+    return(list("sigma" = y, "acc" = n_acc))
   } 
   else {
-    return(sigma_old)
+    return(list("sigma" = sigma_old, "acc" = n_acc))
   }
 }
 

@@ -1,23 +1,22 @@
 ##### UPDATE BETA
 
+# MAIN IMPLEMENTATION: pass as input for beta_old and n_acc the element of
+# the list using $
+
 # Function to update the beta parameter
 # DA TESTARE
-update_beta <- function(n, m1_bar, beta_old, sd = 2) { 
+update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) { 
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
   print(y)
   aprob <- calcolo_alpha_beta(beta_old, y, n, m1_bar)
   print(aprob)
   u <- runif(1) # If condition "(u < aprob)" is NOT met, we'll skip command "x <- y", #  so that the MC does not move from x                 
   if (u < aprob){
-    #acc <- acc + 1
-    #my_list <- list("beta" = y, "acc" = acc)
-    #return(my_list) 
-    return(y)
+    n_acc = n_acc+1
+    return(list("beta" = y, "acc" = n_acc))
   } 
   else {
-    # my_list <- list("beta" = beta_old, "acc" = acc)
-    # return(my_list)
-    return(beta_old)
+    return(list("beta" = beta_old, "acc" = n_acc))
   }
 }
 

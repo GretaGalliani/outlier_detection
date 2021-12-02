@@ -24,4 +24,6 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
                            nu_0_Q, k_0_Q, mu_0_Q, lambda_0_Q)
   
  
-  
+Xi <- Initialization()
+Xi_mu_star <- Xi$Xi_mu_star
+Xi_cov_star <- Xi$Xi_cov_star  

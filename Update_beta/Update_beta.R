@@ -10,6 +10,8 @@
 # OUTPUT: beta -> value of the parameter beta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
 update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) { 
+  # METROPOLIS HASTINGS RANDOM WALK 
+  
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that beta is in (0,1)
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
@@ -74,7 +76,7 @@ calcolo_alpha_beta <- function(x, y, n, m1_bar) {
 # INPUT: x -> point where the partial density is evaluated
 #        n -> number of data points 
 #        m1_bar -> number of points in group 0
-# OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
+# OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_beta <- function(x, n, m1_bar) {
   return ( x^(n - m1_bar) * (1 - x)^(m1_bar) * 1/(x*(1-x)))
 }

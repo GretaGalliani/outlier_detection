@@ -1,20 +1,25 @@
 ##### UPDATE THETA
 
+# MAIN IMPLEMENTATION: pass as input for theta_old and n_acc the element of
+# the list using $
+
 # Function to update the theta parameter
-update_theta <- function(n, m1_bar, k, theta_old, sigma, sd = 2) { 
+update_theta <- function(n, m1_bar, k, theta_old, sigma, sd = 2, n_acc) { 
   y <- inv_theta( change_theta(theta_old) + rnorm(1,0,sd))
   print(y)
   aprob <- calcolo_alpha_theta(theta_old, y, k, m1_bar, sigma, n)
   print(aprob)
   u <- runif(1) # If condition "(u < aprob)" is NOT met, we'll skip command "x <- y", #  so that the MC does not move from x                 
   if (u < aprob){
-    return(y)
+    n_acc = n_acc+1
+    return(list("theta" = y, "acc" = n_acc))
   } 
   else {
-    return(theta_old)
+    return(list("theta" = theta_old, "acc" = n_acc))
   }
 }
-
+# The function returns a list with the parameter for the current iteration
+# and an integer indicating how many times a new value for the param is accepted
 
 # Function to change the value of theta so theta_star is in (-inf, +inf) to do MH
 # FUNZIONA

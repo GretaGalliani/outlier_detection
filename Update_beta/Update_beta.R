@@ -1,19 +1,17 @@
 ##### UPDATE BETA
 
-#Importing some auxiliary functions
-source("Auxiliary_functions/Auxiliary_functions.R")
-
 # Function to update the beta parameter
 # INPUT: n -> number of data points
 #        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
 #        beta_old -> beta at the previous iteration
-#        sd -> standard deviation for the proposal density in the MHRW 
+#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 #        n_acc -> number of accepted proposals in the previous iterations
 
 # OUTPUT: beta -> value of the parameter beta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-
 update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) { 
+  # METROPOLIS HASTINGS RANDOM WALK 
+  
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that beta is in (0,1)
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
@@ -43,7 +41,6 @@ update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) {
 # Function to change the value of beta so beta_star is in (-inf, +inf) to do MH
 # INPUT: x -> value of beta, x is in (0,1)
 # OUTPUT: x_star -> value of transformed beta, x_star is in (-inf, +inf)
-
 change_beta <- function(x) {
   return (log(x) - log(1-x))
 }
@@ -52,7 +49,6 @@ change_beta <- function(x) {
 # inv_beta is the inverse function of change_beta
 # INPUT: x -> value of beta_star, x is in (-inf, +inf)
 # OUTPUT: x_star -> value of beta, x_star is in (0, 1)
-
 inv_beta <- function(x) {
   return (exp(x) / (exp(x) + 1))
 }
@@ -63,7 +59,6 @@ inv_beta <- function(x) {
 #        n -> number of data points
 #        m1_bar -> number of points in group 0
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
-
 calcolo_alpha_beta <- function(x, y, n, m1_bar) {
   # Computation of the partial posterior density for y and x
   pi_y <- dens_beta(y, n, m1_bar)
@@ -81,8 +76,7 @@ calcolo_alpha_beta <- function(x, y, n, m1_bar) {
 # INPUT: x -> point where the partial density is evaluated
 #        n -> number of data points 
 #        m1_bar -> number of points in group 0
-# OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
-
+# OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_beta <- function(x, n, m1_bar) {
   return ( x^(n - m1_bar) * (1 - x)^(m1_bar) * 1/(x*(1-x)))
 }

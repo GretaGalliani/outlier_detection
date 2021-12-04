@@ -87,8 +87,8 @@ calcolo_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
   
-  # ERRATO DAVIDE DEVE SISTEMARE
-  freq_m1 = freq[m1:k]
+  # Select only frequencies of groups which are not singletons
+  freq_m1 = freq[freq>1]
   
   # Computation of the partial posterior density
   return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))

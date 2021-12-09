@@ -2,7 +2,9 @@
 
 Initialization <-function(S, Xi_mu, Xi_cov)
   {
-  k=lenght(unique(S))
+  Xi_mu_star=list()
+  Xi_cov_star=list()
+  
   for (i in unique(S))
     {
     l=which(S==i)

@@ -15,6 +15,12 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
   sigma_old <- sigma_init
   k_old <- length(unique(S_init))
   
+  # Data storage initialization
+  beta_vec = rep(0,n_iter)
+  theta_vec = rep(0,n_iter)
+  sigma_vec = rep(0,n_iter)
+  S_matrix = matrix(nrow = n_iter, ncol = n)
+  
   # Acceptance rates initialization
   acc_beta = 0
   acc_theta = 0
@@ -44,45 +50,47 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
     
     # Updating the variables for next steps
     S_old = clusters$S_new
+    S_matrix[j,] = S_old
     k_old <- length(unique(S_old))
     
-    for (j in 1:k_old){
-      #' Step 2b: Updating the parameters of the groups’ distribution xi_star
-      #' Input variables:
-      #' Y data
-      #' S updated at previous step
-      #' k obtained from new S 
-      #' Q_param list of parameters for the Q0 distribution
-      xi <- update_xi(Y, S_old, k_old, Q_param)
+    #' Step 2b: Updating the parameters of the groups’ distribution xi_star
+    #' Input variables:
+    #' Y data
+    #' S updated at previous step
+    #' k obtained from new S 
+    #' Q_param list of parameters for the Q0 distribution
+    xi <- update_xi(Y, S_old, k_old, Q_param)
+  
+    xi_mu_star <- xi$xi_mean
+    xi_cov_star <- xi$xi_sigma
     
-      xi_mu_star <- xi$xi_mean
-      xi_cov_star <- xi$xi_sigma
-      
-      # m1 and m1_bar computation
-      m1_bar <- m1_bar(S_old)
-      m1 <- m1(S_old)
-      
-      # Freq computation
-      freq <- as.integer(table(S))
-      
-      # Step 2c: Updating the parameters of the discrete component
-      
-      # Update sigma
-      sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
-      sigma_old <- sigma_list$sigma
-      acc_sigma <- sigma_list$acc
-      
-      # Update theta
-      theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)
-      theta_old <- theta_list$theta
-      acc_theta <- theta_list$acc
-      
-      # Step 2d: Updating the weight parameter
-      beta_list <- update_beta(n, m1_bar, beta_old, acc_beta)
-      beta_old <- beta_list$beta
-      acc_beta <- beta_list$acc
-      
-    }
+    # m1 and m1_bar computation
+    m1_bar <- m1_bar(S_old)
+    m1 <- m1(S_old)
+    
+    # Freq computation
+    freq <- as.integer(table(S))
+    
+    # Step 2c: Updating the parameters of the discrete component
+    
+    # Update sigma
+    sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
+    sigma_old <- sigma_list$sigma
+    sigma_vec[r] <- sigma_old
+    acc_sigma <- sigma_list$acc
+    
+    # Update theta
+    theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)
+    theta_old <- theta_list$theta
+    theta_vec[r] <- theta_old
+    acc_theta <- theta_list$acc
+    
+    # Step 2d: Updating the weight parameter
+    beta_list <- update_beta(n, m1_bar, beta_old, acc_beta)
+    beta_old <- beta_list$beta
+    beta_vec[r] <- beta_old
+    acc_beta <- beta_list$acc
+  
 
   }
   

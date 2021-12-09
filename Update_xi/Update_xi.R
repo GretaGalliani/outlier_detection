@@ -1,7 +1,13 @@
 ##### UPDATE XIs
 
 
-update_xi <- function(Y, S, k, mu0, k0, lambda0, nu0){
+update_xi <- function(Y, S, k, Q_param){
+  
+  mu_0 = Q_param$mu_0
+  k_0 = Q_param$k_0
+  lambda_0 = Q_param$lambda_0
+  nu_0 = Q_param$nu_0
+  
   xi_mu = list()
   xi_sigma = list()
   
@@ -18,8 +24,6 @@ update_xi <- function(Y, S, k, mu0, k0, lambda0, nu0){
     
     df = nu_n-d+1
     xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
-    
-    
     xi_sigma_j = rinvwishart(nu_n, inv(lambda_n))
     
     xi_mu <- append(xi_mu, list(xi_mu_j))
@@ -37,4 +41,14 @@ update_xi <- function(Y, S, k, mu0, k0, lambda0, nu0){
 # l
 
 
-
+rwish<-function(n,mu0,S)
+{
+  sS <- chol(S)
+  S<-array( dim=c( dim(S),n ) )
+  for(i in 1:n)
+  {
+    Z <- matrix(rnorm(mu0 * dim(S)[1]), mu0, dim(S)[1]) %*% sS
+    S[,,i]<- t(Z)%*%Z
+  }
+  S[,,1:n]
+}

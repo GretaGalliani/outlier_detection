@@ -1,12 +1,12 @@
 library(MASS)
 
-#d = 2 dimension
 #y_test = seq (-1,1,length.out=10) 
 #f_data = 0.5 * dmvt(y_test,delta = mean_a, sigma =sigma_b) + 0.5 * dmvt(y_test,delta = -mean_a, sigma =sigma_b) 
 #n = 10
 
-mean_a = rep(-3,2)#vector of means
-sigma_b = diag(2)#sigma
+d = 2 #dimension
+mean_a = rep(-3,d)#vector of means
+sigma_b = diag(d)#sigma
 m = 25 #m+s total number of samples (outliers included)
 m1 = rbinom(1, size=m, prob = 0.5) #number of samples coming from the first gaussian 
 m2 = m-m1 # from the second one

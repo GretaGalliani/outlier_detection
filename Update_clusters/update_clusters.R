@@ -5,7 +5,7 @@ library(MASS)
 #samplarlo in j=0?
 
 #Importing some auxiliary functions
-source("Auxiliary_functions/Auxiliary_functions.R")
+source("auxiliary_functions/auxiliary_functions.R")
 
 #r=1,...,R
 

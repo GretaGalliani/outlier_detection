@@ -5,10 +5,12 @@ ALGORITMO:
 - Fare una prova di tutto ?
 
 CODICE:
-Commentare tutte le cose fatte e scrivere documentazione
-Per variabili input e output: aggiornare file con definizioni di variabili
-- update_xi
+- Per variabili input e output: aggiornare file con definizioni di variabili
+
+Commentare
 - update_clusters
+
+- Pensare a come fare variation of information
 
 REPORT:
 1 Introduzione teorica: discorso + formule

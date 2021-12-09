@@ -50,5 +50,5 @@ rwish<-function(n,mu0,S)
     Z <- matrix(rnorm(mu0 * dim(S)[1]), mu0, dim(S)[1]) %*% sS
     S[,,i]<- t(Z)%*%Z
   }
-  S[,,1:n]
+  return (S[,,1:n])
 }

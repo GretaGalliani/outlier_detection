@@ -11,7 +11,6 @@ CODICE:
 Commentare tutte le cose fatte e scrivere documentazione
 Commentare codice + scrivere help di ogni funzione che dice input e output
 Per variabili input e output: aggiornare file con definizioni di variabili
-- update_sigma
 - update_theta
 - auxiliary functions
 - update_xi

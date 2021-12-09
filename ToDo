@@ -9,7 +9,6 @@ ALGORITMO:
 CODICE:
 Commentare tutte le cose fatte e scrivere documentazione
 Per variabili input e output: aggiornare file con definizioni di variabili
-- update_theta
 - auxiliary functions
 - update_xi
 - update_clusters

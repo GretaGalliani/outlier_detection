@@ -87,7 +87,6 @@ calcolo_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
   
-  # ERRATO DAVIDE DEVE SISTEMARE
   freq_m1 = freq[freq>1]
   
   # Computation of the partial posterior density

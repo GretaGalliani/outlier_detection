@@ -67,10 +67,22 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
       m1_bar <- m1_bar(S_old)
       m1 <- m1(S_old)
       
+      # Freq computation
+      freq <- as.integer(table(S))
+      
       # Step 2c: Updating the parameters of the discrete component sigma
       #' Input variables:
-      #' 
-      sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old)
+      #' m1_bar number of outliers
+      #' m1 number of singletons (including the outliers)
+      #' sigma_old sigma updated from previous iteration
+      #' theta_old theta updated from previous iteration
+      #' freq -> vector containing the number of points for each group j=1,...k
+      #' n_acc -> number of accepted proposals until the previous iterations
+      sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
+      sigma_old <- sigma_list$sigma
+      acc_sigma <- sigma_list$acc
+      
+      
       
       
       

@@ -18,6 +18,8 @@ update_xi <- function(Y, S, k, mu0, k0, lambda0, nu0){
     
     df = nu_n-d+1
     xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
+    
+    
     xi_sigma_j = rinvwishart(nu_n, inv(lambda_n))
     
     xi_mu <- append(xi_mu, list(xi_mu_j))

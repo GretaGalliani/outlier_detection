@@ -1,16 +1,11 @@
-
+source("update_clusters/update_clusters.R")
+source("update_xi/update_xi.R")
+source("update_sigma/update_sigma.R")
+source("update_theta/update_theta.R")
+source("update_beta/update_beta.R")
+source("auxiliary_functions/auxiliary_functions_xi.R")
 
 algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_cov, Q_param, P_param, n_iter ){
-  
-  source("update_clusters/update_clusters.R")
-  source("update_xi/update_xi.R")
-  source("update_sigma/update_sigma.R")
-  source("update_theta/update_theta.R")
-  source("update_beta/update_beta.R")
-  source("auxiliary_functions/auxiliary_functions_xi.R")
-  
-  
-  # CAMBIARE NOME FILES DI R CHE INIZINO TUTTI CON LA MINUSCOLA PER DIO
  
   # Variables initialization
   n <- dim(Y)[1]
@@ -90,5 +85,9 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
     }
 
   }
-
+  
+  acc_beta <- acc_beta/n_iter
+  acc_sigma <- acc_sigma/n_iter
+  acc_theta <- acc_theta/n_iter
+  
 }

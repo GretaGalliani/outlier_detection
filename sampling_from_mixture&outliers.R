@@ -19,9 +19,9 @@ allval = allval[sample(m,m),] #randomizing rows
 s=5#number of outliers
 vector_sample = c(sample(1:m,s,replace = FALSE)) #take s=5 samples from m to make them outliers
 
-allval[vector_sample,] = rep(100,2)*t(allval[vector_sample,])  #make them outliers
+allval[vector_sample,] = allval[vector_sample,]*100 #make them outliers
 
-
+allval #matrix containing all the samples (outliers included)
 #qchisq(0.9, df = 2)#the value of the quantile 0.9 of a chisquared = 4.60517
 #s = 5 
 #rtmvnorm(s,mean= c(0,0),sigma= 3^2*diag(2),lower= )

@@ -21,7 +21,7 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, sd = 2, n_acc) {
   y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
   
   # Computation the alpha of the new proposal wrt the old one 
-  aprob <- calcolo_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
+  aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -64,7 +64,7 @@ inv_sigma <- function(x) {
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
-calcolo_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
+compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
   # Computation of the partial posterior density for y and x
   pi_y <- dens_sigma(y, k, m1, m1_bar, theta, freq)
   pi_x <- dens_sigma(x, k, m1, m1_bar, theta, freq)

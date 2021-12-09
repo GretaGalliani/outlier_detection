@@ -1,13 +1,20 @@
 ##### UPDATE THETA
 
-# MAIN IMPLEMENTATION: pass as input for theta_old and n_acc the element of
-# the list using $
-
 # Function to update the theta parameter
+# INPUT: n -> number of data points
+#        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
+#        k -> number of distinct groups
+#        theta_old -> theta at the previous iteration
+#        sigma -> sigma at the current iteration
+#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
+#        n_acc -> number of accepted proposals in the previous iterations
+
+# OUTPUT: theta -> value of the parameter theta at the r iteration
+#         acc -> number of accepted proposals at the current iteration
 update_theta <- function(n, m1_bar, k, theta_old, sigma, sd = 2, n_acc) { 
   y <- inv_theta( change_theta(theta_old) + rnorm(1,0,sd))
   print(y)
-  aprob <- calcolo_alpha_theta(theta_old, y, k, m1_bar, sigma, n)
+  aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n)
   print(aprob)
   u <- runif(1) # If condition "(u < aprob)" is NOT met, we'll skip command "x <- y", #  so that the MC does not move from x                 
   if (u < aprob){
@@ -36,7 +43,7 @@ inv_theta <- function(x) {
 # Function to compute the alpha(x,y) for theta
 # We assume theta ~ U(0,1)
 # DA TESTARE
-calcolo_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
+compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
   pi_y <- dens_theta(y, k, m1_bar, sigma, n)
   pi_x <- dens_theta(x, k, m1_bar, sigma, n)
   rapp <- pi_y/pi_x

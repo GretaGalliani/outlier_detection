@@ -17,7 +17,7 @@ update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) {
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
   
   # Computation the alpha of the new proposal wrt the old one 
-  aprob <- calcolo_alpha_beta(beta_old, y, n, m1_bar)
+  aprob <- compute_alpha_beta(beta_old, y, n, m1_bar)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -59,7 +59,7 @@ inv_beta <- function(x) {
 #        n -> number of data points
 #        m1_bar -> number of points in group 0
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
-calcolo_alpha_beta <- function(x, y, n, m1_bar) {
+compute_alpha_beta <- function(x, y, n, m1_bar) {
   # Computation of the partial posterior density for y and x
   pi_y <- dens_beta(y, n, m1_bar)
   pi_x <- dens_beta(x, n, m1_bar)

@@ -1,5 +1,6 @@
 ### UPDATE CLUSTERS
 library(MASS)
+library(mvtnorm)
 
 #NOTA: cosa succede se due dati sono uguali? Devo esplicitamente dirgli di non
 #samplarlo in j=0?
@@ -40,25 +41,28 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # - comes from an already existing group --> j=1:K
     # - comes from a new group --> j=K+1
     
-    prob <- rep(0:k_new+2,0) #0,1,...k_new, k_new+1
+    prob <- rep(0,k_new+2) #0,1,...k_new, k_new+1
     
     m1_bar <- m1_bar(curr[-i])
     
     #j=0
-    prob[1] <- dens_contaminated(Y[i],beta_old, P_param) 
+    p = dim(Y)[2]
+    
+    prob[1] <- dens_contaminated(Y[i,], p,beta_old, P_param) 
     
     #j=1:K
     for (t in (2:k_new+1)) 
     {
       n_j <- table(which(curr[-i]!=0))
+      n <- dim(data)[1]
       
-      prob[t] <- dens_cluster_old(Y[i],n_j, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t]],
+      prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t]],
                                  xi_cov_star[[t]])
       
       }
     
     #j=K+1
-    prob[k_new+2]<- dens_cluster_new(Y[i], beta_old, sigma_old, theta_old, m1_bar, k_new,
+    prob[k_new+2]<- dens_cluster_new(p, beta_old, sigma_old, theta_old, m1_bar, k_new,
                                      Q_param)
     
     #I sample the new assignment
@@ -117,36 +121,29 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 
 
 
-dens_contaminated <- function(data, beta_old, P_param)
+dens_contaminated <- function(data, p, beta_old, P_param)
 {
-  p <- dim(data)[1]
-  x_mean <- mean(data)
-  S = sum((data[i]-x_mean)*t((data[i]-x_mean)))
-  
-  weight <- (1-beta_old) *rmvt(1,mu= P_param$mu_0, sigma = (P_param$lambda_0 * (P_param$k_0+1))/(k_0*(P_param$nu_0-p+1)), 
+  weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu= P_param$mu_0, S = ((P_param$lambda_0 * (P_param$k_0+1))/(P_param$k_0*(P_param$nu_0-p+1))), 
                                   df = P_param$nu_0-p+1)  
-  
+  print(weight)
   return (weight)
 }
 
 
-dens_cluster_old <- function(data, n_j, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star, xi_cov_star)
+dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
+  coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
   
-  coeff <- beta_old * (n_j-sigma_old)/(theta_old+N-m1_bar-1)
-  
-  weight <- coeff * mvrnorm(1, mean=xi_mu_star, varcov=xi_cov_star)
+  weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
   return (weight)
 }
 
 
-dens_cluster_new <- function(data, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
+dens_cluster_new <- function(p, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
 {
   coeff <- beta_old* (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)
   
-  p <- dim(data)[1]
-  
-  weight <- coeff *rmvt(1, mu = Q_param$mu_0, sigma = (Q_param$lambda_0 * (Q_param$k_0+1))/(Q_param$k_0*(Q_param$nu_0-p+1)), 
+  weight <- coeff *rmvt(1, mu = Q_param$mu_0, S = (Q_param$lambda_0 * (Q_param$k_0+1))/(Q_param$k_0*(Q_param$nu_0-p+1)), 
                                   df = Q_param$nu_0-p+1) 
   return (weight)
 }

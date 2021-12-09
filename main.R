@@ -3,7 +3,7 @@ source("update_xi/update_xi.R")
 source("update_sigma/update_sigma.R")
 source("update_theta/update_theta.R")
 source("update_beta/update_beta.R")
-source("auxiliary_functions/auxiliary_functions_xi.R")
+source("auxiliary_functions/auxiliary_functions.R")
 
 algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_cov, Q_param, P_param, n_iter ){
  

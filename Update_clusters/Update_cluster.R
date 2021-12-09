@@ -12,8 +12,8 @@ source("Auxiliary_functions/Auxiliary_functions.R")
 
 #Input:
 # Y <- data.frame
-# Xi_mu_star <- lista di n vettori --> struttura che contiene medi gruppi
-# Xi_cov_star <- lista di n matrici --> struttura che contiene matrici cov dei gruppi
+# xi_mu_star <- lista di n vettori --> struttura che contiene medi gruppi
+# xi_cov_star <- lista di n matrici --> struttura che contiene matrici cov dei gruppi
 # beta_old <- numero
 # theta_old <- numero
 # sigma_old <- numero
@@ -24,7 +24,7 @@ source("Auxiliary_functions/Auxiliary_functions.R")
 #k_0_P & k_0_Q
 #lambda_0_P & lambda_0_Q
 
-update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
+update_cluster <- function(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star, S_old,
                                      beta_old, theta_old, sigma_old, k_old,
                                     nu_0_P, k_0_P, mu_0_P, lambda_0_P,
                                     nu_0_Q, k_0_Q, mu_0_Q, lambda_0_Q)
@@ -53,8 +53,8 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
     {
       n_j <- table(which(curr[-i]!=0))
       
-      prob[t] <- dens_cluster_old(Y[i],n_j, m1_bar, sigma_old, theta_old, beta_old, Xi_mu_star[[t]],
-                                 Xi_cov_star[[t]])
+      prob[t] <- dens_cluster_old(Y[i],n_j, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t]],
+                                 xi_cov_star[[t]])
       
       }
     
@@ -78,16 +78,16 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
         curr[i] <- j
         
         #I assign the correct group parameters
-        Xi_mu[[i]] <- Xi_mu_star[[j]]
-        Xi_cov[[i]] <- Xi_cov_star[[j]]
+        xi_mu[[i]] <- xi_mu_star[[j]]
+        xi_cov[[i]] <- xi_cov_star[[j]]
         
         #I check if the old group is now empty
         if(!(old_group %in% curr))
           {
             #If it is, I need to shift all the groups' label and to cancel the old group's parameters
             curr <- shift(curr, old_group)
-            Xi_mu_star <- Xi_mu_star[[-old_group]]
-            Xi_cov_star <- Xi_cov_star[[-old_group]]
+            xi_mu_star <- xi_mu_star[[-old_group]]
+            xi_cov_star <- xi_cov_star[[-old_group]]
             k_new=k_new-1
           }
        }
@@ -102,11 +102,11 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
           
           #I sample from the predictive distribution considering only the current point 
           #The predictive distribution is known in closed form
-          Xi_mu_star <- construct_mu_new(Y[i],Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
-          Xi_mu[[i]] <- Xi_mu_star[[j]]
+          xi_mu_star <- construct_mu_new(Y[i],xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+          xi_mu[[i]] <- xi_mu_star[[j]]
           
-          Xi_cov_star <- construct_cov_new(Y[i],Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
-          Xi_cov[[i]] <- Xi_cov_star[[j]]
+          xi_cov_star <- construct_cov_new(Y[i],xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+          xi_cov[[i]] <- xi_cov_star[[j]]
           
       }
     
@@ -118,8 +118,8 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
    } 
   
   S_new <- curr
-  my_list <-list("S_new"=S_new, "Xi_mu"=Xi_mu,"Xi_cov"=Xi_cov,
-                            "Xi_mu_star"=Xi_mu_star,"Xi_cov_star"=Xi_cov_star)
+  my_list <-list("S_new"=S_new, "xi_mu"=xi_mu,"xi_cov"=xi_cov,
+                            "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)
   return (my_list) 
 }
 
@@ -138,12 +138,12 @@ dens_contaminated <- function(data, beta_old, nu_0_P, k_0_P, mu_0_P, lambda_0_P)
 }
 
 
-dens_cluster_old <- function(data, n_j, m1_bar, sigma_old, theta_old, beta_old, Xi_mu_star, Xi_cov_star)
+dens_cluster_old <- function(data, n_j, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star, xi_cov_star)
 {
   
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+N-m1_bar-1)
   
-  weight <- coeff * mvrnorm(1, mean=Xi_mu_star, varcov=Xi_cov_star)
+  weight <- coeff * mvrnorm(1, mean=xi_mu_star, varcov=xi_cov_star)
   return (weight)
 }
 
@@ -174,7 +174,7 @@ shift <- function(curr, old_group)
   return(curr)
 }
 
-construct_mu_new <- function(data,Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+construct_mu_new <- function(data,xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
 {
   p <- dim(data)[2]
   nu_n <- nu_0_Q + 1
@@ -184,11 +184,11 @@ construct_mu_new <- function(data,Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
   sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
                           
   mu_new <- rmvt(1, mu = mu_n, sigma = sigma, df = nu_n-p+1)
-  Xi_mu_star<-append(Xi_mu_star,mu_new)
-  return (Xi_mu_star)
+  xi_mu_star<-append(xi_mu_star,mu_new)
+  return (xi_mu_star)
 }
 
-construct_cov_new <- function(data,Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+construct_cov_new <- function(data,xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
 {
   p <- dim(data)[2]
   nu_n <- nu_0_Q + 1
@@ -200,8 +200,8 @@ construct_cov_new <- function(data,Xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
   cov_inv <- inv(lambda_n)                        
   cov_new <-  rinvwishart(nu_n, cov_inv)
   
-  Xi_cov_star<-append(Xi_cov_star,cov_new)
-  return (Xi_cov_star)
+  xi_cov_star<-append(xi_cov_star,cov_new)
+  return (xi_cov_star)
 }
 
 

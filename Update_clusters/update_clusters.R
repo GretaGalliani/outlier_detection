@@ -188,8 +188,11 @@ construct_cov_new <- function(data,xi_mu_star, Q_param)
   lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*(data-Q_param$mu_0)*t(data-Q_param$mu_0)
   sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
   
+  lambda_n_chol <- chol(lambda_n)
+  inv_lambda_n_chol <- chol2inv(lambda_n_chol)
+  
   cov_inv <- inv(lambda_n)                        
-  cov_new <-  rinvwishart(nu_n, cov_inv)
+  cov_new <-  rinvwishartc(nu_n, chol(inv_lambda_n_chol))
   
   xi_cov_star<-append(xi_cov_star,cov_new)
   return (xi_cov_star)

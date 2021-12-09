@@ -1,5 +1,5 @@
 ##### UPDATE XIs
-
+library(LaplacesDemon)
 
 update_xi <- function(Y, S, k, Q_param){
   
@@ -22,9 +22,13 @@ update_xi <- function(Y, S, k, Q_param){
     nu_n = nu0 + n
     lambda_n = lambda_0 + sample_cov + k0*n/k_n*(mean(Yj)-mu0)%*%t((mean(Yj)-mu0))
     
+    lambda_n_chol <- chol(lambda_n)
+    inv_lambda_n_chol <- chol2inv(lambda_n_chol)
+    
     df = nu_n-d+1
     xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
-    xi_sigma_j = rinvwishart(nu_n, inv(lambda_n))
+    
+    xi_sigma_j = rinvwishartc(nu_n, chol(inv_lambda_n_chol))
     
     xi_mu <- append(xi_mu, list(xi_mu_j))
     xi_sigma <- append(xi_sigma, list(xi_sigma_j))
@@ -33,22 +37,8 @@ update_xi <- function(Y, S, k, Q_param){
   return(list("xi_mean" = xi_mu, "xi_sigma" = xi_sigma))
 }
 
-# How the created data structure works:
-# list of lists where each inner list contains a vector and a matrix
-# sigma = diag(2)
-# l = list()
-# l = append(l, list(sigma))
-# l
 
 
-rwish<-function(n,mu0,S)
-{
-  sS <- chol(S)
-  S<-array( dim=c( dim(S),n ) )
-  for(i in 1:n)
-  {
-    Z <- matrix(rnorm(mu0 * dim(S)[1]), mu0, dim(S)[1]) %*% sS
-    S[,,i]<- t(Z)%*%Z
-  }
-  return (S[,,1:n])
-}
+
+
+

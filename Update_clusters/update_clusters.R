@@ -26,8 +26,7 @@ source("Auxiliary_functions/Auxiliary_functions.R")
 
 update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
                               beta_old, theta_old, sigma_old, k_old,
-                              nu_0_P, k_0_P, mu_0_P, lambda_0_P,
-                              nu_0_Q, k_0_Q, mu_0_Q, lambda_0_Q)
+                              P_param, Q_param)
 {
   N <- dim(Y)[1]
   curr <- S_old 
@@ -46,7 +45,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     m1_bar <- m1_bar(curr[-i])
     
     #j=0
-    prob[1] <- dens_contaminated(Y[i],beta_old, nu_0_P, k_0_P, mu_0_P, lambda_0_P) 
+    prob[1] <- dens_contaminated(Y[i],beta_old, P_param) 
     
     #j=1:K
     for (t in (2:k_new+1)) 
@@ -60,7 +59,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     #j=K+1
     prob[k_new+2]<- dens_cluster_new(Y[i], beta_old, sigma_old, theta_old, m1_bar, k_new,
-                                     nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+                                     Q_param)
     
     #I sample the new assignment
     j <- sample(0:k_new+1,size=1,prob=prob)
@@ -70,7 +69,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     {
     
       #If i sampled an already existent group
-      if(j %in% 1:k_new )
+      if(j %in% 1:k_new)
       {
         #I memorize the old group of the point
         old_group <- curr[i]
@@ -98,9 +97,9 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
           
           #I sample from the predictive distribution considering only the current point 
           #The predictive distribution is known in closed form
-          xi_mu_star <- construct_mu_new(Y[i],xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+          xi_mu_star <- construct_mu_new(Y[i],xi_mu_star, Q_param)
           
-          xi_cov_star <- construct_cov_new(Y[i],xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+          xi_cov_star <- construct_cov_new(Y[i],xi_mu_star, Q_param)
           
       }
     
@@ -118,14 +117,14 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 
 
 
-dens_contaminated <- function(data, beta_old, nu_0_P, k_0_P, mu_0_P, lambda_0_P)
+dens_contaminated <- function(data, beta_old, P_param)
 {
   p <- dim(data)[1]
-  x_medio <- mean(data)
-  S = sum((data[i]-x_medio)*t((data[i]-x_medio)))
+  x_mean <- mean(data)
+  S = sum((data[i]-x_mean)*t((data[i]-x_mean)))
   
-  weight <- (1-beta_old) *rmvt(1,mu= mu_0_P, sigma = (lambda_0_P * (k_0_P+1))/(k_0*(nu_0_P-p+1)), 
-                                  df = nu_0_P-p+1)  
+  weight <- (1-beta_old) *rmvt(1,mu= P_param$mu_0, sigma = (P_param$lambda_0 * (P_param$k_0+1))/(k_0*(P_param$nu_0-p+1)), 
+                                  df = P_param$nu_0-p+1)  
   
   return (weight)
 }
@@ -141,15 +140,14 @@ dens_cluster_old <- function(data, n_j, m1_bar, sigma_old, theta_old, beta_old, 
 }
 
 
-dens_cluster_new <- function(data, beta_old, sigma_old, theta_old, m1_bar, k_old,
-                 nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+dens_cluster_new <- function(data, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
 {
   coeff <- beta_old* (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)
   
   p <- dim(data)[1]
   
-  weight <- coeff *rmvt(1, mu = mu_0, sigma = (lambda_0_Q * (k_0_Q+1))/(k_0_Q*(nu_0_Q-p+1)), 
-                                  df = nu_n-p+1) 
+  weight <- coeff *rmvt(1, mu = Q_param$mu_0, sigma = (Q_param$lambda_0 * (Q_param$k_0+1))/(Q_param$k_0*(Q_param$nu_0-p+1)), 
+                                  df = Q_param$nu_0-p+1) 
   return (weight)
 }
 
@@ -167,13 +165,13 @@ shift <- function(curr, old_group)
   return(curr)
 }
 
-construct_mu_new <- function(data,xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+construct_mu_new <- function(data,xi_mu_star, Q_param)
 {
   p <- dim(data)[2]
-  nu_n <- nu_0_Q + 1
-  k_n <- k_0_Q + 1
-  mu_n <- k_0_Q/(k_n) * mu_0_Q + 1/k_n * data 
-  lambda_n <- lambda_0_Q + (k_0_Q)/(k_n)*(data-mu_0_Q)*t(data-mu_0_Q)
+  nu_n <- Q_param$nu_0 + 1
+  k_n <- Q_param$k_0 + 1
+  mu_n <- Q_param$k_0/(k_n) * Q_param$mu_0 + 1/k_n * data 
+  lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*(data-Q_param$mu_0)*t(data-Q_param$mu_0)
   sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
                           
   mu_new <- rmvt(1, mu = mu_n, sigma = sigma, df = nu_n-p+1)
@@ -181,13 +179,13 @@ construct_mu_new <- function(data,xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
   return (xi_mu_star)
 }
 
-construct_cov_new <- function(data,xi_mu_star, nu_0_Q,mu_0_Q,k_0_Q,lambda_0_Q)
+construct_cov_new <- function(data,xi_mu_star, Q_param)
 {
   p <- dim(data)[2]
-  nu_n <- nu_0_Q + 1
-  k_n <- k_0_Q + 1
+  nu_n <- Q_param$nu_0 + 1
+  k_n <- Q_param$k_0 + 1
   
-  lambda_n <- lambda_0_Q + (k_0_Q)/(k_n)*(data-mu_0_Q)*t(data-mu_0_Q)
+  lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*(data-Q_param$mu_0)*t(data-Q_param$mu_0)
   sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
   
   cov_inv <- inv(lambda_n)                        

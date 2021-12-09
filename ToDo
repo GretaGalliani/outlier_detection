@@ -7,8 +7,9 @@ ALGORITMO:
 CODICE:
 - Per variabili input e output: aggiornare file con definizioni di variabili
 
-Commentare
+Commentare:
 - update_clusters
+- main
 
 - Pensare a come fare variation of information
 

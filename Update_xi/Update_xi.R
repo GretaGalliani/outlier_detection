@@ -53,7 +53,7 @@ update_xi <- function(Y, S, k, Q_param){
     xi_sigma <- append(xi_sigma, list(xi_sigma_j))
   }
   
-  return(list("xi_mean" = xi_mu, "xi_sigma" = xi_sigma))
+  return(list("xi_mu_star" = xi_mu, "xi_cov_star" = xi_sigma))
 }
 
 

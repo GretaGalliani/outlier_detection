@@ -3,3 +3,4 @@ To ask:
   due dati non possono essere samplati in j=0? 
 - È giusto nel passo (a) samplare dalla marginal prior? O è troppo pesante computazionalmente
 - nel punto 2b invertire la matrice delta ha costo computazionale elevato, che fare?
+- quando usiamo InvWishart mettiamo nei parametri inv(lambda) ? 

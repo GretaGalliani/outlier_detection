@@ -1,8 +1,9 @@
 
 
-algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_cov, n_iter){
+algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_cov, Q_param, P_param, n_iter ){
   
-  source("Update_clusters/Update_cluster.R")
+  source("update_clusters/update_clusters.R")
+  source("update_xi/update_xi.R")
   #PASSO A
   #Input:
   # Y <- data.frame
@@ -25,23 +26,46 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
   sigma_old <- sigma_init
   k_old <- length(unique(S_init))
   
-  xi <- Initialization()
+  xi <- init_xi_star(S_init, xi_mu, xi_cov)
   xi_mu_star <- xi$xi_mu_star
   xi_cov_star <- xi$xi_cov_star
   
   
   for (r in 1:n_iter){
     # Updating the clusters
-    clusters <- Update_cluster(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star,
+    clusters <- update_clusters(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, k_old,...)
+    
+    # Updating the variables for next steps
     S_old = clusters$S_new
+    k_old <- length(unique(S_old))
+    
+    xi_mu_star <- clusters$xi_mu_star
+    xi_cov_star <- clusters$xi_cov_star
+    
+    # Updating the parameters of the groups’ distribution xi_star
+    
+    #' Input
+    #' Y data
+    #' S updated at previous step
+    #' k obtained from new S 
+    #' Q_param list of parameters for the Q0 distribution
+    
+    for (j in 1:k_old){
+      xi <- update_xi(Y, S_old, k_old, Q_param)
+      
+      
+      
+      
+    }
     
     
-    k_old <- length(unique(clusters$S_new))
     
     
   }
 
+list("xi_mean" = xi_mu, "xi_sigma" = xi_sigma)
+  
 update_cluster <- function(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star, S_old,
                            beta_old, theta_old, sigma_old, k_old,
                            nu_0_P, k_0_P, mu_0_P, lambda_0_P,
@@ -50,7 +74,7 @@ update_cluster <- function(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star, S_old,
  
 
 
-source("Update_xi/Update_xi.R")
+
 
 my_list <-list("S_new"=S_new, "xi_mu"=xi_mu,"xi_cov"=xi_cov,
                "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)

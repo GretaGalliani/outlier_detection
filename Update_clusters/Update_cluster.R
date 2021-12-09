@@ -2,10 +2,7 @@
 library(MASS)
 
 #NOTA: cosa succede se due dati sono uguali? Devo esplicitamente dirgli di non
-#samplarlo in j=0
-
-#NEL MAIN: 
-#Devo iniziare anche Xi_star (entrambi)
+#samplarlo in j=0?
 
 #Importing some auxiliary functions
 source("Auxiliary_functions/Auxiliary_functions.R")
@@ -47,6 +44,7 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
     prob <- rep(0:k_new+2,0) #0,1,...k_new, k_new+1
     
     m1_bar <- m1_bar(curr[-i])
+    
     #j=0
     prob[1] <- dens_contaminated(Y[i],beta_old, nu_0_P, k_0_P, mu_0_P, lambda_0_P) 
     
@@ -88,8 +86,8 @@ update_cluster <- function(Y, Xi_mu, Xi_cov, Xi_mu_star, Xi_cov_star, S_old,
           {
             #If it is, I need to shift all the groups' label and to cancel the old group's parameters
             curr <- shift(curr, old_group)
-            Xi_mu_star <- Xi_mu_star[-old_group]
-            Xi_cov_star <- Xi_cov_star[-old_group]
+            Xi_mu_star <- Xi_mu_star[[-old_group]]
+            Xi_cov_star <- Xi_cov_star[[-old_group]]
             k_new=k_new-1
           }
        }

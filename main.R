@@ -33,18 +33,6 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
   
   for (r in 1:n_iter){
     # Step 2a: Updating the clusters
-    #Input:
-    # Y <- data.frame
-    # xi_mu_star <- list of n vectors containing group means
-    # xi_cov_star <- list of n matrices containing group covs
-    # beta_old <- numero
-    # theta_old <- numero
-    # sigma_old <- numero
-    # S_old <- clusters vector at previous iteration
-    # k_old <- number of clusters at previous iteration
-    # P_param <- list
-    # Q_param <- list
-    
     clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
     
@@ -61,8 +49,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
     #' Q_param list of parameters for the Q0 distribution
     xi <- update_xi(Y, S_old, k_old, Q_param)
   
-    xi_mu_star <- xi$xi_mean
-    xi_cov_star <- xi$xi_sigma
+    xi_mu_star <- xi$xi_mu_star
+    xi_cov_star <- xi$xi_cov_star
     
     # m1 and m1_bar computation
     m1_bar <- m1_bar(S_old)
@@ -94,8 +82,12 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
 
   }
   
-  acc_beta <- acc_beta/n_iter
-  acc_sigma <- acc_sigma/n_iter
-  acc_theta <- acc_theta/n_iter
+  acc_beta/n_iter
+  acc_sigma/n_iter
+  acc_theta/n_iter
+  
+  return (list("S"=S_matrix, "xi_star"=xi, "sigma"=sigma_vec, "theta"=theta_vec,
+               "beta"=beta_vec, "acc_sigma"= acc_sigma/n_iter, 
+               "acc_theta"= acc_theta/n_iter, "acc_beta"=acc_beta/n_iter))
   
 }

@@ -1,19 +1,14 @@
-
+source("update_clusters/update_clusters.R")
+source("update_xi/update_xi.R")
+source("update_sigma/update_sigma.R")
+source("update_theta/update_theta.R")
+source("update_beta/update_beta.R")
+source("auxiliary_functions/auxiliary_functions_xi.R")
 
 algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_cov, Q_param, P_param, n_iter ){
-  
-  source("update_clusters/update_clusters.R")
-  source("update_xi/update_xi.R")
-  source("update_sigma/update_sigma.R")
-  source("auxiliary_functions/auxiliary_functions_xi.R")
-  
-  
-  # CAMBIARE NOME FILES DI R CHE INIZINO TUTTI CON LA MINUSCOLA PER DIO
-  
-  #PASSO A
-  
-  
+ 
   # Variables initialization
+  n <- dim(Y)[1]
   S_old <- S_init
   beta_old <- beta_init
   theta_old <- theta_init
@@ -44,7 +39,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
     # P_param <- list
     # Q_param <- list
     
-    clusters <- update_clusters(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star,
+    clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
     
     # Updating the variables for next steps
@@ -70,45 +65,29 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
       # Freq computation
       freq <- as.integer(table(S))
       
-      # Step 2c: Updating the parameters of the discrete component sigma
-      #' Input variables:
-      #' m1_bar number of outliers
-      #' m1 number of singletons (including the outliers)
-      #' sigma_old sigma updated from previous iteration
-      #' theta_old theta updated from previous iteration
-      #' freq -> vector containing the number of points for each group j=1,...k
-      #' n_acc -> number of accepted proposals until the previous iterations
+      # Step 2c: Updating the parameters of the discrete component
+      
+      # Update sigma
       sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
       sigma_old <- sigma_list$sigma
       acc_sigma <- sigma_list$acc
       
+      # Update theta
+      theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)
+      theta_old <- theta_list$theta
+      acc_theta <- theta_list$acc
       
-      
-      
-      
+      # Step 2d: Updating the weight parameter
+      beta_list <- update_beta(n, m1_bar, beta_old, acc_beta)
+      beta_old <- beta_list$beta
+      acc_beta <- beta_list$acc
       
     }
-    
-    
-    
-    
+
   }
-
-list("xi_mean" = xi_mu, "xi_sigma" = xi_sigma)
   
-update_cluster <- function(Y, xi_mu, xi_cov, xi_mu_star, xi_cov_star, S_old,
-                           beta_old, theta_old, sigma_old, k_old,
-                           nu_0_P, k_0_P, mu_0_P, lambda_0_P,
-                           nu_0_Q, k_0_Q, mu_0_Q, lambda_0_Q)
+  acc_beta <- acc_beta/n_iter
+  acc_sigma <- acc_sigma/n_iter
+  acc_theta <- acc_theta/n_iter
   
- 
-
-
-
-
-my_list <-list("S_new"=S_new, "xi_mu"=xi_mu,"xi_cov"=xi_cov,
-               "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)
-
-
-
 }

@@ -10,14 +10,16 @@ source("auxiliary_functions/auxiliary_functions.R")
 
 #r=1,...,R
 
+# Function to update the clusters
+# INPUT: Y <- data.frame
 
 #Input:
 # Y <- data.frame
-# xi_mu_star <- lista di n vettori --> struttura che contiene medi gruppi
-# xi_cov_star <- lista di n matrici --> struttura che contiene matrici cov dei gruppi
-# beta_old <- numero
-# theta_old <- numero
-# sigma_old <- numero
+# xi_mu_star <- list of n vectors --> contains means of the groups
+# xi_cov_star <- list of n matrices --> contains cov. matrices of the groups
+# beta_old <- number
+# theta_old <- number
+# sigma_old <- number
 # S_old <- vettore cluster passo precedente
 # k_old <- numero
 #nu_0_P & nu_0_Q

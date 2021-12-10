@@ -13,7 +13,7 @@
 
 # OUTPUT: sigma -> value of the parameter sigma at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, sd = 2, n_acc) { 
+update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq,n_acc, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 

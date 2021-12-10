@@ -14,14 +14,26 @@ update_beta <- function(n, m1_bar, beta_old, n_acc, sd = 2) {
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that beta is in (0,1)
+  
+  
+  #print("il calcolo")
+  #print(change_beta(beta_old))
+  
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
   
-  print(beta_old)
-  print(y)
+  #print("beta_old")
+  #print(beta_old)
+  
+  #print("y")
+  #print(y)
   
   # Computation the alpha of the new proposal wrt the old one 
+  #print("beta_old")
+  #print(beta_old)
+  
   aprob <- compute_alpha_beta(beta_old, y, n, m1_bar)
-  #print(aprob)
+  print("aprob beta")
+  print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -31,11 +43,11 @@ update_beta <- function(n, m1_bar, beta_old, n_acc, sd = 2) {
     n_acc = n_acc+1
     
     # Return of the new value of beta (equal to the proposed value y) and the accuracy 
-    print("End update beta")
+    #print("End update beta")
     return(list("beta" = y, "acc" = n_acc))
   } 
   else {
-    print("End update beta")
+    #print("End update beta")
     # Return of the new value of beta (equal to the previous value beta_old) and the accuracy
     return(list("beta" = beta_old, "acc" = n_acc))
   }
@@ -48,7 +60,7 @@ update_beta <- function(n, m1_bar, beta_old, n_acc, sd = 2) {
 # INPUT: x -> value of beta, x is in (0,1)
 # OUTPUT: x_star -> value of transformed beta, x_star is in (-inf, +inf)
 change_beta <- function(x) {
-  return (log(x) - log(1-x))
+  return (log(x+1e-12) - log(1-x+1e-12))
 }
 
 # Function to change the value of beta_star so beta is in (0, 1) after MH

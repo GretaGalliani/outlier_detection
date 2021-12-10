@@ -21,6 +21,8 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, sd = 2) {
   
   # Computation the alpha of the new proposal wrt the old one
   aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n)
+  print("aprob theta")
+  print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 

@@ -69,8 +69,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
         
         # print("n_j con i")
         # print(n_j)
-        print("gruppo")
-        print(t-1)
+        #print("gruppo")
+        #print(t-1)
         # 
         # print("curr[i] è")
         # print(curr[i])
@@ -150,13 +150,6 @@ dens_contaminated <- function(data, p, beta_old, P_param)
 
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
-  print("xi_mu")
-  print(xi_mu_act)
-  
-  print("xi_cov")
-  print(xi_cov_act)
-  
-  
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
   
@@ -219,9 +212,6 @@ construct_mu_new <- function(data,xi_mu_star, Q_param)
   mu_new <- LaplacesDemon::rmvt(mu = mu_n, S = sigma, df = nu_n-p+1)
   
   mu_new <- as.vector(mu_new)
-  
-  print(" NEWWWWWW")
-  print(mu_new)
   
   xi_mu_star<-append(xi_mu_star,list(mu_new))
   return (xi_mu_star)

@@ -19,7 +19,7 @@ update_xi <- function(Y, S, k, Q_param){
   for (j in 1:k){
     # Select data belonging to cluster j
     Yj <- Y[which(S==j),]
-    
+    print(Yj)
     # Sample covariance
     sample_cov = cov(Yj)
     

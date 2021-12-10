@@ -42,10 +42,9 @@ init_xi_star <-function(S, xi_mu, xi_cov)
     l=which(S==i)
     
     # Appending of the mu and cov of the corresponding data point
-    xi_mu_star=append(xi_mu_star,xi_mu[[l[1]]])
-    xi_cov_star=append(xi_cov_star,xi_cov[[l[1]]])
+    xi_mu_star=append(xi_mu_star,list(xi_mu[[l[1]]]))
+    xi_cov_star=append(xi_cov_star,list(xi_cov[[l[1]]]))
   }
-  
   
   my_list = list("xi_mu_star"=xi_mu_star, "xi_cov_star"=xi_cov_star)
   return (my_list)                              

@@ -52,23 +52,35 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     prob[1] <- dens_contaminated(Y[i,], p,beta_old, P_param) 
     
+    print("curr ")
+    print(curr)
     #j=1:K
-    for (t in (2:k_new+1)) 
+    for (t in (2:(k_new+1))) 
     {
-      n_j <- table(which(curr[-i]!=0))
-      n <- dim(data)[1]
-      
-      prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t]],
-                                 xi_cov_star[[t]])
-      
+      n_j <- as.integer(table(curr)[t-1])
+      print("n_j")
+      print(n_j)
+      print("curr_i ")
+      print (curr[i])
+      if (n_j == 1 & curr[i] == t-1){
+        prob[t-1]=0
       }
+      else{
+        n_j <- as.integer(table(which(curr[-i]==t-1)))
+        n <- dim(data)[1]
+        
+        prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
+                                   xi_cov_star[[t-1]])
+      }
+    }
     
     #j=K+1
-    prob[k_new+2]<- dens_cluster_new(p, beta_old, sigma_old, theta_old, m1_bar, k_new,
+    prob[k_new+2]<- dens_cluster_new(Y[i,], p, N, beta_old, sigma_old, theta_old, m1_bar, k_new,
                                      Q_param)
     
     #I sample the new assignment
-    j <- sample(0:k_new+1,size=1,prob=prob)
+    print(prob)
+    j <- sample(0:(k_new+1),size=1,prob=prob)
     
     #If I sampled the same group, I can skip all the passages below
     if(j != curr[i])
@@ -87,8 +99,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
           {
             #If it is, I need to shift all the groups' label and to cancel the old group's parameters
             curr <- shift(curr, old_group)
-            xi_mu_star <- xi_mu_star[[-old_group]]
-            xi_cov_star <- xi_cov_star[[-old_group]]
+            xi_mu_star <- xi_mu_star[-old_group]
+            xi_cov_star <- xi_cov_star[-old_group]
             k_new=k_new-1
           }
        }
@@ -127,7 +139,6 @@ dens_contaminated <- function(data, p, beta_old, P_param)
 {
   weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu= P_param$mu_0, S = ((P_param$lambda_0 * (P_param$k_0+1))/(P_param$k_0*(P_param$nu_0-p+1))), 
                                   df = P_param$nu_0-p+1)  
-  print(weight)
   return (weight)
 }
 
@@ -136,16 +147,17 @@ dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_ol
 {
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
   
+  
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
   return (weight)
 }
 
 
-dens_cluster_new <- function(p, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
+dens_cluster_new <- function(data, p, n, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
 {
   coeff <- beta_old* (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)
   
-  weight <- coeff *rmvt(1, mu = Q_param$mu_0, S = (Q_param$lambda_0 * (Q_param$k_0+1))/(Q_param$k_0*(Q_param$nu_0-p+1)), 
+  weight <- coeff *LaplacesDemon::dmvt(data, mu = Q_param$mu_0, S = (Q_param$lambda_0 * (Q_param$k_0+1))/(Q_param$k_0*(Q_param$nu_0-p+1)), 
                                   df = Q_param$nu_0-p+1) 
   return (weight)
 }
@@ -153,7 +165,7 @@ dens_cluster_new <- function(p, beta_old, sigma_old, theta_old, m1_bar, k_old, Q
 
 shift <- function(curr, old_group)
 {
-  for(i in (1:dim(curr)[1]))
+  for(i in (1:length(curr)))
   {
     if(curr[i]>old_group)
     {

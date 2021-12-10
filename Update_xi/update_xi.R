@@ -1,4 +1,5 @@
 ##### UPDATE XIs
+# Library to sample from an inverse wishart
 library(LaplacesDemon)
 
 # Function to update the groups' parameters (mu and cov)
@@ -20,12 +21,13 @@ update_xi <- function(Y, S, k, Q_param){
     # Select data belonging to cluster j
     Yj <- Y[which(S==j),]
     
-    # Cases separation: when we have only one data vs multiple data in a group
+    # If there is only one data in the group, smaple_cov is set to 0
     if (length(which(S==j))==1){
       n = 1
       d = length(Yj)
       sample_cov = 0
-      }
+    }
+    # else, compute sample_cov
     else{
       n = dim(Yj)[1]
       d = dim(Yj)[2]
@@ -38,7 +40,7 @@ update_xi <- function(Y, S, k, Q_param){
     nu_n = Q_param$nu_0 + n
     lambda_n = Q_param$lambda_0 + sample_cov + Q_param$k_0*n/k_n*(mean(Yj)-Q_param$mu_0)%*%t((mean(Yj)-Q_param$mu_0))
     
-    
+    # Compute the inverse and the cholesky decomposition of the inverse
     inv_lambda_n <- solve(lambda_n)
     inv_lambda_n_chol <- chol(inv_lambda_n)
     
@@ -51,7 +53,7 @@ update_xi <- function(Y, S, k, Q_param){
     
     
     # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
-    xi_sigma_j = rinvwishartc(nu_n, inv_lambda_n_chol)
+    xi_sigma_j = LaplacesDemon::rinvwishartc(nu_n, inv_lambda_n_chol)
     
     # Appending of the sampled values
     xi_mu <- append(xi_mu, list(xi_mu_j))

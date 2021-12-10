@@ -7,7 +7,6 @@ source("update_theta/update_theta.R")
 source("update_beta/update_beta.R")
 source("auxiliary_functions/auxiliary_functions.R")
 
-
 # INPUT: Y -> data 
 #        S_init -> initialization for the vector of labels Si i=1,...,n
 #        sigma_init -> initialization for sigma 

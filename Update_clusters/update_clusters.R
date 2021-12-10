@@ -168,7 +168,7 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
       j = j + 1
     }
   }
-  }
+  
   
   return(list("curr" = curr, "xi_mu_star" = xi_mu_star, "xi_cov_star" = xi_cov_star))
 }

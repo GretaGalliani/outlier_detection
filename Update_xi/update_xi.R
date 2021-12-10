@@ -38,27 +38,20 @@ update_xi <- function(Y, S, k, Q_param){
     nu_n = Q_param$nu_0 + n
     lambda_n = Q_param$lambda_0 + sample_cov + Q_param$k_0*n/k_n*(mean(Yj)-Q_param$mu_0)%*%t((mean(Yj)-Q_param$mu_0))
     
-    # Application of inversion based on cholesky decomposition
-    lambda_n_chol <- chol(lambda_n)
-    inv_lambda_n_chol <- chol2inv(lambda_n_chol)
+    
+    inv_lambda_n <- solve(lambda_n)
+    inv_lambda_n_chol <- chol(inv_lambda_n)
     
     # computation of degrees of freedom
     df = nu_n-d+1
     
-    print(nu_n)
-    print(d)
-    
-    print(df)
-    print(lambda_n/k_n/df)
-    print(as.inverse(lambda_n/k_n/df))
     
     # Sampling of mu (from a multivariate t-student)
     xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
     
-    print(chol(inv_lambda_n_chol))
     
     # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
-    xi_sigma_j = rinvwishartc(nu_n, chol(inv_lambda_n_chol))
+    xi_sigma_j = rinvwishartc(nu_n, inv_lambda_n_chol)
     
     # Appending of the sampled values
     xi_mu <- append(xi_mu, list(xi_mu_j))

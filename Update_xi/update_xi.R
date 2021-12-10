@@ -19,24 +19,18 @@ update_xi <- function(Y, S, k, Q_param){
   for (j in 1:k){
     # Select data belonging to cluster j
     Yj <- Y[which(S==j),]
-    print(which(S==j))
-    print(Yj)
     
-    Yj <- as.matrix(Y[which(S==j),])
-    print(Yj)
-    
-    # Extraction of the number of data points
-    n = dim(Yj)[1]
-    print(n)
-    
-    # Extraction of the dimension of data
-    d = dim(Yj)[2]
-    
-    # Sample covariance
-    if (n==1)
+    # Cases separation: when we have only one data vs multiple data in a group
+    if (length(which(S==j))==1){
+      n = 1
+      d = length(Yj)
       sample_cov = 0
-    else
+      }
+    else{
+      n = dim(Yj)[1]
+      d = dim(Yj)[2]
       sample_cov = cov(Yj)
+    }
     
     # Compute the parameters for the marginals
     k_n = Q_param$k_0 + n
@@ -51,8 +45,17 @@ update_xi <- function(Y, S, k, Q_param){
     # computation of degrees of freedom
     df = nu_n-d+1
     
+    print(nu_n)
+    print(d)
+    
+    print(df)
+    print(lambda_n/k_n/df)
+    print(as.inverse(lambda_n/k_n/df))
+    
     # Sampling of mu (from a multivariate t-student)
     xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
+    
+    print(chol(inv_lambda_n_chol))
     
     # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
     xi_sigma_j = rinvwishartc(nu_n, chol(inv_lambda_n_chol))

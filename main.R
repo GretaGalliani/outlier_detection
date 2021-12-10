@@ -33,23 +33,19 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
   
   for (r in 1:n_iter){
     # Step 2a: Updating the clusters
-<<<<<<< HEAD
+    
     # clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       #S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
     
     # Updating the variables for next steps
     #S_old = clusters$S_new
     S_matrix[r,] = S_old
-    k_old <- length(unique(S_old)) # ATTENZIONE STAI CONTANDO LO 0 (se c'è lo 0), devi gestire il caso a parte
-=======
-    #clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
-    #                                  S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
     
-    # Updating the variables for next steps
-    #S_old = clusters$S_new
-    #S_matrix[j,] = S_old
-    #k_old <- length(unique(S_old))
->>>>>>> aa8eac11cf27ec87f260ef466f8ce8d33575de3d
+    # Check if we have outliers in order to find the actual number of groups k
+    if (0 %in% unique(S_old))
+      k_old <- length(unique(S_old))-1
+    else
+      k_old <- length(unique(S_old))
     
     #' Step 2b: Updating the parameters of the groups’ distribution xi_star
     #' Input variables:

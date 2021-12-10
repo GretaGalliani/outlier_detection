@@ -18,16 +18,12 @@ update_xi <- function(Y, S, k, Q_param){
   # For each group
   for (j in 1:k){
     # Select data belonging to cluster j
-<<<<<<< HEAD
     Yj <- Y[which(S==j),]
+    print(which(S==j))
     print(Yj)
-    # Sample covariance
-    sample_cov = cov(Yj)
-=======
-    print(Y)
+    
     Yj <- as.matrix(Y[which(S==j),])
     print(Yj)
->>>>>>> aa8eac11cf27ec87f260ef466f8ce8d33575de3d
     
     # Extraction of the number of data points
     n = dim(Yj)[1]

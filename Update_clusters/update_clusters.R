@@ -9,86 +9,84 @@ library(LaplacesDemon)
 #Importing some auxiliary functions
 source("auxiliary_functions/auxiliary_functions.R")
 
-#r=1,...,R
-
 # Function to update the clusters
-# INPUT: Y <- data.frame
+# INPUT: Y -> data 
+#        xi_mu_star -> list of k vectors, contains means of the groups
+#        xi_cov_star -> list of k matrices, contains cov. matrices of the groups
+#        beta_old -> beta at previous iteration
+#        theta_old -> theta at previous iteration
+#        sigma_old -> sigma at previous iteration
+#        S_old -> n vector containing the clusters at previous iteration
+#        k_old -> number of distinct groups
+#        P_param -> list of parameters nu_0_P, mu_0_P, k_0_P, lambda_0_P
+#        Q_param -> list of parameters nu_0_Q, mu_0_Q, k_0_Q, lambda_0_Q
 
-#Input:
-# Y <- data.frame
-# xi_mu_star <- list of n vectors --> contains means of the groups
-# xi_cov_star <- list of n matrices --> contains cov. matrices of the groups
-# beta_old <- number
-# theta_old <- number
-# sigma_old <- number
-# S_old <- vettore cluster passo precedente
-# k_old <- numero
-#nu_0_P & nu_0_Q
-#mu_0_P & mu_0_Q 
-#k_0_P & k_0_Q
-#lambda_0_P & lambda_0_Q
+
+# OUTPUT: list of the following:
+#         S_new -> n vector containing the new clusters
+#         xi_mu_star -> list of k vectors, contains means of the new groups
+#         xi_cov_star -> list of k matrices, contains cov. matrices of the new groups
 
 update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
                               beta_old, theta_old, sigma_old, k_old,
                               P_param, Q_param)
 {
   N <- dim(Y)[1]
+  
+  # Creation of the new S and k initialized like the ones at previous iteration
   curr <- S_old 
-
   k_new <- k_old
   
-  
-  
+  # Cycling over all the elements
   for (i in 1:N)
   {
-    #We compute the probability that the point 
+    # Computation of the probability that the point 
     # - comes from the contaminated distribution --> j=0
     # - comes from an already existing group --> j=1:K
     # - comes from a new group --> j=K+1
     
+    # Initialization of all probabilities to 0
     prob <- rep(0,k_new+2) #0,1,...k_new, k_new+1
     
+    # Computation of m_bar discarding the i-th element
     m1_bar <- m1_bar(curr[-i])
     
     #j=0
     p = dim(Y)[2]
     
+    # Probability that the i-th element is in the contaminated part
     prob[1] <- dens_contaminated(Y[i,], p,beta_old, P_param) 
     
-  
+    
     #j=1:K
+    #note: t goes from 2 to k_new+1 because group j will be in position j+1 of the prob 
+    #vector as the position 1 is occupied by the probability of group j being 0
     for (t in (2:(k_new+1))) 
     {
+      # If the current group is empty the probability of sampling that group is 0
       if (!((t-1) %in% curr)){
         prob[t-1]=0
       }
       
       else
       {
+        # Frequency of the current group
         n_j <- sum(curr == t-1)
         
-        # print("n_j con i")
-        # print(n_j)
-        print("gruppo")
-        print(t-1)
-        # 
-        # print("curr[i] è")
-        # print(curr[i])
-        # 
-        # print("tutto curr è")
-        # print(curr)
-        # 
+        # If data point i is the only point in the current group, then the probability 
+        # of sampling that group is 0
         if (n_j == 1 & curr[i] == t-1){
           prob[t-1]=0
         }
+        
         else{
-          n_j <- sum(curr[-i] == t-1)
           
-          #print("n_j senza i")
-          #print(n_j)
+          # Frequency of the current group without point i 
+          n_j <- sum(curr[-i] == t-1)
           
           n <- dim(data)[1]
           
+          # Computation of the probability that data i is sampled in group j
           prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
                                       xi_cov_star[[t-1]])
         }
@@ -98,25 +96,26 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     }
     
     #j=K+1
+    
+    # Computation of the probability that data i is sampled in a new group 
     prob[k_new+2]<- dens_cluster_new(Y[i,], p, N, beta_old, sigma_old, theta_old, m1_bar, k_new,
                                      Q_param)
     
     
-    #I sample the new assignment
+    # Sampling of the new assignment
     j <- sample(0:(k_new+1),size=1,prob=prob)
     
     curr[i] <- j
     
     
-      #If I sampled a new group, I need to sample also the new parameters
+    # If a new group is sampled, then the new parameters also need to be sampled
     if(j==k_new+1)
       {
+          # A new group has been formed 
           k_new=k_new+1
           
-          curr[i] <- j
-          
-          #I sample from the predictive distribution considering only the current point 
-          #The predictive distribution is known in closed form
+          # Sampling from the predictive distribution considering only the current point 
+          # The predictive distribution is known in closed form
           xi_mu_star <- construct_mu_new(Y[i,],xi_mu_star, Q_param)
           
           xi_cov_star <- construct_cov_new(Y[i,],xi_cov_star, Q_param)
@@ -126,9 +125,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
       
    } 
   
-  # I delete and shift all the empty groups
+  # At the end all the empty groups are deleted and the others are shifted
   delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star)
-  
   curr <- delete_list$curr
   xi_mu_star <- delete_list$xi_mu_star
   xi_cov_star <- delete_list$xi_cov_star
@@ -139,52 +137,95 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 }
 
 
+# Function to compute the probability that a point belongs to the contaminated part
+# INPUT: data -> datapoint 
+#        p -> dimension of the multivariate normal 
+#        beta_old -> beta at previous iteration
+#        P_param -> list of parameters nu_0_P, mu_0_P, k_0_P, lambda_0_P
+
+# OUTPUT: weight -> the computed probability
 
 dens_contaminated <- function(data, p, beta_old, P_param)
 {
+  # Evaluation of a multivariate t-Student
   weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu= P_param$mu_0, S = ((P_param$lambda_0 * (P_param$k_0+1))/(P_param$k_0*(P_param$nu_0-p+1))), 
                                   df = P_param$nu_0-p+1)  
   return (weight)
 }
 
+# Function to compute the probability that a point belongs to the current group
+# INPUT: data -> datapoint 
+#        n_j -> frequency of the current group without data i
+#        n -> number of data points
+#        m1_bar -> number of points in group j=0
+#        sigma_old -> sigma at previous iteration
+#        theta_old -> theta at previous iteration
+#        beta_old -> beta at previous iteration
+#        xi_mu_act -> mean vector of the current group 
+#        xi_cov_act -> cov. matrix of the current group
+
+# OUTPUT: weight -> the computed probability
 
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
-  print("xi_mu")
-  print(xi_mu_act)
-  
-  print("xi_cov")
-  print(xi_cov_act)
-  
-  
+
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
+  
+  # Computation of the density of a multivariate normal 
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
   
   return (weight)
 }
 
+# Function to compute the probability that a point belongs to a new group 
+# INPUT: data -> datapoint 
+#        p -> dimension of the multivariate normal 
+#        n -> number of data points
+#        beta_old -> beta at previous iteration
+#        sigma_old -> sigma at previous iteration
+#        theta_old -> theta at previous iteration
+#        m1_bar -> number of points in group j=0
+#        k_old -> number of distinct groups
+#        Q_param -> list of parameters nu_0_Q, mu_0_Q, k_0_Q, lambda_0_Q
+
+# OUTPUT: weight -> the computed probability
 
 dens_cluster_new <- function(data, p, n, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
 {
   coeff <- beta_old* (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)
   
+  # Evaluation of a multivariate t-Student
   weight <- coeff *LaplacesDemon::dmvt(data, mu = Q_param$mu_0, S = (Q_param$lambda_0 * (Q_param$k_0+1))/(Q_param$k_0*(Q_param$nu_0-p+1)), 
                                   df = Q_param$nu_0-p+1) 
   return (weight)
 }
 
+# Function to delete the empty groups and shift the other groups when needed
+# INPUT: curr -> n vector containing the clusters at current iteration 
+#        xi_mu_star -> list of k vectors, contains means of the current groups
+#        xi_cov_star -> list of k matrices, contains cov. matrices of the current groups
+
+# OUTPUT: curr -> n vector containing the updated clusters
+#         xi_mu_star -> list of k vectors, contains means of the updated groups
+#         xi_cov_star -> list of k matrices, contains cov. matrices of the updated groups
 
 delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
 {
+  # end is the highest possible group index
   end <- max(curr)
+  
   # Iteration from 1 to the max of curr 
   j = 1
   while (j <= end)
   {
     # If the j-th group is empty
     if (j<=max(curr) & !(j %in% curr)){
+      
+      # Elimination of group parameters
       xi_mu_star <- xi_mu_star[-j]
       xi_cov_star <- xi_cov_star[-j]
+      
+      # Shifting of groups with higher index
       for (i in 1:length(curr)){
         if (curr[i]>j){
           curr[i] = curr[i]-1
@@ -192,16 +233,19 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
         
       }
     }
+    
+    # If the current group is deleted, j is not augmented since the group needs to checked
+    # again (after the shifting the current group corresponds to the next one)
+    # If the is no deletion j is augmented to check the next group
     else
     {
       j = j + 1
     }
   }
-  
-  
   return(list("curr" = curr, "xi_mu_star" = xi_mu_star, "xi_cov_star" = xi_cov_star))
 }
 
+# Function to sample the parameter mu for a new group 
 construct_mu_new <- function(data,xi_mu_star, Q_param)
 {
   data <- as.matrix(data)

@@ -1,6 +1,7 @@
 ### UPDATE CLUSTERS
 library(MASS)
 library(mvtnorm)
+library(LaplacesDemon)
 
 #NOTA: cosa succede se due dati sono uguali? Devo esplicitamente dirgli di non
 #samplarlo in j=0?
@@ -36,6 +37,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 
   k_new <- k_old
   
+  
+  
   for (i in 1:N)
   {
     #We compute the probability that the point 
@@ -58,26 +61,46 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     {
       if (!((t-1) %in% curr)){
         prob[t-1]=0
-        next
       }
       
-      n_j <- as.integer(table(curr)[t-1])
-      
-      if (n_j == 1 & curr[i] == t-1){
-        prob[t-1]=0
-      }
-      else{
-        n_j <- as.integer(table(which(curr[-i]==t-1)))
-        n <- dim(data)[1]
+      else
+      {
+        n_j <- sum(curr == t-1)
         
-        prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
-                                   xi_cov_star[[t-1]])
+        # print("n_j con i")
+        # print(n_j)
+        print("gruppo")
+        print(t-1)
+        # 
+        # print("curr[i] è")
+        # print(curr[i])
+        # 
+        # print("tutto curr è")
+        # print(curr)
+        # 
+        if (n_j == 1 & curr[i] == t-1){
+          prob[t-1]=0
+        }
+        else{
+          n_j <- sum(curr[-i] == t-1)
+          
+          #print("n_j senza i")
+          #print(n_j)
+          
+          n <- dim(data)[1]
+          
+          prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
+                                      xi_cov_star[[t-1]])
+        }
       }
+      
+      
     }
     
     #j=K+1
     prob[k_new+2]<- dens_cluster_new(Y[i,], p, N, beta_old, sigma_old, theta_old, m1_bar, k_new,
                                      Q_param)
+    
     
     #I sample the new assignment
     j <- sample(0:(k_new+1),size=1,prob=prob)
@@ -94,9 +117,9 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
           
           #I sample from the predictive distribution considering only the current point 
           #The predictive distribution is known in closed form
-          xi_mu_star <- construct_mu_new(Y[i],xi_mu_star, Q_param)
+          xi_mu_star <- construct_mu_new(Y[i,],xi_mu_star, Q_param)
           
-          xi_cov_star <- construct_cov_new(Y[i],xi_mu_star, Q_param)
+          xi_cov_star <- construct_cov_new(Y[i,],xi_cov_star, Q_param)
           
       }
     
@@ -127,9 +150,16 @@ dens_contaminated <- function(data, p, beta_old, P_param)
 
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
+  print("xi_mu")
+  print(xi_mu_act)
+  
+  print("xi_cov")
+  print(xi_cov_act)
+  
+  
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
-
+  
   return (weight)
 }
 
@@ -174,40 +204,48 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
 
 construct_mu_new <- function(data,xi_mu_star, Q_param)
 {
-  print(data)
+  data <- as.matrix(data)
   p <- dim(data)[2]
   nu_n <- Q_param$nu_0 + 1
   k_n <- Q_param$k_0 + 1
-  mu_n <- Q_param$k_0/(k_n) * Q_param$mu_0 + 1/k_n * data
+  mu_n <- as.vector(Q_param$k_0/(k_n) * Q_param$mu_0 + 1/k_n * data)
   
-  #print(Q_param$lambda_0)
-  #print(data-Q_param$mu_0)
-  #print((data-Q_param$mu_0)*t(data-Q_param$mu_0))
+  r <- as.matrix(data-Q_param$mu_0)
+
+  lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*r%*%t(r)
   
-  lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*(data-Q_param$mu_0)*t(data-Q_param$mu_0)
-  sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
-                          
-  mu_new <- rmvt(1, mu = mu_n, sigma = sigma, df = nu_n-p+1)
-  xi_mu_star<-append(xi_mu_star,mu_new)
+  sigma = (1/(k_n*(nu_n-p+1)))*(lambda_n)
+                    
+  mu_new <- LaplacesDemon::rmvt(mu = mu_n, S = sigma, df = nu_n-p+1)
+  
+  mu_new <- as.vector(mu_new)
+  
+  print(" NEWWWWWW")
+  print(mu_new)
+  
+  xi_mu_star<-append(xi_mu_star,list(mu_new))
   return (xi_mu_star)
 }
 
-construct_cov_new <- function(data,xi_mu_star, Q_param)
+construct_cov_new <- function(data,xi_cov_star, Q_param)
 {
+  data <- as.matrix(data)
   p <- dim(data)[2]
+  
   nu_n <- Q_param$nu_0 + 1
   k_n <- Q_param$k_0 + 1
   
-  lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*(data-Q_param$mu_0)*t(data-Q_param$mu_0)
-  sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
+  r <- as.matrix(data-Q_param$mu_0)
   
-  lambda_n_chol <- chol(lambda_n)
-  inv_lambda_n_chol <- chol2inv(lambda_n_chol)
+  lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*r%*%t(r)
   
-  cov_inv <- inv(lambda_n)                        
-  cov_new <-  rinvwishartc(nu_n, chol(inv_lambda_n_chol))
+  sigma = (1/(k_n*(nu_n-p+1)))*(lambda_n)
   
-  xi_cov_star<-append(xi_cov_star,cov_new)
+  # cov_new <-  LaplacesDemon::rinvwishartc(nu_n, chol2inv(chol(sigma)))
+  
+  cov_new <- LaplacesDemon::rinvwishart(nu_n, as.inverse(sigma))
+  
+  xi_cov_star<-append(xi_cov_star,list(cov_new))
   return (xi_cov_star)
 }
 

@@ -91,7 +91,7 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
   freq_m1 = freq[freq>1]
   
   # Computation of the partial posterior density
-  return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))
+  return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1+1) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))
 }
 
 

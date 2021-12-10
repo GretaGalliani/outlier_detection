@@ -73,8 +73,22 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
         # Frequency of the current group
         n_j <- sum(curr == t-1)
         
+<<<<<<< HEAD
         # If data point i is the only point in the current group, then the probability 
         # of sampling that group is 0
+=======
+        # print("n_j con i")
+        # print(n_j)
+        #print("gruppo")
+        #print(t-1)
+        # 
+        # print("curr[i] è")
+        # print(curr[i])
+        # 
+        # print("tutto curr è")
+        # print(curr)
+        # 
+>>>>>>> 1b2a95be380e4724fe4604b842bcdf6bd8da5085
         if (n_j == 1 & curr[i] == t-1){
           prob[t-1]=0
         }
@@ -168,7 +182,10 @@ dens_contaminated <- function(data, p, beta_old, P_param)
 
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1b2a95be380e4724fe4604b842bcdf6bd8da5085
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
   
   # Computation of the density of a multivariate normal 
@@ -263,9 +280,6 @@ construct_mu_new <- function(data,xi_mu_star, Q_param)
   mu_new <- LaplacesDemon::rmvt(mu = mu_n, S = sigma, df = nu_n-p+1)
   
   mu_new <- as.vector(mu_new)
-  
-  print(" NEWWWWWW")
-  print(mu_new)
   
   xi_mu_star<-append(xi_mu_star,list(mu_new))
   return (xi_mu_star)

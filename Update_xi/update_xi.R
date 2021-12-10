@@ -44,11 +44,17 @@ update_xi <- function(Y, S, k, Q_param){
     df = nu_n-d+1
     
     # Sampling of mu (from a multivariate t-student)
-    xi_mu_j = rmvt(1, mu_n, lambda_n/k_n/df, df)
+    xi_mu_j = LaplacesDemon::rmvt(1, mu_n, lambda_n/k_n/df, df)
     
     
     # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
-    xi_sigma_j = LaplacesDemon::rinvwishartc(nu_n, as.inverse(lambda_n))
+    xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, as.inverse(lambda_n))
+    
+    # print("group")
+    # print(j)
+    # 
+    # print("xi_cov")
+    # print(xi_cov)
     
     # Appending of the sampled values
     xi_mu <- append(xi_mu, list(xi_mu_j))

@@ -13,7 +13,9 @@ data_2 <- mvrnorm(n = 5, mu_1, Sigma_1)
 data = rbind(data_1, data_2)
 
 S_init = c(1,2,3,4,5,6,7,8,9,10)
-beta_init <- 1
+
+# NB NON INIZIALIZZARE BETA A 1 ASSOLUTAMENTE
+beta_init <- 0.9999999
 sigma_init <- 0.5
 theta_init <- 0.5
 

@@ -9,15 +9,19 @@
 
 # OUTPUT: beta -> value of the parameter beta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) { 
+update_beta <- function(n, m1_bar, beta_old, n_acc, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that beta is in (0,1)
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
   
+  print(beta_old)
+  print(y)
+  
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_beta(beta_old, y, n, m1_bar)
+  #print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -27,9 +31,11 @@ update_beta <- function(n, m1_bar, beta_old, sd = 2, n_acc) {
     n_acc = n_acc+1
     
     # Return of the new value of beta (equal to the proposed value y) and the accuracy 
+    print("End update beta")
     return(list("beta" = y, "acc" = n_acc))
   } 
   else {
+    print("End update beta")
     # Return of the new value of beta (equal to the previous value beta_old) and the accuracy
     return(list("beta" = beta_old, "acc" = n_acc))
   }
@@ -63,7 +69,7 @@ compute_alpha_beta <- function(x, y, n, m1_bar) {
   # Computation of the partial posterior density for y and x
   pi_y <- dens_beta(y, n, m1_bar)
   pi_x <- dens_beta(x, n, m1_bar)
-  
+ 
   rapp <- pi_y/pi_x
   
   # Computation of alpha 

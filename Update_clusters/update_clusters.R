@@ -82,32 +82,11 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     print(prob)
     j <- sample(0:(k_new+1),size=1,prob=prob)
     
-    #If I sampled the same group, I can skip all the passages below
-    if(j != curr[i])
-    {
+    curr[i] <- j
     
-      #If i sampled an already existent group
-      if(j %in% 1:k_new)
-      {
-        #I memorize the old group of the point
-        old_group <- curr[i]
-        #I assign the point to the j group
-        curr[i] <- j
-        
-        #I check if the old group is now empty
-        if(!(old_group %in% curr))
-          {
-            #If it is, I need to shift all the groups' label and to cancel the old group's parameters
-            curr <- shift(curr, old_group)
-            xi_mu_star <- xi_mu_star[-old_group]
-            xi_cov_star <- xi_cov_star[-old_group]
-            k_new=k_new-1
-          }
-       }
-     }
     
       #If I sampled a new group, I need to sample also the new parameters
-      else if(j==k_new+1)
+    if(j==k_new+1)
       {
           k_new=k_new+1
           
@@ -121,12 +100,15 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
           
       }
     
-      else
-      #If no one of the cases above is met, then j=0 and I do the assignment
-      {
-        curr[i] <- j
-      }
+      
    } 
+  
+  # I delete and shift all the empty groups
+  delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star)
+  
+  curr <- delete_list$curr
+  xi_mu_star <- delete_list$xi_mu_star
+  xi_cov_star <- delete_list$xi_cov_star
   
   S_new <- curr
   my_list <-list("S_new"=S_new, "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)
@@ -163,17 +145,32 @@ dens_cluster_new <- function(data, p, n, beta_old, sigma_old, theta_old, m1_bar,
 }
 
 
-shift <- function(curr, old_group)
+delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
 {
-  for(i in (1:length(curr)))
+  end <- max(curr)
+  # Iteration from 1 to the max of curr 
+  j = 1
+  while (j <= end)
   {
-    if(curr[i]>old_group)
+    # If the j-th group is empty
+    if (j<=max(curr) & !(j %in% curr)){
+      xi_mu_star <- xi_mu_star[-j]
+      xi_cov_star <- xi_cov_star[-j]
+      for (i in 1:length(curr)){
+        if (curr[i]>j){
+          curr[i] = curr[i]-1
+        }
+        
+      }
+    }
+    else
     {
-      curr[i]=curr[i]-1
+      j = j + 1
     }
   }
+  }
   
-  return(curr)
+  return(list("curr" = curr, "xi_mu_star" = xi_mu_star, "xi_cov_star" = xi_cov_star))
 }
 
 construct_mu_new <- function(data,xi_mu_star, Q_param)

@@ -18,16 +18,22 @@ update_xi <- function(Y, S, k, Q_param){
   # For each group
   for (j in 1:k){
     # Select data belonging to cluster j
-    Yj <- Y[which(S==j),]
-    
-    # Sample covariance
-    sample_cov = cov(Yj)
+    print(Y)
+    Yj <- as.matrix(Y[which(S==j),])
+    print(Yj)
     
     # Extraction of the number of data points
     n = dim(Yj)[1]
+    print(n)
     
     # Extraction of the dimension of data
     d = dim(Yj)[2]
+    
+    # Sample covariance
+    if (n==1)
+      sample_cov = 0
+    else
+      sample_cov = cov(Yj)
     
     # Compute the parameters for the marginals
     k_n = Q_param$k_0 + n

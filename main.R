@@ -33,13 +33,13 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
   
   for (r in 1:n_iter){
     # Step 2a: Updating the clusters
-    clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
-                                      S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
+    #clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
+    #                                  S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
     
     # Updating the variables for next steps
-    S_old = clusters$S_new
-    S_matrix[j,] = S_old
-    k_old <- length(unique(S_old))
+    #S_old = clusters$S_new
+    #S_matrix[j,] = S_old
+    #k_old <- length(unique(S_old))
     
     #' Step 2b: Updating the parameters of the groups’ distribution xi_star
     #' Input variables:

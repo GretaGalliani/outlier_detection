@@ -18,16 +18,10 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq,n_acc, sd = 2) {
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that sigma is in (0,1)
-  
-  print("sigma_old")
-  print(sigma_old)
-  
   y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
   
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
-  print("aprob sigma")
-  print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 

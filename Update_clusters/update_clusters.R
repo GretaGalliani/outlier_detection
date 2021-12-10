@@ -52,16 +52,17 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     prob[1] <- dens_contaminated(Y[i,], p,beta_old, P_param) 
     
-    print("curr ")
-    print(curr)
+  
     #j=1:K
     for (t in (2:(k_new+1))) 
     {
+      if (!((t-1) %in% curr)){
+        prob[t-1]=0
+        next
+      }
+      
       n_j <- as.integer(table(curr)[t-1])
-      print("n_j")
-      print(n_j)
-      print("curr_i ")
-      print (curr[i])
+      
       if (n_j == 1 & curr[i] == t-1){
         prob[t-1]=0
       }
@@ -79,7 +80,6 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
                                      Q_param)
     
     #I sample the new assignment
-    print(prob)
     j <- sample(0:(k_new+1),size=1,prob=prob)
     
     curr[i] <- j
@@ -128,9 +128,8 @@ dens_contaminated <- function(data, p, beta_old, P_param)
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
-  
-  
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
+
   return (weight)
 }
 
@@ -175,10 +174,16 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
 
 construct_mu_new <- function(data,xi_mu_star, Q_param)
 {
+  print(data)
   p <- dim(data)[2]
   nu_n <- Q_param$nu_0 + 1
   k_n <- Q_param$k_0 + 1
-  mu_n <- Q_param$k_0/(k_n) * Q_param$mu_0 + 1/k_n * data 
+  mu_n <- Q_param$k_0/(k_n) * Q_param$mu_0 + 1/k_n * data
+  
+  #print(Q_param$lambda_0)
+  #print(data-Q_param$mu_0)
+  #print((data-Q_param$mu_0)*t(data-Q_param$mu_0))
+  
   lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*(data-Q_param$mu_0)*t(data-Q_param$mu_0)
   sigma = (lambda_n * 1)/(k_n*(nu_n-p+1))
                           

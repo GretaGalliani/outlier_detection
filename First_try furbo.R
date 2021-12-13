@@ -93,4 +93,4 @@ xi_cov <- append(xi_cov, list(xi_sigma_0))
 
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 1, 1, xi_mu, xi_cov, Q_param, P_param, 100)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 1, 1, xi_mu, xi_cov, Q_param, P_param, 3)

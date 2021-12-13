@@ -192,21 +192,27 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 
 dens_contaminated <- function(data, beta_old, P_param)
 {
+  # Transformation of data into a matrix
   data <- as.matrix(data)
   data <- t(data)
+  
+  # Dimension of data 
   p = dim(data)[2]
   
+  # Compute mu_n as a matrix
   mu_n = as.matrix(P_param$k_0/(P_param$k_0+1)*P_param$mu_0 + (1/P_param$k_0 + 1)*data)
   
+  # Compute k_n and nu_n
   k_n = P_param$k_0 + 1
   nu_n = P_param$nu_0 + 1
   
   r <- as.matrix(data-P_param$mu_0)
   
+  # Compute lambda_n
   lambda_n = P_param$lambda_0 + (P_param$k_0/(P_param$k_0 + 1))*t(r)%*%r
   
   # Evaluation of a multivariate t-Student
-  weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu= mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
+  weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu = mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
                                               df = nu_n-p+1)
   
   return (weight)
@@ -227,7 +233,7 @@ dens_contaminated <- function(data, beta_old, P_param)
 
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
-
+  
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
   
   # Computation of the density of a multivariate normal 
@@ -251,17 +257,23 @@ dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_ol
 
 dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param)
 {
+  # Transformation of data into a matrix
   data <- as.matrix(data)
-  p = dim(data)[2]
-  
   data <- t(data)
   
+  # Dimension of data
+  p = dim(data)[2]
+
+  # Compute mu_n as matrix
   mu_n = as.matrix(Q_param$k_0/(Q_param$k_0+1)*Q_param$mu_0 + (1/Q_param$k_0 + 1)*data)
+  
+  # Compute k_n and nu_n
   k_n = Q_param$k_0 + 1
   nu_n = Q_param$nu_0 + 1
   
   r <- as.matrix(data-Q_param$mu_0)
   
+  # Compute lambda_n
   lambda_n = Q_param$lambda_0 + (Q_param$k_0/(Q_param$k_0 + 1))*t(r)%*%r
   
   coeff <- beta_old * (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)

@@ -9,30 +9,38 @@
 
 # OUTPUT: beta -> value of the parameter beta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-update_beta <- function(n, m1_bar, beta_old, n_acc, sd = 2) { 
+update_beta <- function(n, m1_bar, beta_old, a, b, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that beta is in (0,1)
   y <- inv_beta( change_beta(beta_old) + rnorm(1,0,sd))
   
+  # Assuming a conjugate beta prior on beta for the bernoulli likelihood, we obtain a 
+  # posterior beta distribution from which sampling the new value for beta
+  
+  beta_new <- rbeta(1, a+n-m1_bar, b+m1_bar)
+  
+  return(beta_new)
+  
+  
   # Computation the alpha of the new proposal wrt the old one 
-  aprob <- compute_alpha_beta(beta_old, y, n, m1_bar)
+  #aprob <- compute_alpha_beta(beta_old, y, n, m1_bar)
   
   # Sampling from a U(0,1)
-  u <- runif(1) 
+  #u <- runif(1) 
   
   # If u < aprob, the proposed value is accepted and the number of accepted values is increased 
-  if (u < aprob){
-    n_acc = n_acc+1
+  #if (u < aprob){
+  #  n_acc = n_acc+1
     
-    # Return of the new value of beta (equal to the proposed value y) and the accuracy 
-    return(list("beta" = y, "acc" = n_acc))
-  } 
-  else {
-    # Return of the new value of beta (equal to the previous value beta_old) and the accuracy
-    return(list("beta" = beta_old, "acc" = n_acc))
-  }
+  # Return of the new value of beta (equal to the proposed value y) and the accuracy 
+  #  return(list("beta" = y, "acc" = n_acc))
+  #} 
+  #else {
+  # Return of the new value of beta (equal to the previous value beta_old) and the accuracy
+  #  return(list("beta" = beta_old, "acc" = n_acc))
+  #}
 }
 
 

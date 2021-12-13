@@ -1,8 +1,6 @@
 ToDo:
 
 ALGORITMO:
-- Controllo update_clusters
-- Controllo update_xi
 - Controllo update_sigma
 - Controllo update_theta
 - Implementare sampling di beta

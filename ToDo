@@ -1,16 +1,7 @@
 ToDo:
 
 ALGORITMO:
-- Controllo update_sigma
-- Controllo update_theta
-- Implementare sampling di beta
-
-PROVA 
-- Scrivere main più intelligente
-
-Commentare:
-- update_clusters
-- main
+- Sampling di sigma (CORRADIN)
 
 - Pensare a come fare variation of information
 

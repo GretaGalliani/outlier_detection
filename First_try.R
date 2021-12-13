@@ -37,5 +37,5 @@ P_param <- list("nu_0"= 3, "mu_0" = c(0,0), "lambda_0" = matrix(c(1,0,0,1), nrow
   
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu, xi_cov, Q_param, P_param, 20)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu, xi_cov, Q_param, P_param, 200)
 warnings()

@@ -101,8 +101,6 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
       freq[i] <- sum(S_old == i)
     }
     
-    m1_SUPP <- sum(freq==1)
-    
     # Step 2c: Updating the parameters of the discrete component
     
     # Updating sigma

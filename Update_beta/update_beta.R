@@ -4,13 +4,14 @@
 # INPUT: n -> number of data points
 #        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
 #        beta_old -> beta at the previous iteration
+#        a -> first parameter for the beta prior for beta
+#        b -> second parameter for the beta prior for beta
 #        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
-#        n_acc -> number of accepted proposals in the previous iterations
+
 
 # OUTPUT: beta -> value of the parameter beta at the r iteration
-#         acc -> number of accepted proposals at the current iteration
+
 update_beta <- function(n, m1_bar, beta_old, a, b, sd = 2) { 
-  # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that beta is in (0,1)
@@ -42,8 +43,6 @@ update_beta <- function(n, m1_bar, beta_old, a, b, sd = 2) {
   #  return(list("beta" = beta_old, "acc" = n_acc))
   #}
 }
-
-
 
 
 # Function to change the value of beta so beta_star is in (-inf, +inf) to do MH

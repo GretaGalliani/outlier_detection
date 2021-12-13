@@ -13,7 +13,7 @@
 
 # OUTPUT: sigma -> value of the parameter sigma at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq,n_acc, sd = 2) { 
+update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
@@ -22,8 +22,8 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq,n_acc, sd = 2) {
   
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
-  print("Aprob sigma")
-  print(aprob)
+  #print("Aprob sigma")
+  #print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -90,12 +90,28 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
 dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
   
   # I select the groups which are not singletons
+  if (f %in% table(freq) > 1)
   freq_m1 = freq[freq>1]
+  print(freq_m1)
   
   # Computation of the partial posterior density
   return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1+1) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))
 }
 
+single = TRUE
+for (elem in freq){
+  if (elem > 1){
+    single = FALSE
+    break
+  }
+}
 
+if (single)
+  return (x^(k - m1_bar) * 1/(x*(1-x)))
+  
 
-
+x = c(1,1,1,1)
+cond = x[x>1]
+tab = unname(table(x))
+if(x[x>1]==numeric(0))
+  b=1

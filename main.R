@@ -92,7 +92,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
     m1 <- m1(S_old)
     
     # Computation of the frequency vector for the cluster labels
-    freq <- as.integer(table(S_old))
+    freq <- as.integer(unname(table(S_old)))
     
     # Step 2c: Updating the parameters of the discrete component
     

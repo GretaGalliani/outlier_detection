@@ -279,7 +279,7 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
   coeff <- beta_old * (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)
   
   # Evaluation of a multivariate t-Student
-  weight <- coeff *LaplacesDemon::dmvt(data,mu= mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
+  weight <- coeff *LaplacesDemon::dmvt(data,mu = mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
                                                         df = nu_n-p+1)  
   return (weight)
 }
@@ -305,7 +305,7 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
     # If the j-th group is empty
     if (j<=max(curr) & !(j %in% curr)){
       
-      # Elimination of group parameters
+      # Elimination of group's parameters
       xi_mu_star <- xi_mu_star[-j]
       xi_cov_star <- xi_cov_star[-j]
       
@@ -318,9 +318,9 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
       }
     }
     
-    # If the current group is deleted, j is not augmented since the group needs to checked
-    # again (after the shifting the current group corresponds to the next one)
-    # If the is no deletion j is augmented to check the next group
+    # If the current group is deleted, j is not augmented since the group needs to be 
+    # checked again (after the shifting the current group corresponds to the next one)
+    # If there is no deletion j is augmented to check the next group
     else
     {
       j = j + 1
@@ -330,47 +330,74 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
 }
 
 # Function to sample the parameter mu for a new group 
+# INPUT: data -> datapoint 
+#        xi_mu_star -> list of k vectors, contains means of the current groups
+#        Q_param -> list of parameters nu_0_Q, mu_0_Q, k_0_Q, lambda_0_Q
+
+# OUTPUT: xi_mu_star -> list of k vectors, contains means of the updated groups
 construct_mu_new <- function(data,xi_mu_star, Q_param)
 {
+  # Transformation of data into a matrix
   data <- as.matrix(data)
+  
+  # Dimension of data
   p <- dim(data)[2]
+  
+  # Compute nu_n, k_n and mu_n
   nu_n <- Q_param$nu_0 + 1
   k_n <- Q_param$k_0 + 1
   mu_n <- as.vector(Q_param$k_0/(k_n) * Q_param$mu_0 + 1/k_n * data)
   
   r <- as.matrix(data-Q_param$mu_0)
-
+  
+  # Compute lambda_n
   lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*r%*%t(r)
   
+  # Compute sigma
   sigma = (1/(k_n*(nu_n-p+1)))*(lambda_n)
-                    
-  mu_new <- LaplacesDemon::rmvt(mu = mu_n, S = sigma, df = nu_n-p+1)
   
+  # Sampling from a multivariate t-Student                  
+  mu_new <- LaplacesDemon::rmvt(mu = mu_n, S = sigma, df = nu_n-p+1)
   mu_new <- as.vector(mu_new)
   
-  xi_mu_star<-append(xi_mu_star,list(mu_new))
+  # Updating the list containing the mean parameters
+  xi_mu_star <- append(xi_mu_star,list(mu_new))
+  
   return (xi_mu_star)
 }
 
+
+# Function to sample the parameter cov for a new group 
+# INPUT: data -> datapoint 
+#        xi_cov_star -> list of k vectors, contains cov. matrices of the current groups
+#        Q_param -> list of parameters nu_0_Q, mu_0_Q, k_0_Q, lambda_0_Q
+
+# OUTPUT: xi_cov_star -> list of k vectors, contains cov. matrices of the updated groups
 construct_cov_new <- function(data,xi_cov_star, Q_param)
 {
+  # Transformation of data into a matrix
   data <- as.matrix(data)
+  
   p <- dim(data)[2]
   
+  # Compute nu_n, k_n
   nu_n <- Q_param$nu_0 + 1
   k_n <- Q_param$k_0 + 1
   
   r <- as.matrix(data-Q_param$mu_0)
   
+  # Compute lambda_n
   lambda_n <- Q_param$lambda_0 + (Q_param$k_0)/(k_n)*r%*%t(r)
   
+  # Compute sigma
   sigma = (1/(k_n*(nu_n-p+1)))*(lambda_n)
   
-  # cov_new <-  LaplacesDemon::rinvwishartc(nu_n, chol2inv(chol(sigma)))
-  
+  #Sampling from an IW distribution
   cov_new <- LaplacesDemon::rinvwishart(nu_n, as.inverse(sigma))
   
+  # Updating the list containing the cov. matrices parameters
   xi_cov_star<-append(xi_cov_star,list(cov_new))
+  
   return (xi_cov_star)
 }
 

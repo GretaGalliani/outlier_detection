@@ -1,5 +1,7 @@
 ##### ALGORITHM IMPLEMENTATION
 
+library(progress)
+
 source("update_clusters/update_clusters.R")
 source("update_xi/update_xi.R")
 source("update_sigma/update_sigma.R")
@@ -62,6 +64,10 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
   
   # Start to iterate
   for (r in 1:n_iter){
+    # Progress bar
+    pb = progress_bar$new(total=1e3)
+    pb$tick(0)
+    set.seed(26091998)
     # Step 2a: Updating the clusters
     clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)

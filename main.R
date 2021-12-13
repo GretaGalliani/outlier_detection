@@ -26,7 +26,7 @@ source("auxiliary_functions/auxiliary_functions.R")
 #         acc_sigma -> acceptance rate of sigma
 #         acc_theta -> acceptance rate of theta
 #         acc_beta -> acceptance rate of beta
-algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_cov, Q_param, P_param, n_iter ){
+algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu, xi_cov, Q_param, P_param, n_iter ){
  
   # Variables initialization:
   # initialize the variables for the iterations from the input
@@ -49,7 +49,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
   # Acceptance rates initialization:
   # initialize the counter variables for the number of accepted values over MH iterations
   # they will be returned divided by n_iter
-  acc_beta = 0
+  #acc_beta = 0
   acc_theta = 0
   acc_sigma = 0
   
@@ -92,7 +92,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
     m1 <- m1(S_old)
     
     # Computation of the frequency vector for the cluster labels
-    freq <- as.integer(table(S_old))
+    freq <- as.integer(unname(table(S_old)))
     
     # Step 2c: Updating the parameters of the discrete component
     
@@ -111,16 +111,16 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, xi_mu, xi_co
     acc_theta <- theta_list$acc
     
     # Step 2d: Updating the weight parameter
-    beta_list <- update_beta(n, m1_bar, beta_old, acc_beta)
+    beta_new <- update_beta(n, m1_bar, beta_old, a, b)
     # Updating the variables
-    beta_old <- beta_list$beta
+    beta_old <- beta_new
     beta_vec[r] <- beta_old
-    acc_beta <- beta_list$acc
+    #acc_beta <- beta_list$acc
   }
 
   
   return (list("S"= S_matrix, "xi_star" = xi, "sigma" = sigma_vec, "theta" = theta_vec,
                "beta" = beta_vec, "acc_sigma" = acc_sigma/n_iter, 
-               "acc_theta" = acc_theta/n_iter, "acc_beta" = acc_beta/n_iter))
+               "acc_theta" = acc_theta/n_iter))
   
 }

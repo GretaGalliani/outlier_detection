@@ -22,6 +22,8 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq,n_acc, sd = 2) {
   
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
+  print("Aprob sigma")
+  print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 

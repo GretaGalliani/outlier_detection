@@ -1,10 +1,14 @@
 ToDo:
 
 ALGORITMO:
-- Fare una prova di tutto
+- Controllo update_clusters
+- Controllo update_xi
+- Controllo update_sigma
+- Controllo update_theta
+- Implementare sampling di beta
 
-CODICE:
-- Per variabili input e output: aggiornare file con definizioni di variabili
+PROVA 
+- Scrivere main più intelligente
 
 Commentare:
 - update_clusters

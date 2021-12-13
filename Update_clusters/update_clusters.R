@@ -123,8 +123,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # print(prob[k_new+2])
     
     
-    print("vector of prob")
-    print(prob)
+    # print("vector of prob")
+    # print(prob)
     
     # Sampling of the new assignment
     j <- sample(1:(k_new+2),size=1,prob=prob) - 1
@@ -167,14 +167,14 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   print("curr")
   print(curr)
   
-  print("beta")
-  print(beta_old)
-  
-  print("sigma")
-  print(sigma_old)
-  
-  print("theta")
-  print(theta_old)
+  # print("beta")
+  # print(beta_old)
+  # 
+  # print("sigma")
+  # print(sigma_old)
+  # 
+  # print("theta")
+  # print(theta_old)
   
   S_new <- curr
   my_list <-list("S_new"=S_new, "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)

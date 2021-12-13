@@ -69,11 +69,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
     # Updating the variables for next steps
     S_old = clusters$S_new
     
-    # Check if we have outliers in order to find the actual number of groups k
-    if (0 %in% unique(S_old))
-      k_old <- length(unique(S_old))-1
-    else
-      k_old <- length(unique(S_old))
+    # Find the actual number of groups k
+    k_old = max(S_old)
     
     # Store the current cluster labels by rows in the matrix
     S_matrix[r,] = S_old
@@ -92,16 +89,25 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
     m1 <- m1(S_old)
     
     # Computation of the frequency vector for the cluster labels
-    freq <- as.integer(unname(table(S_old)))
+    freq = rep(0,k_old)
+    
+    for (i in 1:k_old){
+      freq[i] <- sum(S_old == i)
+    }
+    
+    m1_SUPP <- sum(freq==1)
     
     # Step 2c: Updating the parameters of the discrete component
     
     # Updating sigma
-    sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
+    sigma_list <- update_sigma(m1_SUPP, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
     # Updating the variables
     sigma_old <- sigma_list$sigma
     sigma_vec[r] <- sigma_old
     acc_sigma <- sigma_list$acc
+    
+    print("sigma")
+    print(sigma_old)
     
     # Updating theta
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)

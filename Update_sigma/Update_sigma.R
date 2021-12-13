@@ -98,10 +98,26 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
     }
   }
   
+  print("freq")
+  print(freq)
+  
+  print("k")
+  print(k)
+  
+  print("m1")
+  print(m1)
+  
+  print("m1_bar")
+  print(m1_bar)
+  
   if(single)
     return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1+1) * 1/(x*(1-x)))
   else{
     freq_m1 = freq[freq>1]
+    
+    print("vettore produttoria")
+    print(gamma(freq_m1-x)/gamma(1-x))
+    
     return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1+1) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))
   }  
 }

@@ -45,76 +45,55 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # - comes from an already existing group --> j=1:K
     # - comes from a new group --> j=K+1
     
+    k_new = max(curr)
+    
     # Initialization of all probabilities to 0
     prob <- rep(0,k_new+2) #0,1,...k_new, k_new+1
     
     # Computation of m_bar discarding the i-th element
     m1_bar <- m1_bar(curr[-i])
     
-    #j=0
+    # Dimension of the multivariate data
     p = dim(Y)[2]
     
+    #j=0
     # Probability that the i-th element is in the contaminated part
     prob[1] <- dens_contaminated(Y[i,], beta_old, P_param) 
     
     # print("prob contaminated")
     # print(prob[1])
     
-    
-    #j=1:K
-    #note: t goes from 2 to k_new+1 because group j will be in position j+1 of the prob 
-    #vector as the position 1 is occupied by the probability of group j being 0
-    for (t in (2:(k_new+1))) 
+    for (t in (2:(k_new+1)))
     {
-      # If the current group is empty the probability of sampling that group is 0
-      if (!((t-1) %in% curr)){
+      # Frequency of the current group
+      n_j <- sum(curr == t-1)
+
+      # If data point i is the only point in the current group, then the probability
+      # of sampling that group is 0
+      if (n_j == 1 & curr[i] == t-1){
         prob[t]=0
       }
-      
-      else
-      {
-        # Frequency of the current group
-        n_j <- sum(curr == t-1)
-      
-        # print("n_j con i")
-        # print(n_j)
-        #print("gruppo")
-        #print(t-1)
-        # 
-        # print("curr[i] è")
-        # print(curr[i])
-        # 
-        # print("tutto curr è")
-        # print(curr)
-        # 
-        
-        # If data point i is the only point in the current group, then the probability 
-        # of sampling that group is 0
-        if (n_j == 1 & curr[i] == t-1){
-          prob[t]=0
-        }
-        
-        else{
-          
-          # Frequency of the current group without point i 
-          n_j <- sum(curr[-i] == t-1)
-          
-          # Computation of the probability that data i is sampled in group j
-          prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
+
+      else{
+
+        # Frequency of the current group without point i
+        n_j <- sum(curr[-i] == t-1)
+
+        # Computation of the probability that data i is sampled in group j
+        prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
                                       xi_cov_star[[t-1]])
-          
-          
+
+
         }
       }
-      
-      # print("gruppo")
-      # print(t-1)
-      # print( "prob gruppo ")
-      # print(prob[t])
-    }
+    #   
+    #   # print("gruppo")
+    #   # print(t-1)
+    #   # print( "prob gruppo ")
+    #   # print(prob[t])
+    
     
     #j=K+1
-    
     # Computation of the probability that data i is sampled in a new group 
     prob[k_new+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, k_new,
                                      Q_param)
@@ -126,9 +105,40 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # print("vector of prob")
     # print(prob)
     
-    # Sampling of the new assignment
-    j <- sample(1:(k_new+2),size=1,prob=prob) - 1
+    # I save the old group
+    old_group <- curr[i]
     
+    # Sampling of the new assignment
+    j <- sample(0:(k_new+1),size=1,prob=prob)
+    
+    # Assignment to the new group
+    curr[i] <- j
+    
+    # If the old group is now empty
+    if (sum(curr==old_group)==0){
+      # I call the function which delete the groups' parameters and shift the groups higher than the old one
+      delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star, old_group)
+      curr <- delete_list$curr
+      xi_mu_star <- delete_list$xi_mu_star
+      xi_cov_star <- delete_list$xi_cov_star
+    }
+    
+    # If a new group is sampled, then the new parameters also need to be sampled
+    if(j==k_new+1)
+    {
+      # A new group has been formed 
+      k_new=k_new+1
+      
+      # Sampling from the predictive distribution considering only the current point 
+      # The predictive distribution is known in closed form
+      xi_mu_star <- construct_mu_new(Y[i,],xi_mu_star, Q_param)
+      
+      xi_cov_star <- construct_cov_new(Y[i,],xi_cov_star, Q_param)
+      
+    }
+    
+    
+  }
     
     # print("sampling")
     # print(j)
@@ -136,33 +146,15 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # print("beta_old")
     # print(beta_old)
     
-    curr[i] <- j
-    
-    
-    # If a new group is sampled, then the new parameters also need to be sampled
-    if(j==k_new+1)
-      {
-          # A new group has been formed 
-          k_new=k_new+1
-          
-          # Sampling from the predictive distribution considering only the current point 
-          # The predictive distribution is known in closed form
-          xi_mu_star <- construct_mu_new(Y[i,],xi_mu_star, Q_param)
-          
-          xi_cov_star <- construct_cov_new(Y[i,],xi_cov_star, Q_param)
-          
-      }
-    
-      
-   } 
+   
 
   
   # At the end all the empty groups are deleted and the others are shifted
-  delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star)
-  curr <- delete_list$curr
-  xi_mu_star <- delete_list$xi_mu_star
-  xi_cov_star <- delete_list$xi_cov_star
-  
+  # delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star)
+  # curr <- delete_list$curr
+  # xi_mu_star <- delete_list$xi_mu_star
+  # xi_cov_star <- delete_list$xi_cov_star
+
   
   print("curr")
   print(curr)
@@ -180,6 +172,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   my_list <-list("S_new"=S_new, "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)
   return (my_list) 
 }
+  
 
 
 # Function to compute the probability that a point belongs to the contaminated part
@@ -276,7 +269,7 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
   # Compute lambda_n
   lambda_n = Q_param$lambda_0 + (Q_param$k_0/(Q_param$k_0 + 1))*t(r)%*%r
   
-  coeff <- beta_old * (theta_old+(k_old-m1_bar)*sigma_old)/(theta_old+n-m1_bar-1)
+  coeff <- beta_old * (theta_old+k_old*sigma_old)/(theta_old+n-m1_bar-1)
   
   # Evaluation of a multivariate t-Student
   weight <- coeff *LaplacesDemon::dmvt(data,mu = mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
@@ -288,44 +281,26 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
 # INPUT: curr -> n vector containing the clusters at current iteration 
 #        xi_mu_star -> list of k vectors, contains means of the current groups
 #        xi_cov_star -> list of k matrices, contains cov. matrices of the current groups
+#        old_group -> index of the group to be cancelled
 
 # OUTPUT: curr -> n vector containing the updated clusters
 #         xi_mu_star -> list of k vectors, contains means of the updated groups
 #         xi_cov_star -> list of k matrices, contains cov. matrices of the updated groups
 
-delete_and_shift <- function(curr, xi_mu_star, xi_cov_star)
+delete_and_shift <- function(curr, xi_mu_star, xi_cov_star, old_group)
 {
-  # end is the highest possible group index
-  end <- max(curr)
-  
-  # Iteration from 1 to the max of curr 
-  j = 1
-  while (j <= end)
-  {
-    # If the j-th group is empty
-    if (j<=max(curr) & !(j %in% curr)){
+  # Elimination of groups' parameters
+  xi_mu_star <- xi_mu_star[-old_group]
+  xi_cov_star <- xi_cov_star[-old_group]
       
-      # Elimination of group's parameters
-      xi_mu_star <- xi_mu_star[-j]
-      xi_cov_star <- xi_cov_star[-j]
-      
-      # Shifting of groups with higher index
-      for (i in 1:length(curr)){
-        if (curr[i]>j){
+  # Shifting of groups with higher index
+  for (i in 1:length(curr)){
+        if (curr[i]>old_group){
           curr[i] = curr[i]-1
         }
-        
-      }
-    }
-    
-    # If the current group is deleted, j is not augmented since the group needs to be 
-    # checked again (after the shifting the current group corresponds to the next one)
-    # If there is no deletion j is augmented to check the next group
-    else
-    {
-      j = j + 1
-    }
   }
+        
+   
   return(list("curr" = curr, "xi_mu_star" = xi_mu_star, "xi_cov_star" = xi_cov_star))
 }
 

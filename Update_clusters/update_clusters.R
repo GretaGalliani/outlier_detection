@@ -46,7 +46,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     
     # Initialization of all probabilities to 0
-    prob <- rep(10000,max(curr)+2) #0,1,...k_new, k_new+1
+    prob <- rep(0,max(curr)+2) #0,1,...k_new, k_new+1
     
     # Computation of m_bar discarding the i-th element
     m1_bar <- m1_bar(curr[-i])

@@ -13,6 +13,8 @@
 #         acc -> number of accepted proposals at the current iteration
 update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = 2) { 
   
+  print("Start update_theta")
+  
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
@@ -32,10 +34,14 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   if (u < aprob){
     n_acc = n_acc+1
     
+    print("End update_theta")
     # Return of the new value of sigma (equal to the proposed value y) and the accuracy
     return(list("theta" = y, "acc" = n_acc))
   } 
   else {
+    
+    print("End update_theta")
+    
     # Return of the new value of sigma (equal to the previous value sigma_old) and the accuracy
     return(list("theta" = theta_old, "acc" = n_acc))
     

@@ -17,7 +17,8 @@
 # OUTPUT: sigma -> value of the parameter sigma at the r iteration
 #         acc -> number of accepted proposals at the current iteration
 update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 2) { 
-  # METROPOLIS HASTINGS RANDOM WALK 
+  # METROPOLIS HASTINGS RANDOM WALK
+  print("Start update_sigma")
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that sigma is in (0,1)
@@ -36,9 +37,13 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_par
     n_acc = n_acc+1
     
     # Return of the new value of sigma (equal to the proposed value y) and the accuracy 
+    print("End update_sigma")
     return(list("sigma" = y, "acc" = n_acc))
   } 
   else {
+    
+    print("End update_sigma")
+    
     # Return of the new value of sigma (equal to the previous value sigma_old) and the accuracy
     return(list("sigma" = sigma_old, "acc" = n_acc))
   }
@@ -115,14 +120,14 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
   
   # print(single)
   
-  if(single)
+  if(single){
     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * (1/(x*(1-x))))
+  }
   else{
     freq_m1 = freq[freq>1]
     
     # print("vettore produttoria")
     # print(gamma(freq_m1-x)/gamma(1-x))
-    
     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * (1/(x*(1-x))))
   }  
 }

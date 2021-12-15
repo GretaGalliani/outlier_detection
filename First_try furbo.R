@@ -69,7 +69,7 @@ data = rbind(data_1, data_2, outlier)
 
 plot(data[-11,])
 
-S_init = c(1,2,3,4,5,6,7,8,9,10,11,12)
+S_init = c(1,1,1,1,1,2,2,2,2,2,3)
 beta_init <- 0.5
 sigma_init <- 0.2
 theta_init <- 0.2
@@ -101,4 +101,4 @@ xi_cov <- append(xi_cov, list(xi_sigma_0))
 
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, xi_mu, xi_cov, Q_param, P_param, 3)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, xi_mu, xi_cov, Q_param, P_param, 1)

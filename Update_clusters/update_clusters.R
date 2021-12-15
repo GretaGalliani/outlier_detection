@@ -28,7 +28,7 @@ source("auxiliary_functions/auxiliary_functions.R")
 #         xi_cov_star -> list of k matrices, contains cov. matrices of the new groups
 
 update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
-                              beta_old, theta_old, sigma_old, k_old,
+                              beta_old, theta_old, sigma_old,
                               P_param, Q_param)
 {
   n <- dim(Y)[1]
@@ -106,11 +106,12 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   
     
     
+    print("i")
+    print(i)
+    
     print("vector of prob")
     print(prob)
     
-    print("i")
-    print(i)
     # print("old_group")
     # print(curr[i])
     

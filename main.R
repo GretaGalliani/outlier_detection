@@ -70,10 +70,13 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     # set.seed(26091998)
     # Step 2a: Updating the clusters
     clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
-                                      S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
+                                      S_old, beta_old, theta_old, sigma_old, P_param, Q_param)
     
     # Updating the variables for next steps
     S_old = clusters$S_new
+    
+    print("Clusters")
+    print(S_old)
     
     # Find the actual number of groups k
     k_old = max(S_old)
@@ -100,7 +103,6 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     
     # Computation of the frequency vector for the cluster labels
     freq = rep(0,k_old)
-    
     for (i in 1:k_old){
       freq[i] <- sum(S_old == i)
     }

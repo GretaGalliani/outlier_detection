@@ -105,7 +105,7 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
 dens_theta <- function(x, k, m1_bar, sigma, n, theta_param) {
   print("dgamma")
   print(dgamma(x, theta_param$a, rate=theta_param$b))
-  print( dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
+  print(dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
   print((gamma(x/sigma)  ))
   print(gamma(x + n - m1_bar))
   

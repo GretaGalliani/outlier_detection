@@ -108,20 +108,14 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # I save the old group
     old_group <- curr[i]
     
+    
     # Sampling of the new assignment
     j <- sample(0:(k_new+1),size=1,prob=prob)
     
     # Assignment to the new group
     curr[i] <- j
     
-    # If the old group is now empty
-    if (sum(curr==old_group)==0){
-      # I call the function which delete the groups' parameters and shift the groups higher than the old one
-      delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star, old_group)
-      curr <- delete_list$curr
-      xi_mu_star <- delete_list$xi_mu_star
-      xi_cov_star <- delete_list$xi_cov_star
-    }
+
     
     # If a new group is sampled, then the new parameters also need to be sampled
     if(j==k_new+1)
@@ -135,6 +129,15 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
       
       xi_cov_star <- construct_cov_new(Y[i,],xi_cov_star, Q_param)
       
+    }
+    
+    # If the old group is now empty
+    if (sum(curr==old_group)==0){
+      # I call the function which delete the groups' parameters and shift the groups higher than the old one
+      delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star, old_group)
+      curr <- delete_list$curr
+      xi_mu_star <- delete_list$xi_mu_star
+      xi_cov_star <- delete_list$xi_cov_star
     }
     
     

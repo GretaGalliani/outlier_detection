@@ -20,7 +20,7 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, gamma_param, the
   y <- inv_theta( change_theta(theta_old) + rnorm(1,0,sd))
   
   # Computation the alpha of the new proposal wrt the old one
-  aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n)
+  aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n,theta_param)
   
   print("aprob theta")
   print(aprob)
@@ -67,13 +67,13 @@ inv_theta <- function(x) {
 #        sigma -> sigma at the current iteration
 #        n -> number of data points
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
-compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
+compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n,theta_param) {
   # Computation of the partial posterior density for y and x
-  pi_y <- dens_theta(y, k, m1_bar, sigma, n)
-  pi_x <- dens_theta(x, k, m1_bar, sigma, n)
-  
+  pi_y <- dens_theta(y, k, m1_bar, sigma, n,theta_param)
   print("pi_y")
   print(pi_y)
+  pi_x <- dens_theta(x, k, m1_bar, sigma, n,theta_param)
+  
   print("pi_x")
   print(pi_x)
   
@@ -96,14 +96,17 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
 #        sigma -> sigma at the current iteration
 #        n -> number of data points
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
-dens_theta <- function(x, k, m1_bar, sigma, n) {
+dens_theta <- function(x, k, m1_bar, sigma, n,theta_param) {
   print("x")
   print(x)
   print("dgamma")
+  print(theta_param)
   print(dgamma(x, theta_param$a, rate=theta_param$b))
-  print(dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
-  print((gamma(x/sigma) * gamma(x + n - m1_bar)))
-  return ( dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
+  print( dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
+  print((gamma(x/sigma)  ))
+  print(gamma(x + n - m1_bar))
+  
+  return (dgamma(x, theta_param$a, rate=theta_param$b) *  gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
 }
 
 

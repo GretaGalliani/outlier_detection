@@ -169,11 +169,11 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   # xi_cov_star <- delete_list$xi_cov_star
 
   
-  print("curr")
-  print(curr)
+  #print("curr")
+  #print(curr)
   
-  print("xi_mu_star")
-  print(xi_mu_star)
+  #print("xi_mu_star")
+  #print(xi_mu_star)
   
   # print("beta")
   # print(beta_old)

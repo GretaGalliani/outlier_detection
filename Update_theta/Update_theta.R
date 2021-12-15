@@ -68,6 +68,12 @@ inv_theta <- function(x) {
 #        n -> number of data points
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
 compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
+  
+  print("x")
+  print(x)
+  print("y")
+  print(y)
+  
   # Computation of the partial posterior density for y and x
   pi_y <- dens_theta(y, k, m1_bar, sigma, n, theta_param)
   print("pi_y")
@@ -97,8 +103,6 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
 #        n -> number of data points
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_theta <- function(x, k, m1_bar, sigma, n, theta_param) {
-  print("x")
-  print(x)
   print("dgamma")
   print(dgamma(x, theta_param$a, rate=theta_param$b))
   print( dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )

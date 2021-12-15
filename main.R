@@ -28,7 +28,7 @@ source("auxiliary_functions/auxiliary_functions.R")
 #         acc_sigma -> acceptance rate of sigma
 #         acc_theta -> acceptance rate of theta
 #         acc_beta -> acceptance rate of beta
-algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu, xi_cov, Q_param, P_param, n_iter ){
+algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a_beta, b_beta, a_sigma, b_sigma, xi_mu, xi_cov, Q_param, P_param, n_iter ){
  
   # Variables initialization:
   # initialize the variables for the iterations from the input
@@ -104,7 +104,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
     # Step 2c: Updating the parameters of the discrete component
     
     # Updating sigma
-    sigma_list <- update_sigma(m1_SUPP, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma)
+    sigma_list <- update_sigma(m1_SUPP, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma, a_sigma, b_sigma)
     # Updating the variables
     sigma_old <- sigma_list$sigma
     sigma_vec[r] <- sigma_old
@@ -121,7 +121,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a, b, xi_mu,
     acc_theta <- theta_list$acc
     
     # Step 2d: Updating the weight parameter
-    beta_new <- update_beta(n, m1_bar, beta_old, a, b)
+    beta_new <- update_beta(n, m1_bar, beta_old, a_beta, b_beta)
     # Updating the variables
     beta_old <- beta_new
     beta_vec[r] <- beta_old

@@ -73,6 +73,11 @@ beta_init <- 0.5
 sigma_init <- 0.5
 theta_init <- 0.5
 
+a_beta = 1
+b_beta = 1
+a_sigma = 1
+b_sigma = 1
+
 xi_mu <- list()
 xi_cov <- list()
 
@@ -93,4 +98,4 @@ xi_cov <- append(xi_cov, list(xi_sigma_0))
 
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 1, 1, xi_mu, xi_cov, Q_param, P_param, 3)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, a_beta, b_beta, a_sigma, b_sigma, xi_mu, xi_cov, Q_param, P_param, 3)

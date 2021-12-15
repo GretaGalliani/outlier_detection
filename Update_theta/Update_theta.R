@@ -84,7 +84,7 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
 #        n -> number of data points
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_theta <- function(x, k, m1_bar, sigma, n) {
-  return ( gamma(x) * gamma(x/sigma + k - m1_bar) / gamma(x/sigma) / gamma(x + n - m1_bar) * (1/x) )
+  return ( gamma(x) * gamma(x/sigma + k) / gamma(x/sigma) / gamma(x + n - m1_bar) * (1/x) )
 }
 
 

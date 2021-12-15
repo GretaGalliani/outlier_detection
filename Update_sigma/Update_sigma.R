@@ -10,10 +10,13 @@
 #        freq -> vector containing the number of points for each group j=1,...k
 #        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 #        n_acc -> number of accepted proposals until the previous iterations
+#        a -> first shape parameter for the beta prior for sigma
+#        b -> second shape parameter for the beta prior for sigma
+#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 
 # OUTPUT: sigma -> value of the parameter sigma at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sd = 2) { 
+update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, a, b, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
@@ -21,7 +24,7 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sd = 2) {
   y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
   
   # Computation the alpha of the new proposal wrt the old one 
-  aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq)
+  aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq, a, b)
   #print("Aprob sigma")
   #print(aprob)
   
@@ -66,10 +69,10 @@ inv_sigma <- function(x) {
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
-compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
+compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, a, b) {
   # Computation of the partial posterior density for y and x
-  pi_y <- dens_sigma(y, k, m1, m1_bar, theta, freq)
-  pi_x <- dens_sigma(x, k, m1, m1_bar, theta, freq)
+  pi_y <- dens_sigma(y, k, m1, m1_bar, theta, freq, a, b)
+  pi_x <- dens_sigma(x, k, m1, m1_bar, theta, freq, a, b)
   
   rapp <- pi_y/pi_x
   
@@ -87,7 +90,7 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq) {
 #        freq -> vector containing the number of points for each group j=1,...k
 #        m1_bar -> number of points in group 0
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
-dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
+dens_sigma <- function(x, k, m1, m1_bar, theta, freq, a, b) {
   
   # I select the groups which are not singletons
   single = TRUE
@@ -118,7 +121,7 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq) {
     print("vettore produttoria")
     print(gamma(freq_m1-x)/gamma(1-x))
     
-    return ( x^(k - m1_bar) * (gamma(theta/x + k - m1_bar)/gamma(theta/x))^(k-m1+1) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))
+    return ( dbeta(x, a, b)* x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * 1/(x*(1-x)))
   }  
 }
 

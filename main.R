@@ -28,7 +28,7 @@ source("auxiliary_functions/auxiliary_functions.R")
 #         acc_sigma -> acceptance rate of sigma
 #         acc_theta -> acceptance rate of theta
 #         acc_beta -> acceptance rate of beta
-algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, xi_mu, xi_cov, Q_param, P_param, n_iter ){
+algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, n_iter ){
  
   # Variables initialization:
   # initialize the variables for the iterations from the input
@@ -116,7 +116,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
 
     
     # Updating theta
-    theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)
+    theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta, theta_param)
     # Updating the variables
     theta_old <- theta_list$theta
     theta_vec[r] <- theta_old

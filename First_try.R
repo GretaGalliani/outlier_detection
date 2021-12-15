@@ -27,6 +27,8 @@ beta_param$a = 1
 beta_param$b = 1
 sigma_param$a = 1
 sigma_param$b = 1
+theta_param$a = 2
+theta_param$b = 0.02
 
 xi_mu <- list()
 xi_cov <- list()
@@ -42,5 +44,5 @@ P_param <- list("nu_0"= 3, "mu_0" = c(0,0), "lambda_0" = matrix(c(1,0,0,1), nrow
   
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init,  beta_param, sigma_param, xi_mu, xi_cov, Q_param, P_param, 200)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init,  beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 200)
 warnings()

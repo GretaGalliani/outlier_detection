@@ -11,7 +11,7 @@
 
 # OUTPUT: theta -> value of the parameter theta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
-update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, sd = 2) { 
+update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, gamma_param, theta_param, sd = 2) { 
   
   # METROPOLIS HASTINGS RANDOM WALK 
   
@@ -84,7 +84,7 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
 #        n -> number of data points
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_theta <- function(x, k, m1_bar, sigma, n) {
-  return ( gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
+  return ( dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
 }
 
 

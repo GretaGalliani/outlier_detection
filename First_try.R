@@ -20,10 +20,13 @@ beta_init <- 0.99
 sigma_init <- 0.5
 theta_init <- 0.5
 # Inizializzare parametri a e b per prior di beta
-a_beta = 1
-b_beta = 1
-a_sigma = 1
-b_sigma = 1
+
+beta_param = list()
+sigma_param = list()
+beta_param$a = 1
+beta_param$b = 1
+sigma_param$a = 1
+sigma_param$b = 1
 
 xi_mu <- list()
 xi_cov <- list()
@@ -39,5 +42,5 @@ P_param <- list("nu_0"= 3, "mu_0" = c(0,0), "lambda_0" = matrix(c(1,0,0,1), nrow
   
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, a_beta, b_beta, a_sigma, b_sigma, xi_mu, xi_cov, Q_param, P_param, 200)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init,  beta_param, sigma_param, xi_mu, xi_cov, Q_param, P_param, 200)
 warnings()

@@ -67,7 +67,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     # Progress bar
     pb = progress_bar$new(total=1e3)
     pb$tick(0)
-    set.seed(26091998)
+    # set.seed(26091998)
     # Step 2a: Updating the clusters
     clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, k_old, P_param, Q_param)
@@ -81,12 +81,16 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     # Store the current cluster labels by rows in the matrix
     S_matrix[r,] = S_old
     
-    # Step 2b: Updating the parameters of the groups’ distribution xi_star
-    xi <- update_xi(Y, S_old, k_old, Q_param)
-  
-    # Updating the variables for next steps
-    xi_mu_star <- xi$xi_mu_star
-    xi_cov_star <- xi$xi_cov_star
+    # If there are some groups, I need to update their parameters
+    if(k_old > 0){
+      # Step 2b: Updating the parameters of the groups’ distribution xi_star
+      xi <- update_xi(Y, S_old, k_old, Q_param)
+      
+      # Updating the variables for next steps
+      xi_mu_star <- xi$xi_mu_star
+      xi_cov_star <- xi$xi_cov_star
+    }
+    
     
     # m1 and m1_bar computation
     # further informations about the functions are available in the script
@@ -109,15 +113,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     sigma_old <- sigma_list$sigma
     sigma_vec[r] <- sigma_old
     acc_sigma <- sigma_list$acc
-    
-    print("sigma")
-    print(sigma_old)
-    
-    print("beta")
-    print(beta_old)
-    
-    print("theta")
-    print(theta_old)
+
     
     # Updating theta
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)
@@ -132,6 +128,17 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     beta_old <- beta_new
     beta_vec[r] <- beta_old
     #acc_beta <- beta_list$acc
+    
+    
+    
+    print("sigma")
+    print(sigma_old)
+    
+    print("beta")
+    print(beta_old)
+    
+    print("theta")
+    print(theta_old)
   }
 
   

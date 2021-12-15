@@ -48,7 +48,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     k_new = max(curr)
     
     # Initialization of all probabilities to 0
-    prob <- rep(0,k_new+2) #0,1,...k_new, k_new+1
+    prob <- rep(10000,k_new+2) #0,1,...k_new, k_new+1
     
     # Computation of m_bar discarding the i-th element
     m1_bar <- m1_bar(curr[-i])
@@ -59,12 +59,15 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     #j=0
     # Probability that the i-th element is in the contaminated part
     prob[1] <- dens_contaminated(Y[i,], beta_old, P_param) 
+
     
     # print("prob contaminated")
     # print(prob[1])
     
-    for (t in (2:(k_new+1)))
-    {
+  
+    if(k_new > 0){
+      for (t in (2:(k_new+1)))
+      {
       # Frequency of the current group
       n_j <- sum(curr == t-1)
 
@@ -72,6 +75,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
       # of sampling that group is 0
       if (n_j == 1 & curr[i] == t-1){
         prob[t]=0
+        print("entro qua e vi odio")
       }
 
       else{
@@ -82,10 +86,12 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
         # Computation of the probability that data i is sampled in group j
         prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
                                       xi_cov_star[[t-1]])
+        print("entro nell else")
 
 
         }
       }
+    }
     #   
     #   # print("gruppo")
     #   # print(t-1)
@@ -98,12 +104,19 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     prob[k_new+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, k_new,
                                      Q_param)
     
+
     # print("prob gruppo nuovo")
     # print(prob[k_new+2])
+  
     
     
-    # print("vector of prob")
-    # print(prob)
+    print("vector of prob")
+    print(prob)
+    
+    print("i")
+    print(i)
+    print("old_group")
+    print(curr[i])
     
     # I save the old group
     old_group <- curr[i]
@@ -211,6 +224,9 @@ dens_contaminated <- function(data, beta_old, P_param)
   weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu = mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
                                               df = nu_n-p+1)
   
+  print("prob contaminated")
+  print(weight)
+  
   return (weight)
 }
 
@@ -231,10 +247,15 @@ dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_ol
 {
   
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
-  
+
+  print("mu")
+  print(xi_mu_act)
+  print("cov")
+  print(xi_cov_act)
   # Computation of the density of a multivariate normal 
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
-  
+  print("weigth")
+  print(weight)
   return (weight)
 }
 

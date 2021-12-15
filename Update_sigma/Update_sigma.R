@@ -113,7 +113,7 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
   # print("m1_bar")
   # print(m1_bar)
   
-  print(single)
+  # print(single)
   
   if(single)
     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * 1/(x*(1-x)))

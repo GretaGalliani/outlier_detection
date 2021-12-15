@@ -34,8 +34,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   n <- dim(Y)[1]
   
   # Creation of the new S and k initialized like the ones at previous iteration
-  curr <- S_old 
-  k_new <- k_old
+  curr <- S_old
   
   # Cycling over all the elements
   for (i in 1:n)
@@ -45,10 +44,9 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # - comes from an already existing group --> j=1:K
     # - comes from a new group --> j=K+1
     
-    k_new = max(curr)
     
     # Initialization of all probabilities to 0
-    prob <- rep(10000,k_new+2) #0,1,...k_new, k_new+1
+    prob <- rep(10000,max(curr)+2) #0,1,...k_new, k_new+1
     
     # Computation of m_bar discarding the i-th element
     m1_bar <- m1_bar(curr[-i])
@@ -65,8 +63,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # print(prob[1])
     
   
-    if(k_new > 0){
-      for (t in (2:(k_new+1)))
+    if(max(curr) > 0){
+      for (t in (2:(max(curr)+1)))
       {
       # Frequency of the current group
       n_j <- sum(curr == t-1)
@@ -75,7 +73,6 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
       # of sampling that group is 0
       if (n_j == 1 & curr[i] == t-1){
         prob[t]=0
-        print("entro qua e vi odio")
       }
 
       else{
@@ -86,7 +83,6 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
         # Computation of the probability that data i is sampled in group j
         prob[t] <- dens_cluster_old(Y[i,],n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_star[[t-1]],
                                       xi_cov_star[[t-1]])
-        print("entro nell else")
 
 
         }
@@ -101,7 +97,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     #j=K+1
     # Computation of the probability that data i is sampled in a new group 
-    prob[k_new+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, k_new,
+    prob[max(curr)+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, max(curr),
                                      Q_param)
     
 
@@ -115,15 +111,17 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     print("i")
     print(i)
-    print("old_group")
-    print(curr[i])
+    # print("old_group")
+    # print(curr[i])
     
     # I save the old group
     old_group <- curr[i]
     
     
     # Sampling of the new assignment
-    j <- sample(0:(k_new+1),size=1,prob=prob)
+    j <- sample(0:(max(curr)+1),size=1,prob=prob)
+    
+    old_k <- max(curr)
     
     # Assignment to the new group
     curr[i] <- j
@@ -131,26 +129,25 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 
     
     # If a new group is sampled, then the new parameters also need to be sampled
-    if(j==k_new+1)
+    if(j==old_k+1)
     {
-      # A new group has been formed 
-      k_new=k_new+1
       
       # Sampling from the predictive distribution considering only the current point 
       # The predictive distribution is known in closed form
       xi_mu_star <- construct_mu_new(Y[i,],xi_mu_star, Q_param)
-      
       xi_cov_star <- construct_cov_new(Y[i,],xi_cov_star, Q_param)
       
     }
     
     # If the old group is now empty
-    if (sum(curr==old_group)==0){
+    if (sum(curr==old_group)==0 & old_group!=0){
       # I call the function which delete the groups' parameters and shift the groups higher than the old one
       delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star, old_group)
       curr <- delete_list$curr
       xi_mu_star <- delete_list$xi_mu_star
       xi_cov_star <- delete_list$xi_cov_star
+      
+      print("ho cancellato un gruppo")
     }
     
     
@@ -174,6 +171,9 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   
   print("curr")
   print(curr)
+  
+  print("xi_mu_star")
+  print(xi_mu_star)
   
   # print("beta")
   # print(beta_old)
@@ -223,9 +223,7 @@ dens_contaminated <- function(data, beta_old, P_param)
   # Evaluation of a multivariate t-Student
   weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu = mu_n, S = lambda_n*(k_n+1)/(k_n*(nu_n-p+1)), 
                                               df = nu_n-p+1)
-  
-  print("prob contaminated")
-  print(weight)
+
   
   return (weight)
 }
@@ -248,14 +246,9 @@ dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_ol
   
   coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
 
-  print("mu")
-  print(xi_mu_act)
-  print("cov")
-  print(xi_cov_act)
   # Computation of the density of a multivariate normal 
   weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
-  print("weigth")
-  print(weight)
+  
   return (weight)
 }
 
@@ -314,8 +307,8 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
 delete_and_shift <- function(curr, xi_mu_star, xi_cov_star, old_group)
 {
   # Elimination of groups' parameters
-  xi_mu_star <- xi_mu_star[-old_group]
-  xi_cov_star <- xi_cov_star[-old_group]
+  xi_mu_star_upd <- xi_mu_star[-old_group]
+  xi_cov_star_upd <- xi_cov_star[-old_group]
       
   # Shifting of groups with higher index
   for (i in 1:length(curr)){
@@ -325,7 +318,7 @@ delete_and_shift <- function(curr, xi_mu_star, xi_cov_star, old_group)
   }
         
    
-  return(list("curr" = curr, "xi_mu_star" = xi_mu_star, "xi_cov_star" = xi_cov_star))
+  return(list("curr" = curr, "xi_mu_star" = xi_mu_star_upd, "xi_cov_star" = xi_cov_star_upd))
 }
 
 # Function to sample the parameter mu for a new group 

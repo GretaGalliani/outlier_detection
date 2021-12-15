@@ -22,6 +22,9 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, gamma_param, the
   # Computation the alpha of the new proposal wrt the old one
   aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n)
   
+  print("aprob theta")
+  print(aprob)
+  
   # Sampling from a U(0,1)
   u <- runif(1) 
   
@@ -69,7 +72,17 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
   pi_y <- dens_theta(y, k, m1_bar, sigma, n)
   pi_x <- dens_theta(x, k, m1_bar, sigma, n)
   
+  print("pi_y")
+  print(pi_y)
+  print("pi_x")
+  print(pi_x)
+  
+  
+  
   rapp <- pi_y/pi_x
+  print("rapp")
+  print(rapp)
+  
   
   # Computation of alpha 
   return (min(1, rapp))
@@ -84,6 +97,12 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n) {
 #        n -> number of data points
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 dens_theta <- function(x, k, m1_bar, sigma, n) {
+  print("x")
+  print(x)
+  print("dgamma")
+  print(dgamma(x, theta_param$a, rate=theta_param$b))
+  print(dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
+  print((gamma(x/sigma) * gamma(x + n - m1_bar)))
   return ( dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
 }
 

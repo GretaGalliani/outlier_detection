@@ -70,8 +70,8 @@ plot(data[-11,])
 
 S_init = c(1,2,3,4,5,6,7,8,9,10,11)
 beta_init <- 0.5
-sigma_init <- 0.5
-theta_init <- 0.5
+sigma_init <- 0.2
+theta_init <- 0.2
 
 beta_param = list()
 sigma_param = list()

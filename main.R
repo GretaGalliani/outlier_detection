@@ -113,6 +113,12 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     print("sigma")
     print(sigma_old)
     
+    print("beta")
+    print(beta_old)
+    
+    print("theta")
+    print(theta_old)
+    
     # Updating theta
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta)
     # Updating the variables

@@ -209,7 +209,7 @@ dens_contaminated <- function(data, beta_old, P_param)
   p = dim(data)[2]
   
   # Compute mu_n as a matrix
-  mu_n = as.matrix(P_param$k_0/(P_param$k_0+1)*P_param$mu_0 + (1/P_param$k_0 + 1)*data)
+  mu_n = as.matrix(P_param$k_0/(P_param$k_0+1)*P_param$mu_0 + (1/(P_param$k_0 + 1))*data)
   
   # Compute k_n and nu_n
   k_n = P_param$k_0 + 1
@@ -282,7 +282,7 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
   p = dim(data)[2]
 
   # Compute mu_n as matrix
-  mu_n = as.matrix(Q_param$k_0/(Q_param$k_0+1)*Q_param$mu_0 + (1/Q_param$k_0 + 1)*data)
+  mu_n = as.matrix(Q_param$k_0/(Q_param$k_0+1)*Q_param$mu_0 + (1/(Q_param$k_0 + 1))*data)
   
   # Compute k_n and nu_n
   k_n = Q_param$k_0 + 1

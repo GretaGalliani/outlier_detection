@@ -104,7 +104,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, a_beta, b_be
     # Step 2c: Updating the parameters of the discrete component
     
     # Updating sigma
-    sigma_list <- update_sigma(m1_SUPP, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma, a_sigma, b_sigma)
+    sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma, a_sigma, b_sigma)
     # Updating the variables
     sigma_old <- sigma_list$sigma
     sigma_vec[r] <- sigma_old

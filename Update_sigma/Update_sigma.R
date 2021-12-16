@@ -19,19 +19,21 @@
 update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK
   print("Start update_sigma")
-  
+  print("sigma_old")
+  print(sigma_old)
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that sigma is in (0,1)
   y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
-  
+  # print("y")
+  # print(y)
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq, sigma_param)
-  #print("Aprob sigma")
-  #print(aprob)
+  # print("Aprob sigma")
+  # print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
-  
+
   # If u < aprob, the proposed value is accepted and the number of accepted values is increased 
   if (u < aprob){
     n_acc = n_acc+1
@@ -79,6 +81,11 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
   pi_y <- dens_sigma(y, k, m1, m1_bar, theta, freq, sigma_param)
   pi_x <- dens_sigma(x, k, m1, m1_bar, theta, freq, sigma_param)
   
+  print("pi_y")
+  print(pi_y)
+  
+  print("pi_x")
+  print(pi_x)
   rapp <- pi_y/pi_x
   
   # Computation of alpha 

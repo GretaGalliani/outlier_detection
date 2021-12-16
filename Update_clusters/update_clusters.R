@@ -103,14 +103,6 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
 
     # print("prob gruppo nuovo")
     # print(prob[k_new+2])
-  
-    
-    
-    print("i")
-    print(i)
-    
-    print("vector of prob")
-    print(prob)
     
     # print("old_group")
     # print(curr[i])
@@ -148,7 +140,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
       xi_mu_star <- delete_list$xi_mu_star
       xi_cov_star <- delete_list$xi_cov_star
       
-      print("ho cancellato un gruppo")
+      print(paste0("Ho cancellato il gruppo ", old_group, " a cui apparteneva il sample ", i))
     }
     
     

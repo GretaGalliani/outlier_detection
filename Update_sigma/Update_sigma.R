@@ -4,32 +4,29 @@
 # INPUT: m1 -> number of singletons (number of points in group 0 + number of groups with one point)
 #                                   (to be computed using the auxiliary function m1)
 #        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
-#        k -> number of distinct groups
-#        sigma_old -> beta at the previous iteration
+#        k -> number of distinct groups (excluding the groups from the contaminated part)
+#        sigma_old -> sigma at the previous iteration
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
-#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 #        n_acc -> number of accepted proposals until the previous iterations
-#        a -> first shape parameter for the beta prior for sigma
-#        b -> second shape parameter for the beta prior for sigma
+#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
+#        sigma_param -> list containing the prior parameter of theta (which is a beta)
+#                       a -> shape1
+#                       b -> shape2
 #        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 
 # OUTPUT: sigma -> value of the parameter sigma at the r iteration
 #         acc -> number of accepted proposals at the current iteration
+
 update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 2) { 
   # METROPOLIS HASTINGS RANDOM WALK
-  print("Start update_sigma")
-  
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that sigma is in (0,1)
   y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
-  # print("y")
-  # print(y)
+
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq, sigma_param)
-  # print("Aprob sigma")
-  # print(aprob)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -39,12 +36,9 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_par
     n_acc = n_acc+1
     
     # Return of the new value of sigma (equal to the proposed value y) and the accuracy 
-    print("End update_sigma")
     return(list("sigma" = y, "acc" = n_acc))
   } 
   else {
-    
-    print("End update_sigma")
     
     # Return of the new value of sigma (equal to the previous value sigma_old) and the accuracy
     return(list("sigma" = sigma_old, "acc" = n_acc))
@@ -70,22 +64,22 @@ inv_sigma <- function(x) {
 # Function to compute the alpha(x,y) for the proposed value y and the old value x
 # INPUT: x -> value of sigma at the previous step
 #        y -> proposed value for sigma
-#        k -> number of distinct groups
+#        k -> number of distinct groups (excluding the groups from the contaminated part)
 #        m1 -> number of singletons (number of points in group 0 + number of groups with one point)
 #        m1_bar -> number of points in group 0
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
+#        sigma_param -> list containing the prior parameter of theta (which is a beta)
+#                       a -> shape1
+#                       b -> shape2
+
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
+
 compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
   # Computation of the partial posterior density for y and x
   pi_y <- dens_sigma(y, k, m1, m1_bar, theta, freq, sigma_param)
   pi_x <- dens_sigma(x, k, m1, m1_bar, theta, freq, sigma_param)
   
-  #print("pi_y")
-  #print(pi_y)
-  
-  #print("pi_x")
-  #print(pi_x)
   rapp <- pi_y/pi_x
   
   # Computation of alpha 
@@ -95,16 +89,21 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
 
 # Function to compute the partial posterior density (up to the normalizing constant) for sigma
 # INPUT: x -> point where the partial density is evaluated
-#        k -> number of distinct groups
+#        k -> number of distinct groups (excluding the groups from the contaminated part)
 #        m1 -> number of singletons (number of points in group 0 + number of groups with one point)
 #        m1_bar -> number of points in group 0
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
-#        m1_bar -> number of points in group 0
+#        sigma_param -> list containing the prior parameter of theta (which is a beta)
+#                       a -> shape1
+#                       b -> shape2
+
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
+
 dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
   
-  # I select the groups which are not singletons
+  # single needs to be equal to true if all the groups are singletons
+  # single is false if there is at least a group which is not a singleton
   single = TRUE
   for (elem in freq){
     if (elem > 1){
@@ -113,11 +112,17 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
     }
   }
    
+  # If single = TRUE, all the groups are singleton and the computation of the prod part is skipped
   if(single){
+    
+    # Computation of the partial posterior density, corrected to account for the reparameterization of MH
     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * (1/(x*(1-x))))
   }
   else{
+    # I compute the frequencies of all the groups which are not singletons
     freq_m1 = freq[freq>1]
+    
+    # Computation of the partial posterior density, corrected to account for the reparameterization of MH
     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * (1/(x*(1-x))))
   }  
 }

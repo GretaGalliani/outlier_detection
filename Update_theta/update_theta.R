@@ -3,18 +3,19 @@
 # Function to update the theta parameter
 # INPUT: n -> number of data points
 #        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
-#        k -> number of distinct groups
+#        k -> number of distinct groups (excluding the groups from the contaminated part)
 #        theta_old -> theta at the previous iteration
 #        sigma -> sigma at the current iteration
-#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 #        n_acc -> number of accepted proposals in the previous iterations
+#        theta_param -> list containing the prior parameter of theta (which is a gamma)
+#                       a -> shape
+#                       b -> rate
+#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 
 # OUTPUT: theta -> value of the parameter theta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
+
 update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = 2) { 
-  
-  print("Start update_theta")
-  
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
@@ -24,23 +25,17 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   # Computation the alpha of the new proposal wrt the old one
   aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n, theta_param)
   
-  print("aprob theta")
-  print(aprob)
-  
   # Sampling from a U(0,1)
   u <- runif(1) 
   
   # If u < aprob, the proposed value is accepted and the number of accepted values is increased 
   if (u < aprob){
     n_acc = n_acc+1
-    
-    print("End update_theta")
+
     # Return of the new value of sigma (equal to the proposed value y) and the accuracy
     return(list("theta" = y, "acc" = n_acc))
   } 
   else {
-    
-    print("End update_theta")
     
     # Return of the new value of sigma (equal to the previous value sigma_old) and the accuracy
     return(list("theta" = theta_old, "acc" = n_acc))
@@ -68,34 +63,19 @@ inv_theta <- function(x) {
 # Function to compute the alpha(x,y) for the proposed value y and the old value x
 # INPUT: x -> value of theta at the previous step
 #        y -> proposed value for theta
-#        k -> number of distinct groups
+#        k -> number of distinct groups (excluding the groups from the contaminated part)
 #        m1_bar -> number of points in group 0
 #        sigma -> sigma at the current iteration
 #        n -> number of data points
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
 compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
-  
-  print("x")
-  print(x)
-  print("y")
-  print(y)
-  
+
   # Computation of the partial posterior density for y and x
   pi_y <- dens_theta(y, k, m1_bar, sigma, n, theta_param)
-  print("pi_y")
-  print(pi_y)
   pi_x <- dens_theta(x, k, m1_bar, sigma, n, theta_param)
   
-  print("pi_x")
-  print(pi_x)
-  
-  
-  
   rapp <- pi_y/pi_x
-  print("rapp")
-  print(rapp)
-  
-  
+
   # Computation of alpha 
   return (min(1, rapp))
 }
@@ -103,18 +83,18 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
 
 # Function to compute the partial posterior density (up to the normalizing constant) for theta
 # INPUT: x -> point where the partial density is evaluated
-#        k -> number of distinct groups
+#        k -> number of distinct groups (excluding the groups from the contaminated part)
 #        m1_bar -> number of points in group 0
 #        sigma -> sigma at the current iteration
 #        n -> number of data points
+#        theta_param -> list containing the prior parameter of theta (which is a gamma)
+#                       a -> shape
+#                       b -> rate
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
+
 dens_theta <- function(x, k, m1_bar, sigma, n, theta_param) {
-  #print("dgamma")
-  #print(dgamma(x, theta_param$a, rate=theta_param$b))
-  #print(dgamma(x, theta_param$a, rate=theta_param$b) * gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
-  #print((gamma(x/sigma)  ))
-  #print(gamma(x + n - m1_bar))
   
+  # Computation of the partial posterior density, corrected to account for the reparameterization of MH
   return (dgamma(x, theta_param$a, rate=theta_param$b) *  gamma(x) * gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * (1/x) )
 }
 

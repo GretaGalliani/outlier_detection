@@ -94,6 +94,9 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
       xi_cov_star <- xi$xi_cov_star
     }
     
+    print("Print xi_mu_star")
+    print(xi_mu_star)
+    
     
     # m1 and m1_bar computation
     # further informations about the functions are available in the script

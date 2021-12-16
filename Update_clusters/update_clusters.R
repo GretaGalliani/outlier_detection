@@ -44,6 +44,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # - comes from an already existing group --> j=1:K
     # - comes from a new group --> j=K+1
     
+    print(paste0("I'm considering sample ", i))
+    
     
     # Initialization of all probabilities to 0
     prob <- rep(0,max(curr)+2) #0,1,...k_new, k_new+1
@@ -64,7 +66,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
   
     if(max(curr) > 0){
-      for (t in (2:(max(curr)+1)))
+      for (t in 2:(max(curr)+1))
       {
       # Frequency of the current group
       n_j <- sum(curr == t-1)
@@ -111,6 +113,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     old_group <- curr[i]
     
     
+    print("Prob vector")
+    print(prob)
     # Sampling of the new assignment
     j <- sample(0:(max(curr)+1),size=1,prob=prob)
     
@@ -135,6 +139,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # If the old group is now empty
     if (sum(curr==old_group)==0 & old_group!=0){
       # I call the function which delete the groups' parameters and shift the groups higher than the old one
+      print(paste0("I'm deleting the group ", old_group))
       delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star, old_group)
       curr <- delete_list$curr
       xi_mu_star <- delete_list$xi_mu_star
@@ -161,22 +166,25 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   # xi_mu_star <- delete_list$xi_mu_star
   # xi_cov_star <- delete_list$xi_cov_star
 
-  
-  #print("curr")
-  #print(curr)
-  
-  #print("xi_mu_star")
-  #print(xi_mu_star)
-  
+  # 
+  # print("curr")
+  # print(curr)
+  # 
+  #print("prob")
+  #print(prob)
+  # 
+  # print("xi_mu_star")
+  # print(xi_mu_star)
+  # 
   # print("beta")
   # print(beta_old)
-  # 
+  #  
   # print("sigma")
   # print(sigma_old)
-  # 
+  #  
   # print("theta")
   # print(theta_old)
-  
+  # 
   S_new <- curr
   my_list <-list("S_new"=S_new, "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)
   return (my_list) 

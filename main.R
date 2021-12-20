@@ -28,7 +28,7 @@ source("auxiliary_functions/auxiliary_functions.R")
 #         acc_sigma -> acceptance rate of sigma
 #         acc_theta -> acceptance rate of theta
 #         acc_beta -> acceptance rate of beta
-algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, n_iter ){
+algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, n_iter, burnin, thinning ){
  
   # Variables initialization:
   # initialize the variables for the iterations from the input
@@ -62,6 +62,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
   xi_mu_star <- xi$xi_mu_star
   xi_cov_star <- xi$xi_cov_star
   
+  if (r > burnin + 1)
+  
   # Start to iterate
   for (r in 1:n_iter){
     
@@ -86,7 +88,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     k_old = max(S_old)
     
     # Store the current cluster labels by rows in the matrix
-    S_matrix[r,] = S_old
+    if (r > burnin + 1 && r %% thinning == 0) S_matrix[r,] = S_old
     
     # If there are some groups, I need to update their parameters
     if(k_old > 0){
@@ -120,22 +122,26 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma, sigma_param)
     # Updating the variables
     sigma_old <- sigma_list$sigma
-    sigma_vec[r] <- sigma_old
-    acc_sigma <- sigma_list$acc
+    if (r > burnin + 1 && r %% thinning == 0){
+      sigma_vec[r] <- sigma_old
+      acc_sigma <- sigma_list$acc
+    }
 
     
     # Updating theta
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta, theta_param)
     # Updating the variables
     theta_old <- theta_list$theta
-    theta_vec[r] <- theta_old
-    acc_theta <- theta_list$acc
+    if (r > burnin + 1 && r %% thinning == 0){
+      theta_vec[r] <- theta_old
+      acc_theta <- theta_list$acc
+    }
     
     # Step 2d: Updating the weight parameter
     beta_new <- update_beta(n, m1_bar, beta_param)
     # Updating the variables
     beta_old <- beta_new
-    beta_vec[r] <- beta_old
+    if (r > burnin + 1 && r %% thinning == 0) beta_vec[r] <- beta_old
     #acc_beta <- beta_list$acc
     
     

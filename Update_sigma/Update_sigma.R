@@ -18,12 +18,12 @@
 # OUTPUT: sigma -> value of the parameter sigma at the r iteration
 #         acc -> number of accepted proposals at the current iteration
 
-update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 2) { 
+update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = .02) { 
   # METROPOLIS HASTINGS RANDOM WALK
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that sigma is in (0,1)
-  y <- inv_sigma( change_sigma(sigma_old) + rnorm(1,0,sd))
+  y <- inv_sigma(change_sigma(sigma_old) + rnorm(1,0,sd))
 
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq, sigma_param)
@@ -116,14 +116,34 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
   if(single){
     
     # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-    return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * (1/(x*(1-x))))
+    return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * ((x*(1-x))))
   }
   else{
     # I compute the frequencies of all the groups which are not singletons
     freq_m1 = freq[freq>1]
     
     # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-    return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * (1/(x*(1-x))))
+    return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * ((x*(1-x))))
   }  
 }
 
+#-------------------
+# - EXAMPLE
+theta <- 1
+m1 <- 10
+m1_bar <- 8
+k <- 20
+sigma_old <- 0.2 
+freq <- c(rep(1, 10), 10, 4, 5, 25, 3, 6, 9, 12, 4, 2)
+n_acc <- 0
+s_vec <- c()
+
+for(i in 1:10000){
+  temp <- update_sigma(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 1)
+  sigma_old <- temp$sigma
+  s_vec[i] <- sigma_old
+  n_acc <- temp$acc
+  print(sigma_old)
+}
+n_acc / 10000
+hist(s_vec)

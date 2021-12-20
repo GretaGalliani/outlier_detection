@@ -43,10 +43,10 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
   # create the vectors that will store the values of beta, theta and sigma
   # generated at each iteration, plus the matrix storing the cluster labels S
   # at each iteration by row
-  beta_vec = rep(0,n_iter)
-  theta_vec = rep(0,n_iter)
-  sigma_vec = rep(0,n_iter)
-  S_matrix = matrix(nrow = n_iter, ncol = n)
+  beta_vec = {}
+  theta_vec = {}
+  sigma_vec = {}
+  S_matrix = matrix(nrow = 0, ncol = n)
   
   # Acceptance rates initialization:
   # initialize the counter variables for the number of accepted values over MH iterations
@@ -62,13 +62,11 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
   xi_mu_star <- xi$xi_mu_star
   xi_cov_star <- xi$xi_cov_star
   
-  if (r > burnin + 1)
-  
   # Start to iterate
   for (r in 1:n_iter){
     
-    if (r %% 500 == 0)
-      print(paste0("Running ", r, " iteration"))
+    if (r %% 10 == 0)
+      print(paste0("Running iteration ", r))
     
     # Progress bar
     pb = progress_bar$new(total=1e3)
@@ -88,7 +86,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     k_old = max(S_old)
     
     # Store the current cluster labels by rows in the matrix
-    if (r > burnin + 1 && r %% thinning == 0) S_matrix[r,] = S_old
+    if (r > burnin + 1 && r %% thinning == 0) S_matrix = rbind(S_matrix, S_old)
     
     # If there are some groups, I need to update their parameters
     if(k_old > 0){
@@ -124,7 +122,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     sigma_old <- sigma_list$sigma
     if (r > burnin + 1){
       if (r %% thinning == 0){
-        sigma_vec[r] <- sigma_old
+        sigma_vec <- append(sigma_vec, sigma_old)
       }
       acc_sigma <- sigma_list$acc
     }
@@ -136,7 +134,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     theta_old <- theta_list$theta
     if (r > burnin + 1){
       if (r %% thinning == 0){
-        theta_vec[r] <- theta_old
+        theta_vec <- append(theta_vec, theta_old)
       }
       acc_theta <- theta_list$acc
     }
@@ -145,19 +143,19 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     beta_new <- update_beta(n, m1_bar, beta_param)
     # Updating the variables
     beta_old <- beta_new
-    if (r > burnin + 1 && r %% thinning == 0) beta_vec[r] <- beta_old
+    if (r > burnin + 1 && r %% thinning == 0) beta_vec <- append(beta_vec, beta_old)
     #acc_beta <- beta_list$acc
     
     
     
-    print("sigma")
-    print(sigma_old)
+    #print("sigma")
+    #print(sigma_old)
 
-    print("beta")
-    print(beta_old)
+    #print("beta")
+    #print(beta_old)
 
-    print("theta")
-    print(theta_old)
+    #print("theta")
+    #print(theta_old)
   }
 
   

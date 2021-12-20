@@ -64,6 +64,10 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
   
   # Start to iterate
   for (r in 1:n_iter){
+    
+    if (r %% 500 == 0)
+      print(paste0("Running ", r, " iteration"))
+    
     # Progress bar
     pb = progress_bar$new(total=1e3)
     pb$tick(0)
@@ -75,8 +79,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     # Updating the variables for next steps
     S_old = clusters$S_new
     
-    print("Clusters")
-    print(S_old)
+    #print("Clusters")
+    #print(S_old)
     
     # Find the actual number of groups k
     k_old = max(S_old)
@@ -94,8 +98,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
       xi_cov_star <- xi$xi_cov_star
     }
     
-    print("Print xi_mu_star")
-    print(xi_mu_star)
+    #print("Print xi_mu_star")
+    #print(xi_mu_star)
     
     
     # m1 and m1_bar computation
@@ -136,14 +140,14 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     
     
     
-    print("sigma")
-    print(sigma_old)
+    #print("sigma")
+    #print(sigma_old)
     
-    print("beta")
-    print(beta_old)
+    #print("beta")
+    #print(beta_old)
     
-    print("theta")
-    print(theta_old)
+    #print("theta")
+    #print(theta_old)
   }
 
   

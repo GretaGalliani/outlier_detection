@@ -44,7 +44,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # - comes from an already existing group --> j=1:K
     # - comes from a new group --> j=K+1
     
-    print(paste0("I'm considering sample ", i))
+    #print(paste0("I'm considering sample ", i))
     
     
     # Initialization of all probabilities to 0
@@ -113,8 +113,8 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     old_group <- curr[i]
     
     
-    print("Prob vector")
-    print(prob)
+    #print("Prob vector")
+    #print(prob)
     # Sampling of the new assignment
     j <- sample(0:(max(curr)+1),size=1,prob=prob)
     
@@ -139,13 +139,13 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # If the old group is now empty
     if (sum(curr==old_group)==0 & old_group!=0){
       # I call the function which delete the groups' parameters and shift the groups higher than the old one
-      print(paste0("I'm deleting the group ", old_group))
+      #print(paste0("I'm deleting the group ", old_group))
       delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star, old_group)
       curr <- delete_list$curr
       xi_mu_star <- delete_list$xi_mu_star
       xi_cov_star <- delete_list$xi_cov_star
       
-      print(paste0("Ho cancellato il gruppo ", old_group, " a cui apparteneva il sample ", i))
+      #print(paste0("Ho cancellato il gruppo ", old_group, " a cui apparteneva il sample ", i))
     }
     
     

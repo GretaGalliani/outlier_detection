@@ -122,8 +122,10 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma, sigma_param)
     # Updating the variables
     sigma_old <- sigma_list$sigma
-    if (r > burnin + 1 && r %% thinning == 0){
-      sigma_vec[r] <- sigma_old
+    if (r > burnin + 1){
+      if (r %% thinning == 0){
+        sigma_vec[r] <- sigma_old
+      }
       acc_sigma <- sigma_list$acc
     }
 
@@ -132,8 +134,10 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta, theta_param)
     # Updating the variables
     theta_old <- theta_list$theta
-    if (r > burnin + 1 && r %% thinning == 0){
-      theta_vec[r] <- theta_old
+    if (r > burnin + 1){
+      if (r %% thinning == 0){
+        theta_vec[r] <- theta_old
+      }
       acc_theta <- theta_list$acc
     }
     

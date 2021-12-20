@@ -24,7 +24,8 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   
   # Computation the alpha of the new proposal wrt the old one
   aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n, theta_param)
-  
+  print("Aprob:")
+  print(aprob)
   # Sampling from a U(0,1)
   u <- runif(1) 
   
@@ -70,11 +71,20 @@ inv_theta <- function(x) {
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
 compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
   
+<<<<<<< HEAD
   log_dens_y <- dgamma(y, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(y) + lgamma(y/sigma + k) - lgamma(y/sigma) - lgamma(y + n - m1_bar) + log(y)
   
   log_dens_x <- dgamma(x, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(x) + lgamma(x/sigma + k) - lgamma(x/sigma) - lgamma(x + n - m1_bar) + log(x)
   
   
+=======
+  rapp <- pi_y/pi_x
+
+  print("pi_y")
+  print(pi_y)
+  print("pi_x")
+  print(pi_x)
+>>>>>>> dca00abf767efc652d5292bfce959dabdb3183e4
   # Computation of alpha 
   return (min(1, exp(log_dens_y - log_dens_x)))
 }

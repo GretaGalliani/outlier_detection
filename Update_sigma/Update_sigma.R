@@ -24,13 +24,13 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_par
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
   # to correct the fact that sigma is in (0,1)
   y <- inv_sigma(change_sigma(sigma_old) + rnorm(1,0,sd))
-
+  
   # Computation the alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq, sigma_param)
   
   # Sampling from a U(0,1)
   u <- runif(1) 
-
+  
   # If u < aprob, the proposed value is accepted and the number of accepted values is increased 
   if (u < aprob){
     n_acc = n_acc+1
@@ -76,14 +76,19 @@ inv_sigma <- function(x) {
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
 
 compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
-  # Computation of the partial posterior density for y and x
-  pi_y <- dens_sigma(y, k, m1, m1_bar, theta, freq, sigma_param)
-  pi_x <- dens_sigma(x, k, m1, m1_bar, theta, freq, sigma_param)
+  freq_m1 = freq[freq>1]
   
-  rapp <- pi_y/pi_x
+  log_dens_y = dbeta(y, sigma_param$a, sigma_param$b, log = TRUE) + k*log(y) + lgamma(theta/y + k) - lgamma(theta/y) + log(y) + log(1-y)
+  log_dens_x = dbeta(x, sigma_param$a, sigma_param$b, log = TRUE) + k*log(x) + lgamma(theta/x + k) - lgamma(theta/x) + log(x) + log(1-x)
+  
+  
+  for (elem in freq_m1){
+    log_dens_y = log_dens_y + lgamma(elem - y) - lgamma(1-y)
+    log_dens_x = log_dens_x + lgamma(elem - x) - lgamma(1-x)
+  }
   
   # Computation of alpha 
-  return (min(1, rapp))
+  return (min(1, exp(log_dens_y - log_dens_x)))
 }
 
 
@@ -100,32 +105,32 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
 
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 
-dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
-  
-  # single needs to be equal to true if all the groups are singletons
-  # single is false if there is at least a group which is not a singleton
-  single = TRUE
-  for (elem in freq){
-    if (elem > 1){
-      single = FALSE
-      break
-    }
-  }
-   
-  # If single = TRUE, all the groups are singleton and the computation of the prod part is skipped
-  if(single){
-    
-    # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-    return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * ((x*(1-x))))
-  }
-  else{
-    # I compute the frequencies of all the groups which are not singletons
-    freq_m1 = freq[freq>1]
-    
-    # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-    return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * ((x*(1-x))))
-  }  
-}
+# dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
+#   
+#   # single needs to be equal to true if all the groups are singletons
+#   # single is false if there is at least a group which is not a singleton
+#   single = TRUE
+#   for (elem in freq){
+#     if (elem > 1){
+#       single = FALSE
+#       break
+#     }
+#   }
+#   
+#   # If single = TRUE, all the groups are singleton and the computation of the prod part is skipped
+#   if(single){
+#     
+#     # Computation of the partial posterior density, corrected to account for the reparameterization of MH
+#     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * ((x*(1-x))))
+#   }
+#   else{
+#     # I compute the frequencies of all the groups which are not singletons
+#     freq_m1 = freq[freq>1]
+#     
+#     # Computation of the partial posterior density, corrected to account for the reparameterization of MH
+#     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * ((x*(1-x))))
+#   }  
+# }
 
 #-------------------
 # - EXAMPLE

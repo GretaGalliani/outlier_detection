@@ -15,7 +15,7 @@
 # OUTPUT: theta -> value of the parameter theta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
 
-update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = .2){ 
+update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = 1){ 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
@@ -31,7 +31,7 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   # If u < aprob, the proposed value is accepted and the number of accepted values is increased 
   if (u < aprob){
     n_acc = n_acc+1
-
+    
     # Return of the new value of sigma (equal to the proposed value y) and the accuracy
     return(list("theta" = y, "acc" = n_acc))
   } 
@@ -69,16 +69,17 @@ inv_theta <- function(x) {
 #        n -> number of data points
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
 compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
-
-  # Computation of the partial posterior density for y and x
-  pi_y <- dens_theta(y, k, m1_bar, sigma, n, theta_param)
-  pi_x <- dens_theta(x, k, m1_bar, sigma, n, theta_param)
   
-  rapp <- pi_y/pi_x
-
+  log_dens_y <- dgamma(y, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(y) + lgamma(y/sigma + k) - lgamma(y/sigma) - lgamma(y + n - m1_bar) + log(y)
+  
+  log_dens_x <- dgamma(x, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(x) + lgamma(x/sigma + k) - lgamma(x/sigma) - lgamma(x + n - m1_bar) + log(x)
+  
+  
   # Computation of alpha 
-  return (min(1, rapp))
+  return (min(1, exp(log_dens_y - log_dens_x)))
 }
+
+
 
 
 # Function to compute the partial posterior density (up to the normalizing constant) for theta
@@ -92,12 +93,12 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
 #                       b -> rate
 # OUTPUT: f -> the evaluation of the partial posterior density at point x
 
-dens_theta <- function(x, k, m1_bar, sigma, n, theta_param) {
-  
-  # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-  return (dgamma(x, theta_param$a, rate=theta_param$b) *  gamma(x) * 
-            gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * x)
-}
+# dens_theta <- function(x, k, m1_bar, sigma, n, theta_param) {
+#   
+#   # Computation of the partial posterior density, corrected to account for the reparameterization of MH
+#   return (dgamma(x, theta_param$a, rate=theta_param$b) *  gamma(x) * 
+#             gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * x)
+# }
 
 #-------------------
 # - EXAMPLE

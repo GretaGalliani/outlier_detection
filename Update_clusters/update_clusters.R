@@ -253,21 +253,7 @@ dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_ol
 dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_old, Q_param, p)
 {
   # Transformation of data into a matrix
-<<<<<<< HEAD
-  
-  # data <- t(data)
-  
-  
-=======
-  data <- as.matrix(data)
-  p = dim(data)[2]
-  
-  data <- t(data)
-  
-  # Dimension of data
-  
 
->>>>>>> dca00abf767efc652d5292bfce959dabdb3183e4
   # Compute mu_n as matrix
   # mu_n = as.matrix(Q_param$k_0/(Q_param$k_0+1)*Q_param$mu_0 + (1/(Q_param$k_0 + 1))*data)
   

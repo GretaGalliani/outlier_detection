@@ -140,14 +140,14 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     
     
     
-    #print("sigma")
-    #print(sigma_old)
-    
-    #print("beta")
-    #print(beta_old)
-    
-    #print("theta")
-    #print(theta_old)
+    print("sigma")
+    print(sigma_old)
+
+    print("beta")
+    print(beta_old)
+
+    print("theta")
+    print(theta_old)
   }
 
   

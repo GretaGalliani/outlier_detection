@@ -26,19 +26,22 @@ update_xi <- function(Y, S, k, Q_param){
       n = 1
       d = length(Yj)
       sample_cov = 0
+      sample_mean = rowMeans(as.matrix(Yj))
     }
     # else, compute sample_cov
     else{
       n = dim(Yj)[1]
       d = dim(Yj)[2]
       sample_cov = cov(Yj)
+      sample_mean = colMeans(Yj)
+      
     }
     
     # Compute the parameters for the marginals
     k_n = Q_param$k_0 + n
-    mu_n = (Q_param$k_0*Q_param$mu_0+n*mean(Yj))/k_n
+    mu_n = Q_param$k_0/(k_n)*Q_param$mu_0 + n/k_n*sample_mean
     nu_n = Q_param$nu_0 + n
-    lambda_n = Q_param$lambda_0 + sample_cov + Q_param$k_0*n/k_n*(mean(Yj)-Q_param$mu_0)%*%t((mean(Yj)-Q_param$mu_0))
+    lambda_n = Q_param$lambda_0 + sample_cov + Q_param$k_0*n/k_n*(sample_mean-Q_param$mu_0)%*%t((sample_mean-Q_param$mu_0))
     
     # computation of degrees of freedom
     df = nu_n-d+1
@@ -49,12 +52,6 @@ update_xi <- function(Y, S, k, Q_param){
     
     # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
     xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, as.inverse(lambda_n))
-    
-    # print("group")
-    # print(j)
-    # 
-    # print("xi_cov")
-    # print(xi_cov)
     
     # Appending of the sampled values
     xi_mu <- append(xi_mu, list(xi_mu_j))

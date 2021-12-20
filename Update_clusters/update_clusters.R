@@ -112,9 +112,13 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     # I save the old group
     old_group <- curr[i]
     
+    print("stiamo guardando il dato")
+    print(i)
     
-    #print("Prob vector")
-    #print(prob)
+    print("Prob vector")
+    print(prob)
+    
+    
     # Sampling of the new assignment
     j <- sample(0:(max(curr)+1),size=1,prob=prob)
     

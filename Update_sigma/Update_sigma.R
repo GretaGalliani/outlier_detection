@@ -129,21 +129,21 @@ dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
 
 #-------------------
 # - EXAMPLE
-theta <- 1
-m1 <- 10
-m1_bar <- 8
-k <- 20
-sigma_old <- 0.2 
-freq <- c(rep(1, 10), 10, 4, 5, 25, 3, 6, 9, 12, 4, 2)
-n_acc <- 0
-s_vec <- c()
-
-for(i in 1:10000){
-  temp <- update_sigma(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 1)
-  sigma_old <- temp$sigma
-  s_vec[i] <- sigma_old
-  n_acc <- temp$acc
-  print(sigma_old)
-}
-n_acc / 10000
-hist(s_vec)
+# theta <- 1
+# m1 <- 10
+# m1_bar <- 8
+# k <- 20
+# sigma_old <- 0.2 
+# freq <- c(rep(1, 10), 10, 4, 5, 25, 3, 6, 9, 12, 4, 2)
+# n_acc <- 0
+# s_vec <- c()
+# 
+# for(i in 1:10000){
+#   temp <- update_sigma(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 1)
+#   sigma_old <- temp$sigma
+#   s_vec[i] <- sigma_old
+#   n_acc <- temp$acc
+#   print(sigma_old)
+# }
+# n_acc / 10000
+# hist(s_vec)

@@ -62,15 +62,12 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
   xi_mu_star <- xi$xi_mu_star
   xi_cov_star <- xi$xi_cov_star
   
+  # Progress bar
+  pb = progress_bar$new(total=n_iter)
+  pb$tick(0)
   # Start to iterate
   for (r in 1:n_iter){
     
-    if (r %% 10 == 0)
-      print(paste0("Running iteration ", r))
-    
-    # Progress bar
-    pb = progress_bar$new(total=1e3)
-    pb$tick(0)
     # set.seed(26091998)
     # Step 2a: Updating the clusters
     clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
@@ -146,7 +143,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     if (r > burnin + 1 && r %% thinning == 0) beta_vec <- append(beta_vec, beta_old)
     #acc_beta <- beta_list$acc
     
-    
+    #Progress bar
+    pb$tick()
     
     #print("sigma")
     #print(sigma_old)

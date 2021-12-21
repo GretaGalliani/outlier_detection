@@ -152,8 +152,11 @@ plot(data[-11,], col=real, pch = 19)
 # devtools::install_github("sarawade/mcclust.ext")
 library(mcclust.ext)
 
+aux <- result$S[,-11]
+psm2 <- comp.psm(aux)
+
 # finds the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
-min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
+min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
       max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
       l=NULL, suppress.comment=TRUE)
 

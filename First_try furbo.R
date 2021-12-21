@@ -121,3 +121,27 @@ for (i in 1:1000){
 }
 
 mean(max) # mean number of clusters by the algorithm 
+
+
+# IMPLEMENTING MIN BINDER LOSS
+
+# These functions needs to have indexes of the groups >=1
+aux = result$S + 1
+
+# For a sample of clusterings of the same objects the proportion of clusterings 
+# in which observation $i$ and $j$ are together in a cluster is computed and 
+# a matrix containing all proportions is given out. 
+psm <- comp.psm(aux)
+
+# finds the clustering that minimizes the posterior expectation of Binders loss function
+min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
+                                           "laugreen","all"), max.k = NULL, include.lg = FALSE, 
+          start.cl = NULL, tol = 0.001)
+
+# best cluster according to binder loss (without outlier)
+plot(data[-11,], col=min_bind$cl)
+
+# real cluster
+real <- c(1,1,1,1,1,2,2,2,2,2)
+plot(data[-11,], col=real)
+

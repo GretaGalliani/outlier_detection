@@ -81,8 +81,8 @@ beta_param$a = 1
 beta_param$b = 1
 sigma_param$a = 1
 sigma_param$b = 1
-theta_param$a = 2
-theta_param$b = 0.02
+theta_param$a = 1
+theta_param$b = 1
 
 xi_mu <- list()
 xi_cov <- list()
@@ -104,7 +104,7 @@ xi_cov <- append(xi_cov, list(xi_sigma_0))
 
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 100, 10, 5)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 5000, 10)
 
 tail(result$sigma, 20)
 plot(result$sigma, type='l')
@@ -115,3 +115,9 @@ plot(result$theta, type='l')
 result$S[1:30,]
 plot(data, col=result$S[150,])
 
+max <- c()
+for (i in 1:1000){
+  max <- c(max, max(result$S[i,]))
+}
+
+mean(max) # mean number of clusters by the algorithm 

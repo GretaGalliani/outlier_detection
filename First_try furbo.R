@@ -124,6 +124,7 @@ mean(max) # mean number of clusters by the algorithm
 
 
 # IMPLEMENTING MIN BINDER LOSS
+library(mcclust)
 
 # These functions needs to have indexes of the groups >=1
 aux = result$S + 1
@@ -138,10 +139,28 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
                                            "laugreen","all"), max.k = NULL, include.lg = FALSE, 
           start.cl = NULL, tol = 0.001)
 
+par(mfrow=c(1,2)) 
+
 # best cluster according to binder loss (without outlier)
-plot(data[-11,], col=min_bind$cl)
+plot(data[-11,], col=min_bind$cl, pch = 19)
 
 # real cluster
 real <- c(1,1,1,1,1,2,2,2,2,2)
-plot(data[-11,], col=real)
+plot(data[-11,], col=real, pch = 19)
 
+# IMPLEMENTING MIN VARIATION OF INFORMATION
+# devtools::install_github("sarawade/mcclust.ext")
+library(mcclust.ext)
+
+# finds the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
+min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
+      max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
+      l=NULL, suppress.comment=TRUE)
+
+par(mfrow=c(1,2))
+
+# best cluster according to iv loss (without outlier)
+plot(data[-11,], col=min_vi$cl, pch = 19)
+
+# real cluster
+plot(data[-11,], col=real, pch = 19)

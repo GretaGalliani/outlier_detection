@@ -106,6 +106,10 @@ xi_cov <- append(xi_cov, list(xi_sigma_0))
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 5000, 10)
 
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
+
+
+
 tail(result$sigma, 20)
 plot(result$sigma, type='l')
 

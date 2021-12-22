@@ -171,8 +171,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   # print("curr")
   # print(curr)
   # 
-  #print("prob")
-  #print(prob)
+
   # 
   # print("xi_mu_star")
   # print(xi_mu_star)
@@ -205,12 +204,13 @@ dens_contaminated <- function(data, beta_old, P_param, p)
 {
   
   # Evaluation of a multivariate t-Student
-  weight <- (1-beta_old) *LaplacesDemon::dmvt(data,mu = P_param$mu_0, 
+  weight <- log(1-beta_old) + LaplacesDemon::dmvt(data,mu = P_param$mu_0, 
                                               S =(P_param$k_0 + 1)/(P_param$k_0*(P_param$nu_0-p+1))*P_param$lambda_0, 
-                                              df = P_param$nu_0-p+1)
+                                              df = P_param$nu_0-p+1,
+                                              log = TRUE)
   
   
-  return (weight)
+  return (exp(weight))
 }
 
 # Function to compute the probability that a point belongs to the current group
@@ -229,12 +229,12 @@ dens_contaminated <- function(data, beta_old, P_param, p)
 dens_cluster_old <- function(data, n_j, n, m1_bar, sigma_old, theta_old, beta_old, xi_mu_act, xi_cov_act)
 {
   
-  coeff <- beta_old * (n_j-sigma_old)/(theta_old+n-m1_bar-1)
+  coeff <- log(beta_old) + log(n_j-sigma_old) - log(theta_old+n-m1_bar-1)
   
   # Computation of the density of a multivariate normal 
-  weight <- coeff * dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act)
+  weight <- coeff + dmvnorm(data, mean=xi_mu_act, sigma=xi_cov_act, log = TRUE)
   
-  return (weight)
+  return (exp(weight))
 }
 
 # Function to compute the probability that a point belongs to a new group 
@@ -266,7 +266,7 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
   # Compute lambda_n
   # lambda_n = Q_param$lambda_0 + (Q_param$k_0/(Q_param$k_0 + 1))*t(r)%*%r
   
-  coeff <- beta_old * (theta_old+k_old*sigma_old)/(theta_old+n-m1_bar-1)
+  coeff <- log(beta_old) + log(theta_old+k_old*sigma_old) - log(theta_old+n-m1_bar-1)
   
   # print("matrice S di Q")
   # print((Q_param$k_0 + 1)/(Q_param$k_0*(Q_param$nu_0-p+1))*Q_param$lambda_0)
@@ -281,10 +281,11 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
   # print(Q_param$lambda_0)
   
   # Evaluation of a multivariate t-Student
-  weight <- coeff *LaplacesDemon::dmvt(data,mu = Q_param$mu_0, 
+  weight <- coeff + LaplacesDemon::dmvt(data,mu = Q_param$mu_0, 
                                        S = (Q_param$k_0 + 1)/(Q_param$k_0*(Q_param$nu_0-p+1))*Q_param$lambda_0, 
-                                       df = Q_param$nu_0-p+1)  
-  return (weight)
+                                       df = Q_param$nu_0-p+1,
+                                       log = TRUE)  
+  return (exp(weight))
 }
 
 # Function to delete the empty groups and shift the other groups when needed

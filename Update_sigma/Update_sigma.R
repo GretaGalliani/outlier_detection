@@ -9,7 +9,6 @@
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
 #        n_acc -> number of accepted proposals until the previous iterations
-#        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 #        sigma_param -> list containing the prior parameter of theta (which is a beta)
 #                       a -> shape1
 #                       b -> shape2

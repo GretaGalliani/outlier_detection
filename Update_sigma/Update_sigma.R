@@ -24,7 +24,7 @@ update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_par
   # to correct the fact that sigma is in (0,1)
   y <- inv_sigma(change_sigma(sigma_old) + rnorm(1,0,sd))
   
-  # Computation the alpha of the new proposal wrt the old one 
+  # Computation of alpha of the new proposal wrt the old one 
   aprob <- compute_alpha_sigma(sigma_old, y, k, m1, m1_bar, theta, freq, sigma_param)
   
   # Sampling from a U(0,1)

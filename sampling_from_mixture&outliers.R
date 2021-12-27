@@ -29,4 +29,5 @@ while(i<s){ #cycle to find s outliers
     }
 }
 allval = allval[sample(m+s,m+s),] #randomizing rows
+rownames(allval)=NULL
 allval

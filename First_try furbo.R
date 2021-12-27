@@ -8,7 +8,7 @@ P_param = list()
 d=2
 
 
-Q_param$k_0 = 2
+Q_param$k_0 = 0.01
 Q_param$mu_0 = c(0,0)
 Q_param$nu_0 = 3 # it must be > (p-1)
 Q_param$lambda_0 = matrix(c(1,0,0,1), nrow = 2, ncol = 2)

@@ -46,6 +46,35 @@ for (i in 1:n){
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 5000, 10)
 
+# PARAMETER ANALYSIS
+x11()
+par(mfrow=c(1,3))
+par(mar=c(3,3,1,1),mgp=c(1.75,.75,0))
+plot(result$sigma,xlab="iteration",ylab=expression(sigma))  
+plot(result$theta,xlab="iteration",ylab=expression(theta))  
+plot(result$beta,xlab="iteration",ylab=expression(beta))  
 
+dev.off()
+
+## marginal traceplots
+x11()
+par(mfrow=c(1,3))
+plot(ts(result$sigma),xlab="iteration",ylab=expression(sigma))
+plot(ts(result$theta),xlab="iteration",ylab=expression(theta))
+plot(ts(result$beta),xlab="iteration",ylab=expression(beta))
+
+
+library(coda)
+
+# Plot of AUTOCORRELATION
+par(mfrow=c(1,3))
+tmp1 <- acf(result$sigma, main='Autocorrelation of sigma')
+tmp2 <- acf(result$theta, main='Autocorrelation of theta')
+tmp3 <- acf(result$beta, main='Autocorrelation of beta')
+
+# ESS
+effectiveSize(result$sigma)
+effectiveSize(result$theta)
+effectiveSize(result$beta)
 
 # CLUSTER ANALYSIS

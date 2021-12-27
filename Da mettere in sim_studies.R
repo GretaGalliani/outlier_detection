@@ -50,9 +50,9 @@ result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param,
 x11()
 par(mfrow=c(1,3))
 par(mar=c(3,3,1,1),mgp=c(1.75,.75,0))
-plot(result$sigma,xlab="iteration",ylab=expression(sigma))  
-plot(result$theta,xlab="iteration",ylab=expression(theta))  
-plot(result$beta,xlab="iteration",ylab=expression(beta))  
+plot(result$sigma,xlab="iteration",ylab=expression(sigma), type = 'l')  
+plot(result$theta,xlab="iteration",ylab=expression(theta), type = 'l')  
+plot(result$beta,xlab="iteration",ylab=expression(beta), type = 'l')  
 
 dev.off()
 

@@ -25,7 +25,7 @@ while(i<s){ #cycle to find s outliers
   if(module^2>3*sqrt(chi)) #If we are sampling from the over-disperse truncated Gaussian distribution
     {
     i=i+1
-    allval = rbind(allval,val)
+    allval = rbind(allval,value)
     }
 }
 allval = allval[sample(m+s,m+s),] #randomizing rows

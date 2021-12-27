@@ -57,7 +57,7 @@ S_init = rep(1,n)
 
 beta_init <- 0.5
 sigma_init <- 0.5
-theta_init <- 100
+theta_init <- 1
 
 beta_param = list()
 sigma_param = list()
@@ -67,7 +67,7 @@ beta_param$b = 1
 sigma_param$a = 1
 sigma_param$b = 1
 theta_param$a = 2
-theta_param$b = 0.02
+theta_param$b = 1/0.02
 
 xi_mu <- list()
 xi_cov <- list()
@@ -82,7 +82,7 @@ for (i in 1:n){
 
 #### RUNNING THE ALGORITHM ####
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 0, 1)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -124,6 +124,14 @@ for (i in 1:1000){
 mean(max) # mean number of clusters by the algorithm 
 
 
+# WE COUNT THE NUMBER OF SINGLETONS
+source("auxiliary_functions/auxiliary_functions.R")
+
+n_singletons <- c()
+for (i in 1:dim(result$S)[1]){
+  n_singletons <- c(n_singletons, m1(result$S[i,]))
+}
+
 # IMPLEMENTING MIN BINDER LOSS
 library(mcclust)
 
@@ -143,7 +151,7 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
 par(mfrow=c(1,2)) 
 
 # best cluster according to binder loss (without outlier)
-plot(data[-11,], col=min_bind$cl, pch = 19)
+plot(data, col=min_bind$cl, pch = 19)
 
 # real cluster
 real <- c(1,1,1,1,1,2,2,2,2,2)

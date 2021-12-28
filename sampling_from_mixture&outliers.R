@@ -140,8 +140,17 @@ n_singletons
 # IMPLEMENTING MIN BINDER LOSS
 library(mcclust)
 
+aux = result$S
+
 # These functions needs to have indexes of the groups >=1
-aux = result$S + 1
+for (i in 1:dim(aux)[1]){
+  for (j in 1:dim(aux)[2]){
+    if (aux[i,j]==0){
+      aux[i,j] = max(aux[i,]) + 1
+    }
+  }
+}
+
 
 # For a sample of clusterings of the same objects the proportion of clusterings 
 # in which observation $i$ and $j$ are together in a cluster is computed and 
@@ -152,6 +161,7 @@ psm <- comp.psm(aux)
 min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
                                                         "laugreen","all"), max.k = NULL, include.lg = FALSE, 
                        start.cl = NULL, tol = 0.001)
+
 
 par(mfrow=c(1,2)) 
 

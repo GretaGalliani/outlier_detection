@@ -187,7 +187,10 @@ min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all
 par(mfrow=c(1,2))
 
 # best cluster according to iv loss (without outlier)
-plot(data[-11,], col=min_vi$cl, pch = 19)
+plot(data, col=min_vi$cl, pch = 19, main = "Our algorithm")
+
+v = as.vector(3:(s+3))
+col = c(rep(1,m1), rep(2,m-m1), v)
 
 # real cluster
-plot(data[-11,], col=real, pch = 19)
+plot(data, col=col, pch = 19, main = "Real data")

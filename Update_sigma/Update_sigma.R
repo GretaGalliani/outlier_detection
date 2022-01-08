@@ -6,15 +6,15 @@
 #        m1_bar -> number of points in group 0 (to be computed using the auxiliary function m1_bar)
 #        k -> number of distinct groups (excluding the groups from the contaminated part)
 #        sigma_old -> sigma at the previous iteration
-#        theta -> theta at the current iteration
+#        theta_old -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
-#        n_acc -> number of accepted proposals until the previous iterations
-#        sigma_param -> list containing the prior parameter of theta (which is a beta)
+#        n_acc -> number of accepted proposals before the current iterations
+#        sigma_param -> list containing the parameters of the prior for sigma (which is a beta)
 #                       a -> shape1
 #                       b -> shape2
 #        sd -> standard deviation for the proposal density in the MHRW (default value is 2)
 
-# OUTPUT: sigma -> value of the parameter sigma at the r iteration
+# OUTPUT: sigma -> value of the parameter sigma at the current iteration
 #         acc -> number of accepted proposals at the current iteration
 
 update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 2.5) { 
@@ -68,7 +68,7 @@ inv_sigma <- function(x) {
 #        m1_bar -> number of points in group 0
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
-#        sigma_param -> list containing the prior parameter of theta (which is a beta)
+#        sigma_param -> list containing the prior parameter of sigma (which is a beta)
 #                       a -> shape1
 #                       b -> shape2
 
@@ -98,7 +98,7 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
 #        m1_bar -> number of points in group 0
 #        theta -> theta at the current iteration
 #        freq -> vector containing the number of points for each group j=1,...k
-#        sigma_param -> list containing the prior parameter of theta (which is a beta)
+#        sigma_param -> list containing the parameters of the prior for sigma (which is a beta)
 #                       a -> shape1
 #                       b -> shape2
 

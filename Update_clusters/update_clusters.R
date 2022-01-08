@@ -100,7 +100,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
     #j=K+1
     # Computation of the probability that data i is sampled in a new group 
-    prob[max(curr)+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, max(curr),
+    prob[max(curr)+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, max(curr[-i]),
                                          Q_param, p)
     
     

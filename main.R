@@ -83,7 +83,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     k_old = max(S_old)
     
     # Store the current cluster labels by rows in the matrix
-    if (r > burnin + 1 && r %% thinning == 0) S_matrix = rbind(S_matrix, S_old)
+    if (r >= burnin + 1 && r %% thinning == 0) S_matrix = rbind(S_matrix, S_old)
     
     # If there are some groups, I need to update their parameters
     if(k_old > 0){
@@ -117,7 +117,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     sigma_list <- update_sigma(m1, m1_bar, k_old, sigma_old, theta_old, freq, acc_sigma, sigma_param)
     # Updating the variables
     sigma_old <- sigma_list$sigma
-    if (r > burnin + 1){
+    if (r >= burnin + 1){
       if (r %% thinning == 0){
         sigma_vec <- append(sigma_vec, sigma_old)
       }
@@ -129,7 +129,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta, theta_param)
     # Updating the variables
     theta_old <- theta_list$theta
-    if (r > burnin + 1){
+    if (r >= burnin + 1){
       if (r %% thinning == 0){
         theta_vec <- append(theta_vec, theta_old)
       }
@@ -140,7 +140,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     beta_new <- update_beta(n, m1_bar, beta_param)
     # Updating the variables
     beta_old <- beta_new
-    if (r > burnin + 1 && r %% thinning == 0) beta_vec <- append(beta_vec, beta_old)
+    if (r >= burnin + 1 && r %% thinning == 0) beta_vec <- append(beta_vec, beta_old)
     #acc_beta <- beta_list$acc
     
     #Progress bar

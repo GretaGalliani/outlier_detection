@@ -51,7 +51,8 @@ update_xi <- function(Y, S, k, Q_param){
     
     
     # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
-    xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, as.inverse(lambda_n))
+    # xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, as.inverse(lambda_n))
+    xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, lambda_n)
     
     # Appending of the sampled values
     xi_mu <- append(xi_mu, list(xi_mu_j))

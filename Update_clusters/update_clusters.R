@@ -379,7 +379,8 @@ construct_cov_new <- function(data,xi_cov_star, Q_param)
   sigma = (1/(k_n*(nu_n-p+1)))*(lambda_n)
   
   #Sampling from an IW distribution
-  cov_new <- LaplacesDemon::rinvwishart(nu_n, as.inverse(sigma))
+  # cov_new <- LaplacesDemon::rinvwishart(nu_n, as.inverse(sigma))
+  cov_new <- LaplacesDemon::rinvwishart(nu_n, sigma)
   
   # Updating the list containing the cov. matrices parameters
   xi_cov_star<-append(xi_cov_star,list(cov_new))

@@ -9,10 +9,10 @@ P_param = list()
 d=2
 
 
-Q_param$k_0 = 0.01
+Q_param$k_0 = 0.1
 Q_param$mu_0 = c(0,0)
 Q_param$nu_0 = 3 # it must be > (p-1)
-Q_param$lambda_0 = matrix(c(1,0,0,1), nrow = 2, ncol = 2)
+Q_param$lambda_0 = matrix(c(3,0,0,3), nrow = 2, ncol = 2)
 
 # computation of degrees of freedom
 df = Q_param$nu_0-d+1
@@ -21,7 +21,8 @@ df = Q_param$nu_0-d+1
 ### GROUP 1
 
 # sigma of group 1
-xi_sigma_1 = LaplacesDemon::rinvwishart(Q_param$nu_0, as.inverse(Q_param$lambda_0))
+# xi_sigma_1 = LaplacesDemon::rinvwishart(Q_param$nu_0, as.inverse(Q_param$lambda_0))
+xi_sigma_1 = LaplacesDemon::rinvwishart(Q_param$nu_0, Q_param$lambda_0)
 
 # Sampling of mu 
 xi_mu_1 = MASS::mvrnorm(1, Q_param$mu_0, xi_sigma_1/Q_param$k_0)
@@ -33,7 +34,8 @@ data_1 <- mvrnorm(n = 10, xi_mu_1, xi_sigma_1)
 
 ### GROUP 2
 # sigma of group 2
-xi_sigma_2 = LaplacesDemon::rinvwishart(Q_param$nu_0, as.inverse(Q_param$lambda_0))
+# xi_sigma_2 = LaplacesDemon::rinvwishart(Q_param$nu_0, as.inverse(Q_param$lambda_0))
+xi_sigma_2 = LaplacesDemon::rinvwishart(Q_param$nu_0, Q_param$lambda_0)
 
 # Sampling of mu 2
 xi_mu_2 = MASS::mvrnorm(1, Q_param$mu_0, xi_sigma_2/Q_param$k_0)
@@ -49,13 +51,14 @@ data_2 <- mvrnorm(n = 10, xi_mu_2, xi_sigma_2)
 P_param$k_0 = 0.01
 P_param$mu_0 = c(0,0)
 P_param$nu_0 = 3 # it must be > (p-1)
-P_param$lambda_0 = matrix(c(1,0,0,1), nrow = 2, ncol = 2)
+P_param$lambda_0 = matrix(c(3,0,0,3), nrow = 2, ncol = 2)
 
 # computation of degrees of freedom
 df = P_param$nu_0-d+1
 
 # sigma of group 0
-xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, as.inverse(P_param$lambda_0))
+# xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, as.inverse(P_param$lambda_0))
+xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, P_param$lambda_0)
 
 # Sampling of mu 0
 xi_mu_0 = MASS::mvrnorm(1, P_param$mu_0, xi_sigma_0/P_param$k_0)
@@ -68,7 +71,8 @@ outlier1 <- cbind(data_3[1],data_3[2])
 
 # Repeating other two times
 # sigma of group 0
-xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, as.inverse(P_param$lambda_0))
+# xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, as.inverse(P_param$lambda_0))
+xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, P_param$lambda_0)
 
 # Sampling of mu 0
 xi_mu_0 = MASS::mvrnorm(1, P_param$mu_0, xi_sigma_0/P_param$k_0)
@@ -80,7 +84,8 @@ outlier2 <- NULL
 outlier2 <- cbind(data_3[1],data_3[2])
 
 # sigma of group 0
-xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, as.inverse(P_param$lambda_0))
+# xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, as.inverse(P_param$lambda_0))
+xi_sigma_0 = LaplacesDemon::rinvwishart(P_param$nu_0, P_param$lambda_0)
 
 # Sampling of mu 0
 xi_mu_0 = MASS::mvrnorm(1, P_param$mu_0, xi_sigma_0/P_param$k_0)
@@ -117,6 +122,12 @@ theta_param$b = 1
 xi_mu <- list()
 xi_cov <- list()
 
+# for (i in 1:10)
+# {
+#   xi_mu <- append(xi_mu, list(xi_mu_0))
+#   xi_cov <- append(xi_cov, list(xi_sigma_0))
+# }
+
 init_mu <- colMeans(data)
 init_var <- cov(data)
 
@@ -125,10 +136,10 @@ for (i in 1:dim(data)[1]){
   xi_cov <- append(xi_cov, list(init_var))
 }
 
-
+# S_init = c(rep(1,10), rep(2,10), rep(0,3))
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 5000, 10)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 1)
 
 # result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
 

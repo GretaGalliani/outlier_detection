@@ -2,7 +2,7 @@ set.seed(04021997)
 library(MASS)
 
 #### SAMPLING FROM THE DENSITY ####
-d = 2 #dimension
+d = 4 #dimension
 mean_a = rep(-3,d)#vector of means
 sigma_b = diag(d) #sigma
 m = 90 #m number of samples (outliers excluded)
@@ -37,13 +37,13 @@ allval
 
 data <- allval
 
-plot(allval, col = col, pch = 19)
+pairs(allval, col = col, pch = 19)
 
 #### INIZIALIZZAZIONE - P0 DIVERSO DA Q0 ####
 Q_param = list()
 P_param = list()
 
-d = 2
+d = 4
 
 Q_param$k_0 = 1
 Q_param$mu_0 = c(0,0)
@@ -69,8 +69,8 @@ beta_param$a = 1
 beta_param$b = 1
 sigma_param$a = 1
 sigma_param$b = 1
-theta_param$a = 2
-theta_param$b = 0.02
+theta_param$a = 1
+theta_param$b = 1
 
 xi_mu <- list()
 xi_cov <- list()
@@ -85,7 +85,7 @@ for (i in 1:n){
 
 #### RUNNING THE ALGORITHM ####
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 10000, 1)
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -166,7 +166,7 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
 par(mfrow=c(1,2)) 
 
 # best cluster according to binder loss (without outlier)
-plot(data, col=min_bind$cl, pch = 19)
+pairs(data, col=min_bind$cl, pch = 19)
 
 # real cluster
 real <- c(1,1,1,1,1,2,2,2,2,2)
@@ -187,7 +187,7 @@ min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all
 par(mfrow=c(1,2))
 
 # best cluster according to iv loss (without outlier)
-plot(data, col=min_vi$cl, pch = 19, main = "Our algorithm")
+pairs(data, col=min_vi$cl, pch = 19, main = "Our algorithm")
 
 v = as.vector(3:(s+3))
 col = c(rep(1,m1), rep(2,m-m1), v)

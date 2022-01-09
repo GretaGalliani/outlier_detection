@@ -186,8 +186,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
   # print(theta_old)
   # 
   S_new <- curr
-  my_list <-list("S_new"=S_new, "xi_mu_star"=xi_mu_star,"xi_cov_star"=xi_cov_star)
-  return (my_list) 
+  return (S_new) 
 }
 
 

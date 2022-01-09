@@ -70,11 +70,8 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     
     # set.seed(26091998)
     # Step 2a: Updating the clusters
-    clusters <- update_clusters(Y, xi_mu_star, xi_cov_star,
+    S_old <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, P_param, Q_param)
-    
-    # Updating the variables for next steps
-    S_old = clusters$S_new
     
     #print("Clusters")
     #print(S_old)

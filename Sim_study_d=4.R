@@ -94,7 +94,7 @@ for (i in 1:n){
 
 #### RUNNING THE ALGORITHM ####
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 10000, 1)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -172,7 +172,6 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
                        start.cl = NULL, tol = 0.001)
 
 
-par(mfrow=c(1,2)) 
 
 # best cluster according to binder loss 
 # GUARDARE A MANO CON table(min_bind$cl) quanti clusters ci sono 
@@ -180,14 +179,13 @@ tab <- table(min_bind$cl)
 
 pal = brewer.pal(n = 9, name = "Set1")
 col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[4], tab[[3]]), rep(pal[5], tab[[4]]),
-             rep(pal[6], tab[[5]]), rep(pal[7], tab[[6]]), rep(pal[8], tab[[7]]), rep(pal[2],s))
+             rep(pal[6], tab[[5]]), rep(pal[7], tab[[6]]), rep(pal[8], tab[[7]]), rep(pal[2],12))
 
 
-pc = c(rep(16,m), rep(17,s))
+pc = c(rep(16,88), rep(17,12))
 
 pairs(data, col = col_bind, pch = pc)
 
-pairs(data, col=min_bind$cl, pch = 19)
 
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
@@ -201,13 +199,14 @@ min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 
-par(mfrow=c(1,2))
 
-# best cluster according to iv loss (without outlier)
-pairs(data, col=min_vi$cl[c(1,2)], pch = 19, main = "Our algorithm")
+# best cluster according to iv loss 
+tab <- table(min_vi$cl)
 
-v = as.vector(3:(s+3))
-col = c(rep(1,m1), rep(2,m-m1), v)
+pal = brewer.pal(n = 9, name = "Set1")
+col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[2],10))
 
-# real cluster
-plot(data, col=col, pch = 19, main = "Real data")
+
+pc = c(rep(16,90), rep(17,10))
+
+pairs(data, col = col_bind, pch = pc)

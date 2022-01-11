@@ -1,16 +1,13 @@
-# cambiare k=0.1 risultati migliori
-#Salvo i plot, numero di singleton e numero max di gruppi, con deviazione standard (mean sd),salvo parametri
-#
-library(RColorBrewer)
-
 set.seed(04021997)
 library(MASS)
+library(RColorBrewer)
 
 #### SAMPLING FROM THE DENSITY ####
-d = 2 #dimension
-mean_a = rep(-3,d)#vector of means
+# BASE MEASURE
+d = 4 #dimension
+mean_a = rep(-3,d) #vector of means
 sigma_b = diag(d) #sigma
-m = 90 #m number of samples (outliers excluded) {90, 240}
+m = 90 #m number of samples (outliers excluded)
 m1 = rbinom(1, size=m, prob = 0.5) #number of samples coming from the first gaussian 
 m2 = m-m1 # from the second one
 
@@ -18,45 +15,51 @@ val1 = mvrnorm (m1,mu = mean_a, Sigma = sigma_b) #samples from first multivariat
 val2 = mvrnorm (m2,mu = -mean_a, Sigma = sigma_b) #samples from second multivariate function
 allval = rbind(val1,val2) #combine
 
-# allval <- NULL
-
+# CONTAMINATED MEASURE
 s=10 #number of outliers
+# sampling
 i=0 
-while(i<s){ #cycle to find s outliers
-  value=mvrnorm(1,mu= rep(0,d),Sigma= 3^2*diag(d)) #sampling from a multivariate normal distribution
+while(i<s){ # cycle to find s outliers
+  value=mvrnorm(1,mu= rep(0,d),Sigma= 3^2*diag(d)) # sampling from a multivariate normal distribution
   module = norm(as.matrix(value), type="2")
   chi=qchisq(0.9, df = d)
-  # if(module^2>3*sqrt(chi))
-  if(module^2>9*chi) #If we are sampling from the over-disperse truncated Gaussian distribution
+  # If we are sampling from the over-disperse truncated Gaussian distribution,
+  # We keep only points verifying this condition
+  if(module^2>9*chi) 
   {
     i=i+1
     allval = rbind(allval,value)
   }
 }
-# allval = allval[sample(m+s,m+s),] #randomizing rows
 
-col = c(rep(1,m1), rep(2,m-m1), rep(3,s))
-
+# Constructing the dataset
 rownames(allval)=NULL
 allval
-
 data <- allval
 
-pairs(allval, col = col, pch = 19)
+# Plotting the data with the original groups
+pal = brewer.pal(n = 9, name = "Set1")
+col_real = c(rep(pal[1], m1), rep(pal[2], m-m1))
+for (i in 1:s){
+  col_real = c(col_real, pal[(i+2)%%9])
+}
 
-#### INIZIALIZZAZIONE - P0 DIVERSO DA Q0 ####
+pairs(data, col = col_real, pch = 19)
+
+
+#### INITIALIZATION ####
 Q_param = list()
 P_param = list()
 
-d = 2
+d = dim(data)[2]
 
-Q_param$k_0 = 1 #{1, 0.5}
-Q_param$mu_0 = c(0,0)
+Q_param$k_0 = 1
+Q_param$mu_0 = rep(0,d)
 Q_param$nu_0 = d + 3 # it must be > (p-1)
 Q_param$lambda_0 = diag(diag(cov(data)))
 
-P_param$k_0 = 0.25 #{0.25,0.5}
-P_param$mu_0 = c(0,0)
+P_param$k_0 = 0.25
+P_param$mu_0 = rep(0,d)
 P_param$nu_0 = d + 3 # it must be > (p-1)
 P_param$lambda_0 = diag(diag(cov(data)))
 
@@ -74,8 +77,7 @@ beta_param$a = 1
 beta_param$b = 1
 sigma_param$a = 1
 sigma_param$b = 1
-#Gamma con picco in 1
-theta_param$a = 2 
+theta_param$a = 2
 theta_param$b = 1
 
 xi_mu <- list()
@@ -92,8 +94,6 @@ for (i in 1:n){
 #### RUNNING THE ALGORITHM ####
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 10000, 1)
-save(result,file='output_salvati/prova_1.dat')
-load('output_salvati/prova_1.dat')
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -144,9 +144,6 @@ for (i in 1:dim(result$S)[1]){
 }
 
 n_singletons
-mean(n_singletons)
-
-sd(result$S)
 
 # IMPLEMENTING MIN BINDER LOSS
 library(mcclust)
@@ -166,7 +163,6 @@ for (i in 1:dim(aux)[1]){
 # For a sample of clusterings of the same objects the proportion of clusterings 
 # in which observation $i$ and $j$ are together in a cluster is computed and 
 # a matrix containing all proportions is given out. 
-
 psm <- comp.psm(aux)
 
 # finds the clustering that minimizes the posterior expectation of Binders loss function
@@ -175,39 +171,24 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
                        start.cl = NULL, tol = 0.001)
 
 
-par(mfrow=c(1,3)) 
+par(mfrow=c(1,2)) 
 
-# Plotting the real data
-pal = brewer.pal(n = s+2, name = "Set3")
-col_real = c(rep(pal[1],m1), rep(pal[2],m-m1))
-for (i in 1:s)
-{
-  col_real <- c(col_real,pal[i+2])
-}
-plot(data, col = col_real, pch = 19, main = "Real data")
+# best cluster according to binder loss (without outlier)
+pairs(data, col=min_bind$cl, pch = 19)
 
-#####HElp QUIIIIIIIII
-# best cluster according to binder loss 
-pal = brewer.pal(n = 9, name = "Set1")
-col_min_bind = rep(0,dim(data)[1])
-
-for (i in 1:length(col_min_bind))
-{
-<<<<<<< HEAD
-  col_min_bind[i] = pal[min_bind$cl[i]]
-=======
-  col_min_bind[i] = pal[min_bind$cl[(i%%19)]]
->>>>>>> 23ad8970c3c8eb3e21f9b1c27d4d62764e92be47
-}
-plot(data, col=col_min_bind, pch = 19, main = "Partition minimizing Binder Loss")
-
+# real cluster
+real <- c(1,1,1,1,1,2,2,2,2,2)
+plot(data[-11,], col=real, pch = 19)
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
-#devtools::install_github("sarawade/mcclust.ext")
+# devtools::install_github("sarawade/mcclust.ext")
 library(mcclust.ext)
 
+aux <- result$S[,-11]
+psm2 <- comp.psm(aux)
+
 # finds the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
-min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
+min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 

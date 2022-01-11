@@ -91,6 +91,7 @@ for (i in 1:n){
 #### RUNNING THE ALGORITHM ####
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 10000, 1)
+save(result,file='prova_1.dat')
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -178,7 +179,7 @@ real <- c(1,1,1,1,1,2,2,2,2,2)
 plot(data[-11,], col=real, pch = 19)
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
-# devtools::install_github("sarawade/mcclust.ext")
+ devtools::install_github("sarawade/mcclust.ext")
 library(mcclust.ext)
 
 aux <- result$S[,-11]

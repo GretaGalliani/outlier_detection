@@ -22,8 +22,9 @@ allval = rbind(val1,val2) #combine
 
 s=10 #number of outliers
 i=0 
+c=1.25
 while(i<s){ #cycle to find s outliers
-  value=mvrnorm(1,mu= rep(0,d),Sigma= 3^2*diag(d)) #sampling from a multivariate normal distribution
+  value=c*mvrnorm(1,mu= rep(0,d),Sigma= 3^2*diag(d)) #sampling from a multivariate normal distribution
   module = norm(as.matrix(value), type="2")
   chi=qchisq(0.9, df = d)
   # if(module^2>3*sqrt(chi))
@@ -91,9 +92,9 @@ for (i in 1:n){
 
 #### RUNNING THE ALGORITHM ####
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 10000, 1)
-save(result,file='output_salvati/prova_1.dat')
-load('output_salvati/prova_1.dat')
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
+save(result,file='output_salvati/prova_2.dat')
+#load('output_salvati/prova_1.dat')
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -120,7 +121,7 @@ par(mfrow=c(1,3))
 tmp1 <- acf(result$sigma, main='Autocorrelation of sigma')
 tmp2 <- acf(result$theta, main='Autocorrelation of theta')
 tmp3 <- acf(result$beta, main='Autocorrelation of beta')
-
+library(coda)
 # ESS
 effectiveSize(result$sigma)
 effectiveSize(result$theta)
@@ -133,7 +134,15 @@ for (i in 1:1000){
 }
 
 mean(max) # mean number of clusters by the algorithm 
+sd(max)
 
+#COSE DA SALVARE:
+mean(result$beta)
+sd(result$beta)
+mean(result$theta)
+sd(result$theta)
+mean(result$sigma)
+sd(result$sigma)
 
 # WE COUNT THE NUMBER OF SINGLETONS
 source("auxiliary_functions/auxiliary_functions.R")
@@ -145,8 +154,11 @@ for (i in 1:dim(result$S)[1]){
 
 n_singletons
 mean(n_singletons)
-
+sd(n_singletons)
 sd(result$S)
+
+result$acc_theta
+result$acc_sigma
 
 # IMPLEMENTING MIN BINDER LOSS
 library(mcclust)
@@ -186,7 +198,7 @@ for (i in 1:s)
 }
 plot(data, col = col_real, pch = 19, main = "Real data")
 
-
+#Plot normale --> non funzia
 # best cluster according to binder loss 
 pal = brewer.pal(n = 9, name = "Set1")
 col_min_bind = rep(0,dim(data)[1])
@@ -197,6 +209,22 @@ for (i in 1:length(col_min_bind))
 }
 
 plot(data, col=min_bind$cl, pch = 19, main = "Partition minimizing Binder Loss")
+
+par(mfrow=c(1,2)) 
+# best cluster according to binder loss 
+# GUARDARE A MANO CON table(min_bind$cl) quanti clusters ci sono 
+tab <- table(min_bind$cl)
+
+pal = brewer.pal(n = 9, name = "Set1")
+rai <- rainbow(20)
+col_bind = c(rep(rai[1], tab[[1]]), rep(rai[3], tab[[2]]), rep(rai[4], tab[[3]]), rep(rai[5], tab[[5]]),
+             rep(rai[6], tab[[8]]), rep(rai[7], tab[[10]]), rep(rai[8], tab[[13]]),rep(rai[9], tab[[34]]),
+             rep(rai[10], tab[[35]]),rep(rai[11], tab[[33]]),rep(rai[12], tab[[38]]),
+             rep(rai[13], tab[[39]]), rep(rai[2],50))
+
+pc = c(rep(16,250), rep(17,50))
+
+pairs(data, col = col_bind, pch = pc)
 
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
@@ -209,8 +237,23 @@ min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"
                 l=NULL, suppress.comment=TRUE)
 
 
+# best cluster according to binder loss 
+# GUARDARE A MANO CON table(min_bind$cl) quanti clusters ci sono 
+tab <- table(min_vi$cl)
+
+pal = brewer.pal(n = 9, name = "Set1")
+col_bind = c(rep(pal[1], tab[[1]]),rep(pal[3], tab[[2]]),rep(pal[4], tab[[3]]),
+             rep(pal[5], tab[[5]]),rep(pal[6], tab[[6]]),rep(pal[2],10))
+
+
+pc = c(rep(16,240), rep(17,10))
+
+pairs(data, col = col_bind, pch = pc)
 
 # best cluster according to iv loss (without outlier)
+par(mfrow=c(1,3)) 
+plot(data, col=c(rep(1,m-m2),rep(2,m2),rep(3,s)), pch = 19, main = "Vi loss")
+plot(data, col=min_bind$cl, pch = 19, main = "Vi loss")
 plot(data, col=min_vi$cl, pch = 19, main = "Vi loss")
 
 pairs(data, col=min_vi$cl, pch = 19, main = "Vi loss")

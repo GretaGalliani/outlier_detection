@@ -1,10 +1,7 @@
 Simulation study d=2:
-k_0_p=1
-k_0_q=0.25
-theta_param$a = 2 
-theta_param$b = 1
-- Prova_1: R=15000, burn,in=10000, sd_theta=1.2,sd_sigma=1.5
-  mean(max) = 6.052
-  mean(n_singletons) = 15.012
-  sd(result$S) = 1.399937
+
+- Prova_1: k_0_p=1,k_0_q=0.25,c=1,N=100
+- Prova_2:k_0_p=1,k_0_q=0.25,c=1,N=250
+- Prova_3:k_0_p=1,k_0_q=0.25,c=1,N=100
+
 

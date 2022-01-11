@@ -4,7 +4,7 @@ k_0_q=0.25
 theta_param$a = 2 
 theta_param$b = 1
 - Prova_1: R=15000, burn,in=10000, sd_theta=1.2,sd_sigma=1.5
-  mean(max) = 5.782
-  mean(n_singletons) = 14.9804
-  sd(result$S) = 1.403634
+  mean(max) = 6.052
+  mean(n_singletons) = 15.012
+  sd(result$S) = 1.399937
 

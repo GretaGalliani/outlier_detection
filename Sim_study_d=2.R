@@ -186,20 +186,17 @@ for (i in 1:s)
 }
 plot(data, col = col_real, pch = 19, main = "Real data")
 
-#####HElp QUIIIIIIIII
+
 # best cluster according to binder loss 
 pal = brewer.pal(n = 9, name = "Set1")
 col_min_bind = rep(0,dim(data)[1])
 
 for (i in 1:length(col_min_bind))
 {
-<<<<<<< HEAD
-  col_min_bind[i] = pal[min_bind$cl[i]]
-=======
-  col_min_bind[i] = pal[min_bind$cl[(i%%19)]]
->>>>>>> 23ad8970c3c8eb3e21f9b1c27d4d62764e92be47
+  col_min_bind[i] = pal[min_bind$cl[(i%%9+1)]]
 }
-plot(data, col=col_min_bind, pch = 19, main = "Partition minimizing Binder Loss")
+
+plot(data, col=col, pch = 19, main = "Partition minimizing Binder Loss")
 
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION

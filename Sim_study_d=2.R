@@ -1,6 +1,7 @@
 # cambiare k=0.1 risultati migliori
 #Salvo i plot, numero di singleton e numero max di gruppi, con deviazione standard (mean sd),salvo parametri
 #
+library(RColorBrewer)
 
 set.seed(04021997)
 library(MASS)
@@ -91,7 +92,8 @@ for (i in 1:n){
 #### RUNNING THE ALGORITHM ####
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 10000, 1)
-save(result,file='prova_1.dat')
+save(result,file='output_salvati/prova_1.dat')
+load('output_salvati/prova_1.dat')
 
 #### PARAMETER ANALYSIS ####
 x11()
@@ -142,6 +144,9 @@ for (i in 1:dim(result$S)[1]){
 }
 
 n_singletons
+mean(n_singletons)
+
+sd(result$S)
 
 # IMPLEMENTING MIN BINDER LOSS
 library(mcclust)
@@ -161,6 +166,7 @@ for (i in 1:dim(aux)[1]){
 # For a sample of clusterings of the same objects the proportion of clusterings 
 # in which observation $i$ and $j$ are together in a cluster is computed and 
 # a matrix containing all proportions is given out. 
+
 psm <- comp.psm(aux)
 
 # finds the clustering that minimizes the posterior expectation of Binders loss function
@@ -169,24 +175,36 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
                        start.cl = NULL, tol = 0.001)
 
 
-par(mfrow=c(1,2)) 
+par(mfrow=c(1,3)) 
 
-# best cluster according to binder loss (without outlier)
-pairs(data, col=min_bind$cl, pch = 19)
+# Plotting the real data
+pal = brewer.pal(n = s+2, name = "Set3")
+col_real = c(rep(pal[1],m1), rep(pal[2],m-m1))
+for (i in 1:s)
+{
+  col_real <- c(col_real,pal[i+2])
+}
+plot(data, col = col_real, pch = 19, main = "Real data")
 
-# real cluster
-real <- c(1,1,1,1,1,2,2,2,2,2)
-plot(data[-11,], col=real, pch = 19)
+
+# best cluster according to binder loss 
+pal = brewer.pal(n = max(min_bind$cl), name = "Set2")
+col_min_bind = rep(0,dim(data)[1])
+
+for (i in 1:length(col_min_bind))
+{
+
+  col_min_bind[i] = pal[min_bind$cl[i]]
+}
+plot(data, col=col_min_bind, pch = 19, main = "Partition minimizing Binder Loss")
+
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
- devtools::install_github("sarawade/mcclust.ext")
+#devtools::install_github("sarawade/mcclust.ext")
 library(mcclust.ext)
 
-aux <- result$S[,-11]
-psm2 <- comp.psm(aux)
-
 # finds the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
-min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
+min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 

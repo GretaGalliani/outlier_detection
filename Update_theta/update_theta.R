@@ -15,7 +15,7 @@
 # OUTPUT: theta -> value of the parameter theta at the r iteration
 #         acc -> number of accepted proposals at the current iteration
 
-update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = 1.7){ 
+update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = 1.2){ 
   # METROPOLIS HASTINGS RANDOM WALK 
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 

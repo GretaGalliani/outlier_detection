@@ -190,13 +190,13 @@ plot(data, col = col_real, pch = 19, main = "Real data")
 # best cluster according to binder loss 
 pal = brewer.pal(n = 9, name = "Set1")
 col_min_bind = rep(0,dim(data)[1])
-
+#IDEA ALE: col=rainbow(max(min_bind$cl))
 for (i in 1:length(col_min_bind))
 {
   col_min_bind[i] = pal[min_bind$cl[(i%%9+1)]]
 }
 
-plot(data, col=col, pch = 19, main = "Partition minimizing Binder Loss")
+plot(data, col=min_bind$cl, pch = 19, main = "Partition minimizing Binder Loss")
 
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
@@ -208,13 +208,14 @@ min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 
-par(mfrow=c(1,2))
+
 
 # best cluster according to iv loss (without outlier)
-pairs(data, col=min_vi$cl, pch = 19, main = "Our algorithm")
+plot(data, col=min_vi$cl, pch = 19, main = "Vi loss")
+
+pairs(data, col=min_vi$cl, pch = 19, main = "Vi loss")
 
 v = as.vector(3:(s+3))
 col = c(rep(1,m1), rep(2,m-m1), v)
 
-# real cluster
-plot(data, col=col, pch = 19, main = "Real data")
+

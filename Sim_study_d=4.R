@@ -39,12 +39,13 @@ data <- allval
 
 # Plotting the data with the original groups
 pal = brewer.pal(n = 9, name = "Set1")
-col_real = c(rep(pal[1], m1), rep(pal[2], m-m1))
-for (i in 1:s){
-  col_real = c(col_real, pal[(i+2)%%9])
-}
+col_real = c(rep(pal[1], m1), rep(pal[3], m-m1), rep(pal[2],s))
 
-pairs(data, col = col_real, pch = 19)
+
+pc = c(rep(16,m), rep(17,s))
+
+pairs(data, col = col_real, pch = pc)
+
 
 
 #### INITIALIZATION ####
@@ -173,18 +174,26 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
 
 par(mfrow=c(1,2)) 
 
-# best cluster according to binder loss (without outlier)
+# best cluster according to binder loss 
+# GUARDARE A MANO CON table(min_bind$cl) quanti clusters ci sono 
+tab <- table(min_bind$cl)
+
+pal = brewer.pal(n = 9, name = "Set1")
+col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[4], tab[[3]]), rep(pal[5], tab[[4]]),
+             rep(pal[6], tab[[5]]), rep(pal[7], tab[[6]]), rep(pal[8], tab[[7]]), rep(pal[2],s))
+
+
+pc = c(rep(16,m), rep(17,s))
+
+pairs(data, col = col_bind, pch = pc)
+
 pairs(data, col=min_bind$cl, pch = 19)
 
-# real cluster
-real <- c(1,1,1,1,1,2,2,2,2,2)
-plot(data[-11,], col=real, pch = 19)
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
 # devtools::install_github("sarawade/mcclust.ext")
 library(mcclust.ext)
 
-aux <- result$S[,-11]
 psm2 <- comp.psm(aux)
 
 # finds the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
@@ -195,7 +204,7 @@ min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all
 par(mfrow=c(1,2))
 
 # best cluster according to iv loss (without outlier)
-pairs(data, col=min_vi$cl, pch = 19, main = "Our algorithm")
+pairs(data, col=min_vi$cl[c(1,2)], pch = 19, main = "Our algorithm")
 
 v = as.vector(3:(s+3))
 col = c(rep(1,m1), rep(2,m-m1), v)

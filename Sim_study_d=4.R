@@ -44,7 +44,7 @@ col_real = c(rep(pal[1], m1), rep(pal[3], m-m1), rep(pal[2],s))
 
 pc = c(rep(16,m), rep(17,s))
 
-pairs(data, col = col_real, pch = pc)
+pairs(data, col = col_real, pch = pc, main = "Real data")
 
 
 
@@ -174,7 +174,7 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
 
 
 # best cluster according to binder loss 
-# GUARDARE A MANO CON table(min_bind$cl) quanti clusters ci sono 
+# NOTE: We report only the graph for CPY1, n=100, c=1
 tab <- table(min_bind$cl)
 
 pal = brewer.pal(n = 9, name = "Set1")
@@ -184,7 +184,7 @@ col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[4], tab[[3]])
 
 pc = c(rep(16,88), rep(17,12))
 
-pairs(data, col = col_bind, pch = pc)
+pairs(data, col = col_bind, pch = pc, main = "Clustering minimizing Binder loss")
 
 
 
@@ -209,4 +209,4 @@ col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[2],10))
 
 pc = c(rep(16,90), rep(17,10))
 
-pairs(data, col = col_bind, pch = pc)
+pairs(data, col = col_bind, pch = pc, main = "Clustering minimizing VI loss")

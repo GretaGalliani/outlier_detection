@@ -7,7 +7,7 @@ library(RColorBrewer)
 d = 4 #dimension
 mean_a = rep(-3,d) #vector of means
 sigma_b = diag(d) #sigma
-m = 90 #m number of samples (outliers excluded)
+m = 240 #m number of samples (outliers excluded)
 m1 = rbinom(1, size=m, prob = 0.5) #number of samples coming from the first gaussian 
 m2 = m-m1 # from the second one
 
@@ -17,6 +17,7 @@ allval = rbind(val1,val2) #combine
 
 # CONTAMINATED MEASURE
 s=10 #number of outliers
+c = 1.5 # augmenting factor
 # sampling
 i=0 
 while(i<s){ # cycle to find s outliers
@@ -28,7 +29,7 @@ while(i<s){ # cycle to find s outliers
   if(module^2>9*chi) 
   {
     i=i+1
-    allval = rbind(allval,value)
+    allval = rbind(allval,c*value)
   }
 }
 
@@ -54,12 +55,12 @@ P_param = list()
 
 d = dim(data)[2]
 
-Q_param$k_0 = 1
+Q_param$k_0 = 0.5
 Q_param$mu_0 = rep(0,d)
 Q_param$nu_0 = d + 3 # it must be > (p-1)
 Q_param$lambda_0 = diag(diag(cov(data)))
 
-P_param$k_0 = 0.25
+P_param$k_0 = 0.5
 P_param$mu_0 = rep(0,d)
 P_param$nu_0 = d + 3 # it must be > (p-1)
 P_param$lambda_0 = diag(diag(cov(data)))
@@ -175,18 +176,18 @@ min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws",
 
 # best cluster according to binder loss 
 # NOTE: We report only the graph for CPY1, n=100, c=1
-tab <- table(min_bind$cl)
+tab_bind <- table(min_bind$cl)
 
 pal = brewer.pal(n = 9, name = "Set1")
 col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[4], tab[[3]]), rep(pal[5], tab[[4]]),
              rep(pal[6], tab[[5]]), rep(pal[7], tab[[6]]), rep(pal[8], tab[[7]]), rep(pal[2],12))
 
 
-pc = c(rep(16,88), rep(17,12))
+pc = c(rep(16,90), rep(17,10))
 
 pairs(data, col = col_bind, pch = pc, main = "Clustering minimizing Binder loss")
 
-
+pairs(data, col = min_bind$cl, pch = pc, main = "Clustering minimizing Binder loss")
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
 # devtools::install_github("sarawade/mcclust.ext")
@@ -201,12 +202,39 @@ min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all
 
 
 # best cluster according to iv loss 
-tab <- table(min_vi$cl)
+tab_vi <- table(min_vi$cl)
 
 pal = brewer.pal(n = 9, name = "Set1")
-col_bind = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[2],10))
+col_vi = c(rep(pal[1], tab[[1]]), rep(pal[3], tab[[2]]), rep(pal[2],10))
 
 
 pc = c(rep(16,90), rep(17,10))
 
-pairs(data, col = col_bind, pch = pc, main = "Clustering minimizing VI loss")
+pairs(data, col = col_vi, pch = pc, main = "Clustering minimizing VI loss")
+
+pairs(data, col = min_vi$cl, pch = pc, main = "Clustering minimizing VI loss")
+
+
+#### RELEVANT PARAMETERS ####
+mean(result$beta)
+sd(result$beta)
+
+mean(result$theta)
+sd(result$theta)
+
+mean(result$sigma)
+sd(result$sigma)
+
+mean(max)
+sd(max)
+
+mean(n_singletons)
+sd(n_singletons)
+
+length(which(tab_bind==1))
+
+length(which(tab_vi==1))
+
+result$acc_theta
+result$acc_sigma
+

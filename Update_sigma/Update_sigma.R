@@ -77,10 +77,12 @@ inv_sigma <- function(x) {
 compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
   freq_m1 = freq[freq>1]
   
+  #We are using the log-form 
+  #Pay attention the prior chosen is beta on (1,1) but it is egual to a uniform on (0,1)
   log_dens_y = dbeta(y, sigma_param$a, sigma_param$b, log = TRUE) + k*log(y) + lgamma(theta/y + k) - lgamma(theta/y) + log(y) + log(1-y)
   log_dens_x = dbeta(x, sigma_param$a, sigma_param$b, log = TRUE) + k*log(x) + lgamma(theta/x + k) - lgamma(theta/x) + log(x) + log(1-x)
   
-  
+  #computation the product of a sequence's part of the formula
   for (elem in freq_m1){
     log_dens_y = log_dens_y + lgamma(elem - y) - lgamma(1-y)
     log_dens_x = log_dens_x + lgamma(elem - x) - lgamma(1-x)

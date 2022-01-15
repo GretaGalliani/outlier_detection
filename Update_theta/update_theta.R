@@ -24,8 +24,7 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   
   # Computation the alpha of the new proposal wrt the old one
   aprob <- compute_alpha_theta(theta_old, y, k, m1_bar, sigma, n, theta_param)
-  #print("Aprob:")
-  #print(aprob)
+  
   
   # Sampling from a U(0,1)
   u <- runif(1) 
@@ -34,12 +33,12 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   if (u < aprob){
     n_acc = n_acc+1
     
-    # Return of the new value of sigma (equal to the proposed value y) and the accuracy
+    # Returning new value of sigma (equal to the proposed value y) and the accuracy
     return(list("theta" = y, "acc" = n_acc))
   } 
   else {
     
-    # Return of the new value of sigma (equal to the previous value sigma_old) and the accuracy
+    # Returning new value of sigma (equal to the previous value sigma_old) and the accuracy
     return(list("theta" = theta_old, "acc" = n_acc))
     
   }
@@ -72,9 +71,9 @@ inv_theta <- function(x) {
 # OUTPUT: alpha -> the alpha needed to perform the acceptance/rejection in MH
 compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
   
-
+  #We are using the log-form 
+  #Pay attention the prior chosen is a Gamma
   log_dens_y <- dgamma(y, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(y) + lgamma(y/sigma + k) - lgamma(y/sigma) - lgamma(y + n - m1_bar) + log(y)
-  
   log_dens_x <- dgamma(x, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(x) + lgamma(x/sigma + k) - lgamma(x/sigma) - lgamma(x + n - m1_bar) + log(x)
   
   

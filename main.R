@@ -73,8 +73,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     S_old <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, P_param, Q_param)
     
-    #print("Clusters")
-    #print(S_old)
+   
     
     # Find the actual number of groups k
     k_old = max(S_old)
@@ -92,8 +91,7 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
       xi_cov_star <- xi$xi_cov_star
     }
     
-    #print("Print xi_mu_star")
-    #print(xi_mu_star)
+    
     
     
     # m1 and m1_bar computation
@@ -143,17 +141,10 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     #Progress bar
     pb$tick()
     
-    #print("sigma")
-    #print(sigma_old)
-
-    #print("beta")
-    #print(beta_old)
-
-    #print("theta")
-    #print(theta_old)
+  
   }
 
-  
+  #returning all final values in a list
   return (list("S"= S_matrix, "xi_star" = xi, "sigma" = sigma_vec, "theta" = theta_vec,
                "beta" = beta_vec, "acc_sigma" = acc_sigma/n_iter, 
                "acc_theta" = acc_theta/n_iter))

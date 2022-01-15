@@ -62,10 +62,6 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     prob[1] <- dens_contaminated(Y[i,], beta_old, P_param, p) 
     
     
-    # print("prob contaminated")
-    # print(prob[1])
-    
-    
     if(max(curr) > 0){
       for (t in 2:(max(curr)+1))
       {
@@ -92,10 +88,7 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
       }
     }
     #   
-    #   # print("gruppo")
-    #   # print(t-1)
-    #   # print( "prob gruppo ")
-    #   # print(prob[t])
+    
     
     
     #j=K+1
@@ -103,19 +96,12 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     prob[max(curr)+2]<- dens_cluster_new(Y[i,], n, beta_old, sigma_old, theta_old, m1_bar, max(curr[-i]),
                                          Q_param, p)
     
-    
-    # print("prob gruppo nuovo")
-    # print(prob[k_new+2])
-    
-    # print("old_group")
-    # print(curr[i])
+
     
     # I save the old group
     old_group <- curr[i]
     
     
-    #print("Prob vector")
-    #print(prob)
     # Sampling of the new assignment
     j <- sample(0:(max(curr)+1),size=1,prob=prob)
     
@@ -152,39 +138,16 @@ update_clusters <- function(Y, xi_mu_star, xi_cov_star, S_old,
     
   }
   
-  # print("sampling")
-  # print(j)
-  
-  # print("beta_old")
-  # print(beta_old)
-  
-  
-  
-  
+
   # At the end all the empty groups are deleted and the others are shifted
   # delete_list <- delete_and_shift(curr, xi_mu_star, xi_cov_star)
   # curr <- delete_list$curr
   # xi_mu_star <- delete_list$xi_mu_star
   # xi_cov_star <- delete_list$xi_cov_star
   
-  # 
-  # print("curr")
-  # print(curr)
-  # 
-
-  # 
-  # print("xi_mu_star")
-  # print(xi_mu_star)
-  # 
-  # print("beta")
-  # print(beta_old)
-  #  
-  # print("sigma")
-  # print(sigma_old)
-  #  
-  # print("theta")
-  # print(theta_old)
-  # 
+   
+ 
+   
   S_new <- curr
   return (S_new) 
 }
@@ -267,18 +230,7 @@ dens_cluster_new <- function(data, n, beta_old, sigma_old, theta_old, m1_bar, k_
   
   coeff <- log(beta_old) + log(theta_old+k_old*sigma_old) - log(theta_old+n-m1_bar-1)
   
-  # print("matrice S di Q")
-  # print((Q_param$k_0 + 1)/(Q_param$k_0*(Q_param$nu_0-p+1))*Q_param$lambda_0)
-  # 
-  # print("numeratore")
-  # print(Q_param$k_0 + 1)
-  # 
-  # print("coeff")
-  # print((Q_param$k_0 + 1)/(Q_param$k_0*(Q_param$nu_0-p+1)))
-  # 
-  # print("matrice iniziale")
-  # print(Q_param$lambda_0)
-  
+
   # Evaluation of a multivariate t-Student
   weight <- coeff + LaplacesDemon::dmvt(data,mu = Q_param$mu_0, 
                                        S = (Q_param$k_0 + 1)/(Q_param$k_0*(Q_param$nu_0-p+1))*Q_param$lambda_0, 

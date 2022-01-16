@@ -3,8 +3,7 @@ library(MASS)
 library(mvtnorm)
 library(LaplacesDemon)
 
-#NOTA: cosa succede se due dati sono uguali? Devo esplicitamente dirgli di non
-#samplarlo in j=0?
+
 
 #Importing some auxiliary functions
 source("auxiliary_functions/auxiliary_functions.R")

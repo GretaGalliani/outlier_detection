@@ -53,7 +53,7 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 2500, 100, 1)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
 
 
 
@@ -104,8 +104,12 @@ par(mfrow=c(1,2))
 
 
 # best cluster according to binder loss 
-pal = brewer.pal(n = max(min_bind$cl), name = "Set3")
+pal = brewer.pal(n = max(min_bind$cl), name = "Set1")
 col_min_bind = rep(0,dim(data)[1])
+
+bind_tab = table(min_bind$cl)
+bind_pch = rep(17,n)
+bind_pch[min_bind$cl %in% which(bind_tab>1)]=16
 
 for (i in 1:length(col_min_bind))
 {
@@ -113,7 +117,7 @@ for (i in 1:length(col_min_bind))
 }
 
 
-plot(data, col=col_min_bind, pch = 19, main = "Partition minimizing Binder Loss")
+plot(data, col=col_min_bind, pch = bind_pch, main = "Partition minimizing Binder Loss")
 
 
 
@@ -127,7 +131,7 @@ min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 
-pal = brewer.pal(n = max(min_bind$cl), name = "Set3")
+pal = brewer.pal(n = max(min_vi$cl), name = "Set1")
 col_min_vi = rep(0,dim(data)[1])
 
 for (i in 1:length(col_min_bind))
@@ -135,6 +139,10 @@ for (i in 1:length(col_min_bind))
   col_min_vi[i] = pal[min_vi$cl[i]]
 }
 
+vi_tab = table(min_vi$cl)
+vi_pch = rep(17,n)
+vi_pch[min_vi$cl %in% which(vi_tab>1)]=16
 
-plot(data, col=col_min_vi, pch = 19, main = "Partition minimizing VI Loss")
+
+plot(data, col=col_min_vi, pch = vi_pch, main = "Partition minimizing VI Loss")
 

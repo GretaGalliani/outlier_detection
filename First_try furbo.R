@@ -104,6 +104,7 @@ pal = brewer.pal(n = 5, name = "Set2")
 col_real = c(rep(pal[1],10), rep(pal[2],10), pal[3], pal[4], pal[5])
 plot(data, col = col_real, pch = 19, main = "Real data")
 
+#setting parameters
 S_init = rep(1,23)
 beta_init <- 0.5
 sigma_init <- 0.2
@@ -119,6 +120,7 @@ sigma_param$b = 1
 theta_param$a = 1
 theta_param$b = 1
 
+#creating empty list of mean and covariance for xi's
 xi_mu <- list()
 xi_cov <- list()
 
@@ -144,7 +146,7 @@ result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param,
 # result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
 
 
-
+#plotting sigma and theta
 tail(result$sigma, 20)
 plot(result$sigma, type='l')
 

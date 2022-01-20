@@ -72,7 +72,7 @@ inv_theta <- function(x) {
 compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
   
   #We are using the log-form 
-  #Pay attention the prior chosen is a Gamma
+  #The prior chosen is a Gamma
   log_dens_y <- dgamma(y, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(y) + lgamma(y/sigma + k) - lgamma(y/sigma) - lgamma(y + n - m1_bar) + log(y)
   log_dens_x <- dgamma(x, theta_param$a, rate=theta_param$b, log = TRUE) + lgamma(x) + lgamma(x/sigma + k) - lgamma(x/sigma) - lgamma(x + n - m1_bar) + log(x)
   
@@ -101,29 +101,4 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
 #   return (dgamma(x, theta_param$a, rate=theta_param$b) *  gamma(x) * 
 #             gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * x)
 # }
-
-#-------------------
-# - EXAMPLE
-# theta_old <- 1
-# sigma <- 0.2
-# m1 <- 10
-# m1_bar <- 8
-# k <- 20
-# sigma_old <- 0.2
-# freq <- c(rep(1, 10), 10, 4, 5, 25, 3, 6, 9, 12, 4, 2)
-# n <- sum(freq)
-# n_acc <- 0
-# t_vec <- c()
-# theta_param <- list(a = 1, b = 1)
-# 
-# for(i in 1:10000){
-#   temp <- update_theta(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd = .25)
-#   theta_old <- temp$theta
-#   t_vec[i] <- theta_old
-#   n_acc <- temp$acc
-#   print(theta_old)
-# }
-# n_acc / 10000
-# hist(t_vec)
-
 

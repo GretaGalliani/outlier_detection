@@ -2,12 +2,12 @@
 
 library(progress)
 
-source("update_clusters/update_clusters.R")
-source("update_xi/update_xi.R")
-source("update_sigma/update_sigma.R")
-source("update_theta/update_theta.R")
-source("update_beta/update_beta.R")
-source("auxiliary_functions/auxiliary_functions.R")
+source("algorithm_v1/update_clusters.R")
+source("algorithm_v1/update_xi/update_xi.R")
+source("algorithm_v1/Update_sigma.R")
+source("algorithm_v1//update_theta.R")
+source("algorithm_v1/update_beta.R")
+source("algorithm_v1/auxiliary_functions.R")
 
 # INPUT: Y -> data 
 #        S_init -> initialization for the vector of labels Si i=1,...,n

@@ -3,9 +3,9 @@
 library(progress)
 
 source("algorithm_v1/update_clusters.R")
-source("algorithm_v1/update_xi/update_xi.R")
+source("algorithm_v1/update_xi.R")
 source("algorithm_v1/Update_sigma.R")
-source("algorithm_v1//update_theta.R")
+source("algorithm_v1/update_theta.R")
 source("algorithm_v1/update_beta.R")
 source("algorithm_v1/auxiliary_functions.R")
 

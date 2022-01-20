@@ -6,7 +6,7 @@ library(LaplacesDemon)
 
 
 #Importing some auxiliary functions
-source("auxiliary_functions/auxiliary_functions.R")
+source("algorithm_v1/auxiliary_functions.R")
 
 # Function to update the clusters
 # INPUT: Y -> data 

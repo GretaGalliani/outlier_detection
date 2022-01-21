@@ -1,4 +1,11 @@
-sim_study <- function(d,c,k0_P,k0_Q,m)
+sim_study <- function(input) #in input ho una lista
+{
+  d <- input$d
+  c <- input$c
+  k0_P <- input$k0_P
+  k0_Q <- input$k0_Q
+  m <- input$m
+  
   mean_a = rep(-3,d)#vector of means
   sigma_b = diag(d) #sigma
   m1 = rbinom(1, size=m, prob = 0.5) #number of samples coming from the first gaussian 

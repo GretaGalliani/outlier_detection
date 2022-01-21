@@ -19,9 +19,9 @@ update_xi <- function(Y, S, k, Q_param){
   # For each group
   for (j in 1:k){
     # Select data belonging to cluster j
-    Yj <- Y[which(S==j),]
+    Yj <- as.matrix(Y[which(S==j),])
     
-    # If there is only one data in the group, smaple_cov is set to 0
+    # If there is only one data in the group, sample_cov is set to 0
     if (length(which(S==j))==1){
       n = 1
       d = length(Yj)
@@ -32,7 +32,10 @@ update_xi <- function(Y, S, k, Q_param){
     else{
       n = dim(Yj)[1]
       d = dim(Yj)[2]
-      sample_cov = cov(Yj)
+      if (d==1) 
+        sample_cov = var(Yj)
+      else
+        sample_cov = cov(Yj)
       sample_mean = colMeans(Yj)
       
     }

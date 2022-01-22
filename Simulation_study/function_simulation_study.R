@@ -87,7 +87,7 @@ sim_study <- function(input) #in input ho una lista
   
   #### RUNNING THE ALGORITHM ####
   source("main.R")
-  result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
+  result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 6000, 1000, 1)
   #SE VOGLIAMO SALVARE I FILE! BISOGNA PASSARE UN ITERATORE i
   #nome_file <- paste('output_salvati_prova',as.character(i),sep="_")
   #nome_file <-paste(nome_file,'dat',sep=".")

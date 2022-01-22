@@ -87,7 +87,7 @@ sim_study <- function(input) #in input ho una lista
   
   #### RUNNING THE ALGORITHM ####
   source("main.R")
-  result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 1, 1)
+  result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
   #SE VOGLIAMO SALVARE I FILE! BISOGNA PASSARE UN ITERATORE i
   #nome_file <- paste('output_salvati_prova',as.character(i),sep="_")
   #nome_file <-paste(nome_file,'dat',sep=".")
@@ -95,12 +95,12 @@ sim_study <- function(input) #in input ho una lista
   print("ciao")
   #### CLUSTER ANALYSIS ####
   max <- c()
-  for (i in 1:1000){
+  for (i in 1:dim(result$S)[1]){
     max <- c(max, max(result$S[i,]))
   }
   
   # WE COUNT THE NUMBER OF SINGLETONS
-  source("auxiliary_functions/auxiliary_functions.R")
+  source("algorithm_v1/auxiliary_functions.R")
   
   n_singletons <- c()
   for (i in 1:dim(result$S)[1]){
@@ -152,7 +152,7 @@ sim_study <- function(input) #in input ho una lista
   # best cluster according to binder loss 
   tab_vi <- table(min_vi$cl)
   
- output_model<-list("beta_mean"=result$beta, "k_mean"=mean(max),"singletons_mean"=n_singletons,
+ output_model<-list("beta_mean"=mean(result$beta), "k_mean"=mean(max),"singletons_mean"=mean(n_singletons),
                    "BL"=length(which(tab_bind==1)),"VI"=length(which(tab_vi==1)))
   
 return (output_model)

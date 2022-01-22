@@ -1,5 +1,8 @@
 sim_study <- function(input) #in input ho una lista
 {
+   # pb <- progress_bar$new(
+   #         format = "  processing [:bar] :percent eta: :eta",
+   #         total = B, clear = FALSE)
   d <- input$d
   c <- input$c
   k0_P <- input$k0_P
@@ -84,12 +87,12 @@ sim_study <- function(input) #in input ho una lista
   
   #### RUNNING THE ALGORITHM ####
   source("main.R")
-  result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
+  result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 1, 1)
   #SE VOGLIAMO SALVARE I FILE! BISOGNA PASSARE UN ITERATORE i
-  nome_file <- paste('output_salvati_prova',as.character(i),sep="_")
-  nome_file <-paste(nome_file,'dat',sep=".")
+  #nome_file <- paste('output_salvati_prova',as.character(i),sep="_")
+  #nome_file <-paste(nome_file,'dat',sep=".")
   #save(result,file=nome_file)
-  
+  print("ciao")
   #### CLUSTER ANALYSIS ####
   max <- c()
   for (i in 1:1000){
@@ -148,9 +151,8 @@ sim_study <- function(input) #in input ho una lista
   
   # best cluster according to binder loss 
   tab_vi <- table(min_vi$cl)
-
- output_model<-list("beta_mean"=result$beta, "beta_sd"=sd(result$beta), "k_mean"=mean(max),
-                   "k_sd"=sd(max),"singletons_mean"=n_singletons,"singletons_sd"=sd(n_singletons),
+  
+ output_model<-list("beta_mean"=result$beta, "k_mean"=mean(max),"singletons_mean"=n_singletons,
                    "BL"=length(which(tab_bind==1)),"VI"=length(which(tab_vi==1)))
   
 return (output_model)

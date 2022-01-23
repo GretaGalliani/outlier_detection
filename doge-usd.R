@@ -18,7 +18,7 @@ doge$Adj.Close = NULL
 
 ts_plot(data.frame(date = date, LogReturn=doge$LogReturn))
 
-data = as.matrix(doge$LogReturn)
+data = as.matrix(scale(doge))
 n = dim(data)[1]
 d = dim(data)[2]
 
@@ -51,7 +51,7 @@ beta_param$a = 1
 beta_param$b = 1
 sigma_param$a = 1
 sigma_param$b = 1
-theta_param$a = 1
+theta_param$a = 2
 theta_param$b = 1
 
 xi_mu <- list()
@@ -118,7 +118,7 @@ par(mfrow=c(1,2))
 
 
 # best cluster according to binder loss 
-pal = brewer.pal(n = max(min_bind$cl), name = "Set1")
+pal = rainbow(max(min_bind$cl))
 col_min_bind = rep(0,dim(data)[1])
 
 bind_tab = table(min_bind$cl)
@@ -131,7 +131,7 @@ for (i in 1:length(col_min_bind))
 }
 
 
-plot(data, col=col_min_bind, pch = bind_pch, main = "Partition minimizing Binder Loss")
+plot(doge$LogReturn, col=col_min_bind, pch = bind_pch, main = "Partition minimizing Binder Loss")
 
 
 
@@ -145,7 +145,7 @@ min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 
-pal = brewer.pal(n = max(min_vi$cl), name = "Set1")
+pal = rainbow(max(min_vi$cl))
 col_min_vi = rep(0,dim(data)[1])
 
 for (i in 1:length(col_min_bind))
@@ -157,6 +157,6 @@ vi_tab = table(min_vi$cl)
 vi_pch = rep(17,n)
 vi_pch[min_vi$cl %in% which(vi_tab>1)]=16
 
-
-plot(data, col=col_min_vi, pch = vi_pch, main = "Partition minimizing VI Loss")
-
+jpeg("doge_plot.jpg", width = 350, height = 350)
+plot(doge$LogReturn, col=col_min_vi, pch = vi_pch, main = "Partition minimizing VI Loss")
+dev.off()

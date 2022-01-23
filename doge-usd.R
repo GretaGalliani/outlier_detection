@@ -28,15 +28,15 @@ P_param = list()
 
 # Contaminated component
 Q_param$k_0 = 1.25
-Q_param$mu_0 = mean(data)
+Q_param$mu_0 = colMeans(data)
 Q_param$nu_0 = d+3
-Q_param$lambda_0 = var(data)
+Q_param$lambda_0 = cov(data)
 
 # Contaminant diffuse component
 P_param$k_0 = 1
-P_param$mu_0 = mean(data)
+P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
-P_param$lambda_0 = var(data)
+P_param$lambda_0 = cov(data)
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)

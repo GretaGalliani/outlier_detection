@@ -6,14 +6,31 @@ library(TSstudio)
 # Import dataset about countries development
 df = read.csv('Country-data.csv')
 
+# country:	Name of the country
+# child_mort:	Death of children under 5 years of age per 1000 live births
+# exports:	Exports of goods and services per capita. Given as %age of the GDP 
+#           per capita
+# health:	Total health spending per capita. Given as %age of GDP per capita
+# imports:	Imports of goods and services per capita. Given as %age of the GDP 
+#           per capita
+# Income:	Net income per person
+# Inflation:	The measurement of the annual growth rate of the Total GDP
+# life_expec:	The average number of years a new born child would live if the 
+#             current mortality patterns are to remain the same
+# total_fer:	The number of children that would be born to each woman if the 
+#             current age-fertility rates remain the same.
+# gdpp:	The GDP per capita. Calculated as the Total GDP divided by the total 
+#       population.
+
 plot(df)
 plot(df$gdpp, df$life_expec)
 
 country = df$country
-df$country = NULL
 
+data = df
+data$country = NULL
 
-data = as.matrix(scale(df))
+data = as.matrix(scale(data))
 n = dim(data)[1]
 d = dim(data)[2]
 
@@ -22,13 +39,13 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-Q_param$k_0 = 1.7
+Q_param$k_0 = 1
 Q_param$mu_0 = colMeans(data)
 Q_param$nu_0 = d+3
 Q_param$lambda_0 = cov(data)
 
 # Contaminant diffuse component
-P_param$k_0 = 1.2
+P_param$k_0 = 1
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
 P_param$lambda_0 = cov(data)
@@ -156,4 +173,45 @@ plot(df$gdpp, df$life_expec, col=col_min_vi, pch = vi_pch, main = "Partition min
 
 plot(df, col=col_min_vi, pch=vi_pch)
 
-country[min_vi$cl %in% which(vi_tab==1)]
+# Clusters and outliers
+
+out_i = as.numeric(which(vi_tab==1))
+cl_i = as.numeric(which(vi_tab>1))
+
+print("Outliers: ")
+print(country[which(min_vi$cl %in% out_i)])
+
+count = 1
+for (i in 1:length(cl_i)){
+  print(paste0("Cluster number ", count))
+  print(country[which(min_vi$cl == cl_i[i])])
+  count = count+1
+}
+
+
+# Focus on United States, Luxembourg, Haiti and Burundi
+
+red_mark = function(name, countries){
+  col = rep('#000000', length(countries))
+  pch = rep(20, length(countries))
+  col[which(country==name)] = '#FF0000'
+  pch[which(country==name)] = 8
+  return(list(col=col, pch=pch))
+}
+
+US = red_mark('United States', country)
+Lux = red_mark('Luxembourg', country)
+Ha = red_mark('Haiti', country)
+Bur = red_mark('Burundi', country)
+
+p = df[,c(2,6,7,8,10)]
+
+plot(p, col=US$col, pch=US$pch)
+plot(p, col=Lux$col, pch=Lux$pch)
+plot(p, col=Ha$col, pch=Ha$pch)
+plot(p, col=Bur$col, pch=Bur$pch)
+
+
+
+
+

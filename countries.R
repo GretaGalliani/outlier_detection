@@ -1,5 +1,5 @@
 library(MASS)
-library(RColorBrewer)
+#library(RColorBrewer)
 library(robustbase)
 library(TSstudio)
 
@@ -206,10 +206,10 @@ Bur = red_mark('Burundi', country)
 
 p = df[,c(2,6,7,8,10)]
 
-plot(p, col=US$col, pch=US$pch)
-plot(p, col=Lux$col, pch=Lux$pch)
-plot(p, col=Ha$col, pch=Ha$pch)
-plot(p, col=Bur$col, pch=Bur$pch)
+plot(p, col=US$col, pch=US$pch, main = 'Focus on United States')
+plot(p, col=Lux$col, pch=Lux$pch, main = 'Focus on Luxembourg')
+plot(p, col=Ha$col, pch=Ha$pch, main = 'Focus on Haiti')
+plot(p, col=Bur$col, pch=Bur$pch, main = 'Focus on Burundi')
 
 
 

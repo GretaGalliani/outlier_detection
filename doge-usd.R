@@ -16,9 +16,9 @@ for (i in 2:dim(doge)[1]){
 doge$Adj.Close = NULL
 
 
-ts_plot(data.frame(date = date, LogReturn=doge$LogReturn))
+#ts_plot(data.frame(date = date, LogReturn=doge$LogReturn))
 
-data = as.matrix(scale(doge))
+data = as.matrix(doge$LogReturn)
 n = dim(data)[1]
 d = dim(data)[2]
 
@@ -27,16 +27,16 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-Q_param$k_0 = 1.25
-Q_param$mu_0 = colMeans(data)
+Q_param$k_0 = 1.5
+Q_param$mu_0 = mean(data)
 Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)
+Q_param$lambda_0 = var(data)
 
 # Contaminant diffuse component
 P_param$k_0 = 1
-P_param$mu_0 = colMeans(data)
+P_param$mu_0 = mean(data)
 P_param$nu_0 = d+3
-P_param$lambda_0 = cov(data)
+P_param$lambda_0 = var(data)
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)
@@ -57,8 +57,8 @@ theta_param$b = 1
 xi_mu <- list()
 xi_cov <- list()
 
-init_mu <- colMeans(data)
-init_var <- cov(data)
+init_mu <- mean(data)
+init_var <- var(data)
 
 
 for (i in 1:dim(data)[1]){
@@ -118,21 +118,28 @@ par(mfrow=c(1,2))
 
 
 # best cluster according to binder loss 
-pal = rainbow(max(min_bind$cl))
-col_min_bind = rep(0,dim(data)[1])
 
 bind_tab = table(min_bind$cl)
 bind_pch = rep(17,n)
 bind_pch[min_bind$cl %in% which(bind_tab>1)]=16
 
+pal = brewer.pal(length(which(bind_tab>1)), 'Set1')
+col_min_bind = rep(0,dim(data)[1])
+
+
+cl = which(bind_tab>1)
 for (i in 1:length(col_min_bind))
 {
-  col_min_bind[i] = pal[min_bind$cl[i]]
+  if(min_bind$cl[i] %in% which(bind_tab==1))
+    col_min_bind[i] = '#000000'
+  else{
+    col_min_bind[i] = pal[which(cl==min_bind$cl[i])]
+  }
 }
 
-
+jpeg("doge_plot.jpg", width = 350, height = 350)
 plot(doge$LogReturn, col=col_min_bind, pch = bind_pch, main = "Partition minimizing Binder Loss")
-
+dev.off()
 
 
 # IMPLEMENTING MIN VARIATION OF INFORMATION
@@ -145,17 +152,25 @@ min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
 
-pal = rainbow(max(min_vi$cl))
-col_min_vi = rep(0,dim(data)[1])
-
-for (i in 1:length(col_min_bind))
-{
-  col_min_vi[i] = pal[min_vi$cl[i]]
-}
 
 vi_tab = table(min_vi$cl)
 vi_pch = rep(17,n)
 vi_pch[min_vi$cl %in% which(vi_tab>1)]=16
+
+pal = brewer.pal(length(which(vi_tab>1)), 'Paired')
+col_min_vi = rep(0,dim(data)[1])
+
+
+cl = which(vi_tab>1)
+for (i in 1:length(col_min_vi))
+{
+  if(min_vi$cl[i] %in% which(vi_tab==1))
+    col_min_vi[i] = '#000000'
+  else{
+    col_min_vi[i] = pal[which(cl==min_vi$cl[i])]
+  }
+}
+
 
 jpeg("doge_plot.jpg", width = 350, height = 350)
 plot(doge$LogReturn, col=col_min_vi, pch = vi_pch, main = "Partition minimizing VI Loss")

@@ -1,7 +1,9 @@
 library(MASS)
-#library(RColorBrewer)
+library(RColorBrewer)
 library(robustbase)
 library(TSstudio)
+library(rworldmap)
+library(countrycode)
 
 # Import dataset about countries development
 df = read.csv('Country-data.csv')
@@ -79,8 +81,8 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 2500, 100, 2)
-save(result, file='country3.RData')
+#result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 2500, 100, 2)
+#save(result, file='country3.RData')
 
 
 tail(result$sigma, 20)
@@ -177,12 +179,26 @@ plot(df, col=col_min_vi, pch=vi_pch)
 
 out_i = as.numeric(which(vi_tab==1))
 cl_i = as.numeric(which(vi_tab>1))
+out_names = country[which(min_vi$cl %in% out_i)]
+
+# Scale outliers
+clust_map = min_vi$cl 
+clust_map[which(clust_map %in% out_i)] = 0
+
+
+for (i in 1:length(unique(clust_map))){
+  if(as.numeric(levels(factor(clust_map)))[i]>length(unique(clust_map))-1){
+    clust_map[which(clust_map==as.numeric(levels(factor(clust_map)))[i])]=i-1
+  }
+}
+
+factor(clust_map)
 
 print("Outliers: ")
-print(country[which(min_vi$cl %in% out_i)])
+print(out_names)
 
 count = 1
-for (i in 1:length(cl_i)){
+for (i in 1:length(l_i)){
   print(paste0("Cluster number ", count))
   print(country[which(min_vi$cl == cl_i[i])])
   count = count+1
@@ -199,19 +215,36 @@ red_mark = function(name, countries){
   return(list(col=col, pch=pch))
 }
 
+
+p = df[,c(3,4,7,8,10)]
+
+
+for (name in out_names){
+  mark = red_mark(name, country)
+  x11()
+  plot(p, col=mark$col, pch=mark$pch, main = paste0('Focus on ',name))
+}
+
 US = red_mark('United States', country)
 Lux = red_mark('Luxembourg', country)
 Ha = red_mark('Haiti', country)
 Bur = red_mark('Burundi', country)
 
-p = df[,c(2,6,7,8,10)]
 
 plot(p, col=US$col, pch=US$pch, main = 'Focus on United States')
 plot(p, col=Lux$col, pch=Lux$pch, main = 'Focus on Luxembourg')
 plot(p, col=Ha$col, pch=Ha$pch, main = 'Focus on Haiti')
 plot(p, col=Bur$col, pch=Bur$pch, main = 'Focus on Burundi')
 
+# Map plot
+country_codes = countrycode(country, origin = 'country.name', destination = 'iso.name.en')
+map_data = data.frame(country = country, cluster = clust_map)
 
+map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
+                    nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
+                    mapResolution = "coarse", projection = NA, verbose = FALSE)
 
-
-
+jpeg("map.jpg", width = 500, height = 500)
+mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
+               colourPalette = 'rainbow', mapTitle = 'Country clusters')
+dev.off()

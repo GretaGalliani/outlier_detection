@@ -153,6 +153,7 @@ sim_study <- function(input) #in input ho una lista
   tab_vi <- table(min_vi$cl)
   
  output_model<-list("beta_mean"=mean(result$beta), "k_mean"=mean(max),"singletons_mean"=mean(n_singletons),
+                    "BL_k"=length(which(tab_bind>1)),"VI_k"=length(which(tab_vi>1)),
                    "BL"=length(which(tab_bind==1)),"VI"=length(which(tab_vi==1)))
   
 return (output_model)

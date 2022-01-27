@@ -94,7 +94,7 @@ for (i in 1:n){
 
 #### RUNNING THE ALGORITHM ####
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 6000, 1000, 1)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
 #save(result,file='output_salvati/prova_1.dat')
 load('output_salvati/prova_1.dat')
 
@@ -132,12 +132,12 @@ effectiveSize(result$beta)
 
 #### CLUSTER ANALYSIS ####
 max <- c()
-for (i in 1:1000){
+for (i in 1:10){
   max <- c(max, max(result$S[i,]))
 }
 
 # WE COUNT THE NUMBER OF SINGLETONS
-source("auxiliary_functions/auxiliary_functions.R")
+source("algorithm_v1/auxiliary_functions.R")
 
 n_singletons <- c()
 for (i in 1:dim(result$S)[1]){

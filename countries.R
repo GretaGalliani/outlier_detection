@@ -176,10 +176,13 @@ plot(df$gdpp, df$life_expec, col=col_min_vi, pch = vi_pch, main = "Partition min
 plot(df, col=col_min_vi, pch=vi_pch)
 
 # Clusters and outliers
-
 out_i = as.numeric(which(vi_tab==1))
 cl_i = as.numeric(which(vi_tab>1))
 out_names = country[which(min_vi$cl %in% out_i)]
+
+# NUMBER OF OUTLIERS AND CLUSTERS
+print(paste0('Number of outliers: ', length(out_i)))
+print(paste0('Number of clusters: ', length(cl_i)))
 
 # Scale outliers
 clust_map = min_vi$cl 

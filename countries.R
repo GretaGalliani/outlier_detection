@@ -184,24 +184,27 @@ out_names = country[which(min_vi$cl %in% out_i)]
 print(paste0('Number of outliers: ', length(out_i)))
 print(paste0('Number of clusters: ', length(cl_i)))
 
+factor(min_vi$cl) 
+table(min_vi$cl)
+
 # Scale outliers
 clust_map = min_vi$cl 
 clust_map[which(clust_map %in% out_i)] = 0
 
-
-for (i in 1:length(unique(clust_map))){
-  if(as.numeric(levels(factor(clust_map)))[i]>length(unique(clust_map))-1){
-    clust_map[which(clust_map==as.numeric(levels(factor(clust_map)))[i])]=i-1
+uniq = 1:length(unique(clust_map))
+levels = as.numeric(levels(factor(clust_map)))
+for (i in uniq){
+  if(levels[i]>uniq[i]-1){
+    clust_map[which(clust_map==levels[i])]=i-1
   }
 }
 
-factor(clust_map)
 
 print("Outliers: ")
 print(out_names)
 
 count = 1
-for (i in 1:length(l_i)){
+for (i in 1:length(cl_i)){
   print(paste0("Cluster number ", count))
   print(country[which(min_vi$cl == cl_i[i])])
   count = count+1
@@ -239,9 +242,12 @@ plot(p, col=Lux$col, pch=Lux$pch, main = 'Focus on Luxembourg')
 plot(p, col=Ha$col, pch=Ha$pch, main = 'Focus on Haiti')
 plot(p, col=Bur$col, pch=Bur$pch, main = 'Focus on Burundi')
 
+graphics.off()
+
 # Map plot
 country_codes = countrycode(country, origin = 'country.name', destination = 'iso.name.en')
 map_data = data.frame(country = country, cluster = clust_map)
+map_data[102,]$country='Federated States of Micronesia'
 
 map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
                     nameCountryColumn = "country", suggestForFailedCodes = TRUE, 

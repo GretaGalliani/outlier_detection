@@ -9,6 +9,10 @@ library(countrycode)
 df = read.csv('Country-data.csv')
 df[102,]$country='Federated States of Micronesia'
 
+set.seed(1997)
+rows = sample(nrow(df))
+df = df[rows,]
+
 # country:	Name of the country
 # child_mort:	Death of children under 5 years of age per 1000 live births
 # exports:	Exports of goods and services per capita. Given as %age of the GDP 

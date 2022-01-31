@@ -7,6 +7,7 @@ library(countrycode)
 
 # Import dataset about countries development
 df = read.csv('Country-data.csv')
+df[102,]$country='Federated States of Micronesia'
 
 # country:	Name of the country
 # child_mort:	Death of children under 5 years of age per 1000 live births
@@ -245,9 +246,7 @@ plot(p, col=Bur$col, pch=Bur$pch, main = 'Focus on Burundi')
 graphics.off()
 
 # Map plot
-country_codes = countrycode(country, origin = 'country.name', destination = 'iso.name.en')
 map_data = data.frame(country = country, cluster = clust_map)
-map_data[102,]$country='Federated States of Micronesia'
 
 map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
                     nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
@@ -257,3 +256,35 @@ jpeg("map.jpg", width = 500, height = 500)
 mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
                colourPalette = 'rainbow', mapTitle = 'Country clusters')
 dev.off()
+
+# Compare outliers value with clusters means IGNORARE
+# Consider the covariate gdpp
+data_ns = df
+data_ns$country = NULL
+data_ns = as.matrix(data_ns)
+
+cl_means <- list()
+for (i in 1:length(cl_i)-1){
+  cl_data = data_ns[which(clust_map==i),]
+  m = colMeans(cl_data)
+  cl_means = append(cl_means, list(m))
+}
+
+gdpp_cl =rep(0,n)
+for (i in 1:n){
+  if (clust_map[i] == 0)
+    gdpp_cl[i]=data_ns[i,9]
+  else
+    gdpp_cl[i]=as.numeric(cl_means[[clust_map[i]]][9])
+}
+
+map_data_gdpp = data.frame(country = country, gdpp = data_ns[,9])
+
+map_gdpp = joinCountryData2Map(map_data_gdpp, joinCode = "NAME", nameJoinColumn = "country", 
+                          nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
+                          mapResolution = "coarse", projection = NA, verbose = FALSE)
+
+mapCountryData(map_gdpp, nameColumnToPlot = 'gdpp', catMethod = 'fixedWidth', 
+               colourPalette = 'heat', mapTitle = 'Country clusters')
+
+

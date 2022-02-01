@@ -256,10 +256,10 @@ map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country
                     nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
                     mapResolution = "coarse", projection = NA, verbose = FALSE)
 
-jpeg("map.jpg", width = 500, height = 500)
+#jpeg("map.jpg", width = 500, height = 500)
 mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
                colourPalette = 'rainbow', mapTitle = 'Country clusters')
-dev.off()
+#dev.off()
 
 # DA QUI IN POI INUTILE
 # Compare outliers value with clusters means

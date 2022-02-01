@@ -261,7 +261,8 @@ mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical',
                colourPalette = 'rainbow', mapTitle = 'Country clusters')
 dev.off()
 
-# Compare outliers value with clusters means IGNORARE
+# DA QUI IN POI INUTILE
+# Compare outliers value with clusters means
 # Consider the covariate gdpp
 data_ns = df
 data_ns$country = NULL

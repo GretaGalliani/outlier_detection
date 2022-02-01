@@ -52,7 +52,7 @@ Q_param$nu_0 = d+3
 Q_param$lambda_0 = cov(data)
 
 # Contaminant diffuse component
-P_param$k_0 = 1
+P_param$k_0 = 0.5
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
 P_param$lambda_0 = cov(data)
@@ -86,8 +86,8 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-#result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 2500, 100, 2)
-#save(result, file='country3.RData')
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 12000, 2000, 10)
+save(result, file='country_nicoletta.RData')
 
 
 tail(result$sigma, 20)

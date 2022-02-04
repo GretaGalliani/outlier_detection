@@ -60,11 +60,8 @@ Q_param$nu_0 = d+3
 Q_param$lambda_0 = cov(data)
 
 # Contaminant diffuse component
-<<<<<<< HEAD
-P_param$k_0 = 0.11
-=======
+
 P_param$k_0 = 0.05
->>>>>>> ff9cdd026fad942f37373e3d581d2e0a70038259
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
 P_param$lambda_0 = cov(data)

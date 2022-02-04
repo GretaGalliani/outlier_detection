@@ -52,7 +52,7 @@ Q_param$nu_0 = d+3
 Q_param$lambda_0 = cov(data)
 
 # Contaminant diffuse component
-P_param$k_0 = 0.5
+P_param$k_0 = 0.11
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
 P_param$lambda_0 = cov(data)
@@ -87,8 +87,8 @@ for (i in 1:dim(data)[1]){
 
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 12000, 2000, 10)
-save(result, file='country_nicoletta.RData')
-
+save(result, file='country_nicoletta_1_0.1.RData')
+load('country_nicoletta.RData')
 
 tail(result$sigma, 20)
 plot(result$sigma, type='l')
@@ -193,6 +193,10 @@ factor(min_vi$cl)
 table(min_vi$cl)
 
 # Scale outliers
+# clust_map = min_bind$cl
+# out_i = as.numeric(which(bind_tab==1))
+# cl_i = as.numeric(which(bind_tab>1))
+# out_names = country[which(min_bind$cl %in% out_i)]
 clust_map = min_vi$cl 
 clust_map[which(clust_map %in% out_i)] = 0
 
@@ -257,6 +261,7 @@ map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country
                     mapResolution = "coarse", projection = NA, verbose = FALSE)
 
 #jpeg("map.jpg", width = 500, height = 500)
+x11()
 mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
                colourPalette = 'rainbow', mapTitle = 'Country clusters')
 #dev.off()

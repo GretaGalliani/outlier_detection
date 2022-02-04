@@ -6,21 +6,40 @@ library(parallel)
 library(pbapply)
 library(pbmcapply)
 library(future)
+library(doParallel) 
 
 source("real_dataset_doge/doge-usd_function.R")
 #SETTA I PARAMETRI CHE VUOI DARE IN INPUT HAI DIVERSI MODELLI
-input_cores_1 <- list("costante"=1,"k0_Q"=1,"k0_P"=0.25) 
-input_cores_2 <- list("costante"=1,"k0_Q"=1,"k0_P"=0.25) 
-input_cores_3 <- list("costante"=1,"k0_Q"=1,"k0_P"=0.25) 
-input_cores_4 <- list("costante"=1,"k0_Q"=1,"k0_P"=0.25) 
+input_cores_1 <- list("costante"=6,"k0_Q"=1,"k0_P"=0.1) 
+input_cores_2 <- list("costante"=6,"k0_Q"=1,"k0_P"=0.01) 
+input_cores_3 <- list("costante"=6,"k0_Q"=0.5,"k0_P"=0.5) 
+input_cores_4 <- list("costante"=6,"k0_Q"=0.5,"k0_P"=0.1) 
 input <- list("1" = input_cores_1,
               "2" = input_cores_2,
               "3" = input_cores_3,
               "4" = input_cores_4)
 
 
-numCores <- detectCores()
+############################################################
+# WINDOWS
 
+cl <- makeCluster(detectCores(), type='PSOCK')
+result <-parLapply (cl, input, fun = doge_function )
+
+result_1 = result[[1]]$Result
+save(result_1, file='postcor6Q1P025.RData')
+result_2 = result[[2]]$Result
+save(result_2, file='postcor6Q05P05.RData')
+result_3 = result[[3]]$Result
+save(result_3, file='postcor6Q1P05.RData')
+result_4 = result[[4]]$Result
+save(result_4, file='postcor6Q05P025.RData')
+
+stopCluster (cl)
+#############################################################
+
+#numCores <- detectCores()
+numCores=4
 output_model <- pbmclapply(input, FUN=doge_function, mc.cores = numCores,mc.set.seed=TRUE)
 
 

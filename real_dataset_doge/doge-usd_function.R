@@ -22,6 +22,7 @@ for (i in 2:dim(doge)[1]){
 #ts_plot(data.frame(date = date, LogReturn=doge$LogReturn))
 
 data = as.matrix(doge$LogReturn)
+data=data[1:365,]
 data= scale(data)
 n = dim(data)[1]
 d = dim(data)[2]
@@ -71,7 +72,7 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 1, 1)
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 2000, 100, 1)
 
   output_model<-list("Result"=result)
 

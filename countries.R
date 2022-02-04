@@ -5,6 +5,8 @@ library(TSstudio)
 library(rworldmap)
 library(countrycode)
 
+# Dataset location:
+# https://www.kaggle.com/amritachatterjee09/clustering-help-international-ngo-aid/data
 # Import dataset about countries development
 df = read.csv('Country-data.csv')
 df[102,]$country='Federated States of Micronesia'
@@ -29,8 +31,14 @@ df = df[rows,]
 # gdpp:	The GDP per capita. Calculated as the Total GDP divided by the total 
 #       population.
 
-plot(df)
-plot(df$gdpp, df$life_expec)
+#plot(df)
+#plot(df$gdpp, df$life_expec)
+
+df$life_expec=log(df$life_expec)
+df$gdpp=log(df$gdpp)
+df$child_mort=log(df$child_mort)
+df$income=log(df$income)
+df$total_fer=log(df$total_fer)
 
 country = df$country
 
@@ -46,13 +54,17 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-Q_param$k_0 = 1
+Q_param$k_0 = 0.95
 Q_param$mu_0 = colMeans(data)
 Q_param$nu_0 = d+3
 Q_param$lambda_0 = cov(data)
 
 # Contaminant diffuse component
+<<<<<<< HEAD
 P_param$k_0 = 0.11
+=======
+P_param$k_0 = 0.05
+>>>>>>> ff9cdd026fad942f37373e3d581d2e0a70038259
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
 P_param$lambda_0 = cov(data)
@@ -86,9 +98,17 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
+<<<<<<< HEAD
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 12000, 2000, 10)
 save(result, file='country_nicoletta_1_0.1.RData')
 load('country_nicoletta.RData')
+=======
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
+                    beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
+                    Q_param, P_param, 6000, 1500, 5)
+save(result, file='country_P095_Q005.RData')
+
+>>>>>>> ff9cdd026fad942f37373e3d581d2e0a70038259
 
 tail(result$sigma, 20)
 plot(result$sigma, type='l')
@@ -98,6 +118,18 @@ plot(result$theta, type='l')
 
 result$S[1:30,]
 plot(data, col=result$S[150,])
+
+
+library(coda)
+
+# Plot of AUTOCORRELATION
+par(mfrow=c(1,2))
+tmp1 <- acf(result$sigma, main='Autocorrelation of sigma')
+tmp2 <- acf(result$theta, main='Autocorrelation of theta')
+
+# ESS
+effectiveSize(result$sigma)
+effectiveSize(result$theta)
 
 max <- c()
 for (i in 1:1000){
@@ -110,8 +142,21 @@ mean(max) # mean number of clusters by the algorithm
 # IMPLEMENTING MIN BINDER LOSS
 library(mcclust)
 
-# These functions needs to have indexes of the groups >=1
 aux = result$S
+
+# Compute the probability of a single country to be an outlier 
+# based on relative frequency
+
+freq = rep(0,n)
+for (i in 1:n){
+  freq[i] = length(which(aux[,i]==0))
+}
+rel_freq = freq/dim(aux)[1]
+
+# Take the 5 most probable outliers by relative frequencies
+country[order(rel_freq, decreasing = TRUE)[1:10]]
+
+
 
 # These functions needs to have indexes of the groups >=1
 for (i in 1:dim(aux)[1]){
@@ -179,6 +224,9 @@ vi_pch[min_vi$cl %in% which(vi_tab>1)]=16
 plot(df$gdpp, df$life_expec, col=col_min_vi, pch = vi_pch, main = "Partition minimizing VI Loss")
 
 plot(df, col=col_min_vi, pch=vi_pch)
+
+# Try a logarithmic transformation
+plot(log(df[,c(2,10)]), col=col_min_vi, pch=vi_pch)
 
 # Clusters and outliers
 out_i = as.numeric(which(vi_tab==1))

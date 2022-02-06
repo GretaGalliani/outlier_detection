@@ -54,17 +54,17 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-Q_param$k_0 = 0.95
+Q_param$k_0 = 0.7
 Q_param$mu_0 = colMeans(data)
 Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)
+Q_param$lambda_0 = cov(data)*0.8
 
 # Contaminant diffuse component
 
 P_param$k_0 = 0.05
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+3
-P_param$lambda_0 = cov(data)
+P_param$lambda_0 = cov(data)*0.8
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)
@@ -95,27 +95,28 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-<<<<<<< HEAD
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 12000, 2000, 10)
-save(result, file='country_nicoletta_1_0.1.RData')
-load('country_nicoletta.RData')
-=======
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
                     beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
                     Q_param, P_param, 6000, 1500, 5)
-save(result, file='country_P095_Q005.RData')
+save(result, file='country_Q07_P005_CovDiv_08.RData')
 
->>>>>>> ff9cdd026fad942f37373e3d581d2e0a70038259
 
 tail(result$sigma, 20)
-plot(result$sigma, type='l')
+plot(result$sigma,type='l')
+plot(density(result$sigma))
+mean(result$sigma)
+sd(result$sigma)
 
 tail(result$theta, 20)
 plot(result$theta, type='l')
 
+plot(result$beta, type='l')
+plot(density(result$beta))
+mean(result$beta)
+sd(result$beta)
+
 result$S[1:30,]
 plot(data, col=result$S[150,])
-
 
 library(coda)
 
@@ -169,6 +170,7 @@ for (i in 1:dim(aux)[1]){
 # in which observation $i$ and $j$ are together in a cluster is computed and 
 # a matrix containing all proportions is given out. 
 psm <- comp.psm(aux)
+image(psm)
 
 # finds the clustering that minimizes the posterior expectation of Binders loss function
 min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
@@ -264,6 +266,19 @@ for (i in 1:length(cl_i)){
   count = count+1
 }
 
+# Map plot
+map_data = data.frame(country = country, cluster = clust_map)
+
+map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
+                    nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
+                    mapResolution = "coarse", projection = NA, verbose = FALSE)
+
+#jpeg("map_Q07_P005_CovDiv_08.jpg", width = 700, height = 700)
+x11()
+mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
+               colourPalette = 'rainbow', mapTitle = 'Country clusters')
+#dev.off()
+
 
 # Focus on United States, Luxembourg, Haiti and Burundi
 
@@ -298,19 +313,6 @@ plot(p, col=Bur$col, pch=Bur$pch, main = 'Focus on Burundi')
 
 graphics.off()
 
-# Map plot
-map_data = data.frame(country = country, cluster = clust_map)
-
-map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
-                    nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
-                    mapResolution = "coarse", projection = NA, verbose = FALSE)
-
-#jpeg("map.jpg", width = 500, height = 500)
-x11()
-mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
-               colourPalette = 'rainbow', mapTitle = 'Country clusters')
-#dev.off()
-
 # DA QUI IN POI INUTILE
 # Compare outliers value with clusters means
 # Consider the covariate gdpp
@@ -342,4 +344,5 @@ map_gdpp = joinCountryData2Map(map_data_gdpp, joinCode = "NAME", nameJoinColumn 
 mapCountryData(map_gdpp, nameColumnToPlot = 'gdpp', catMethod = 'fixedWidth', 
                colourPalette = 'heat', mapTitle = 'Country clusters')
 
+length(unique(result$S[500,]))
 

@@ -29,15 +29,15 @@ country_function <- function(input) #in input ho una lista
   
   # Contaminated component
   Q_param$k_0 = input$k0_Q ###VARIABILE CHE GLI PASSI IN INPUT
-  Q_param$mu_0 = mean(data)
+  Q_param$mu_0 = colMeans(data)
   Q_param$nu_0 = d+3
-  Q_param$lambda_0 = var(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  Q_param$lambda_0 = cov(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
   
   # Contaminant diffuse component
   P_param$k_0 = input$k0_P ###VARIABILE CHE GLI PASSI IN INPUT
-  P_param$mu_0 = mean(data)
+  P_param$mu_0 = colMeans(data)
   P_param$nu_0 = d+3
-  P_param$lambda_0 = var(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  P_param$lambda_0 = cov(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
   
   # Initialization of the parameters for the Pitman-Yor and initial partition
   S_init = rep(1, n)
@@ -58,8 +58,8 @@ country_function <- function(input) #in input ho una lista
   xi_mu <- list()
   xi_cov <- list()
   
-  init_mu <- mean(data)
-  init_var <- var(data)
+  init_mu <- colMeans(data)
+  init_var <- cov(data)
   
   
   for (i in 1:dim(data)[1]){

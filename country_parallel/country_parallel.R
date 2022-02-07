@@ -21,7 +21,7 @@ input <- list("1" = input_cores_1,
 
 numCores <- detectCores()
 
-output_model <- pbmclapply(input, FUN=country_function, mc.cores = numCores,mc.set.seed=TRUE)
+output_model <- pbmclapply(input, FUN=country_function, mc.cores = numCores)
 
 
 result_1 <- output_model[[1]]$Result

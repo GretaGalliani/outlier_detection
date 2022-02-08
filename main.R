@@ -118,6 +118,12 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
       }
       acc_sigma <- sigma_list$acc
     }
+    
+    if(r %% 100 == 0){
+      print(r)
+      print(paste0('Sigma = ', sigma_old))
+    }
+
 
     
     # Updating theta

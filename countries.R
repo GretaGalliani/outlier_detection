@@ -54,17 +54,17 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-Q_param$k_0 = 0.7
+Q_param$k_0 = 0.8
 Q_param$mu_0 = colMeans(data)
-Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)*0.8
+Q_param$nu_0 = d+4
+Q_param$lambda_0 = diag(d)*0.5
 
 # Contaminant diffuse component
 
 P_param$k_0 = 0.05
 P_param$mu_0 = colMeans(data)
-P_param$nu_0 = d+3
-P_param$lambda_0 = cov(data)*0.8
+P_param$nu_0 = d+4
+P_param$lambda_0 = diag(d)*0.5
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)
@@ -96,31 +96,68 @@ for (i in 1:dim(data)[1]){
 
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
-                    beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
+                    beta_param, s2igma_param, theta_param, xi_mu, xi_cov, 
                     Q_param, P_param, 6000, 1500, 5)
-save(result, file='country_Q07_P005_CovDiv_08.RData')
+save(result, file='country_Q08_P005_CovDiv_05_.RData')
 
+# Diagnostics
 
-tail(result$sigma, 20)
-plot(result$sigma,type='l')
+# Sigma
+jpeg("sigma.jpg", width = 500, height = 500)
+plot(result$sigma, type='l', ylim=c(0,1), xlab='iter', ylab=expression(sigma))
+lines(rep(mean(result$sigma),length(result$sigma)), type='l', col='red' )
+grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1)
+dev.off()
+
 plot(density(result$sigma))
+result$acc_sigma
 mean(result$sigma)
 sd(result$sigma)
 
-tail(result$theta, 20)
-plot(result$theta, type='l')
+# Theta
+jpeg("theta.jpg", width = 500, height = 500)
+plot(result$theta, type='l', xlab='iter', ylab=expression(theta))
+lines(rep(mean(result$theta),length(result$theta)), type='l', col='red' )
+grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1) 
+dev.off()
 
-plot(result$beta, type='l')
+plot(density(result$theta))
+result$acc_theta
+mean(result$theta)
+sd(result$theta)
+
+# Beta
+jpeg("beta.jpg", width = 500, height = 500)
+plot(result$beta, type='l', ylim=c(0,1), xlab='iter', ylab=expression(beta))
+lines(rep(mean(result$beta),length(result$beta)), type='l', col='red' )
+grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1)
+dev.off()
+
 plot(density(result$beta))
 mean(result$beta)
 sd(result$beta)
 
-result$S[1:30,]
-plot(data, col=result$S[150,])
+# M1 bar
+result_m1_bar = {}
+for(i in 1:dim(result$S)[1])
+  result_m1_bar = append(result_m1_bar, m1_bar(result$S[i,]))
 
-library(coda)
+jpeg("m1_bar.jpg", width = 500, height = 500)
+plot(result_m1_bar, type='l', xlab='iter', ylab=expression(bar(m[1])))
+lines(rep(mean(result_m1_bar),length(result_m1_bar)), type='l', col='red' )
+grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1)
+dev.off()
+
+plot(density(result$beta))
+mean(result$beta)
+sd(result$beta)
+
+
+
+
 
 # Plot of AUTOCORRELATION
+library(coda)
 par(mfrow=c(1,2))
 tmp1 <- acf(result$sigma, main='Autocorrelation of sigma')
 tmp2 <- acf(result$theta, main='Autocorrelation of theta')
@@ -274,7 +311,6 @@ map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country
                     mapResolution = "coarse", projection = NA, verbose = FALSE)
 
 #jpeg("map_Q07_P005_CovDiv_08.jpg", width = 700, height = 700)
-x11()
 mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
                colourPalette = 'rainbow', mapTitle = 'Country clusters')
 #dev.off()

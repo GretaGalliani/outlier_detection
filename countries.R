@@ -54,40 +54,18 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-<<<<<<< HEAD
-Q_param$k_0 = 0.8
-Q_param$mu_0 = colMeans(data)
-Q_param$nu_0 = d+4
-Q_param$lambda_0 = diag(d)*0.5
-=======
-<<<<<<< HEAD
-Q_param$k_0 = 0.6
-Q_param$mu_0 = colMeans(data)
-Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)*0.9
-=======
 Q_param$k_0 = 0.7
 Q_param$mu_0 = colMeans(data)
 Q_param$nu_0 = d+3
 Q_param$lambda_0 = cov(data)*0.8
->>>>>>> 1a70f3c9a894f05901e2e72801fd7d2836a007f3
->>>>>>> 7052487b4ad7bad7efe20e2bdddee065115f3406
+
 
 # Contaminant diffuse component
 
 P_param$k_0 = 0.05
 P_param$mu_0 = colMeans(data)
-<<<<<<< HEAD
 P_param$nu_0 = d+4
 P_param$lambda_0 = diag(d)*0.5
-=======
-P_param$nu_0 = d+3
-<<<<<<< HEAD
-P_param$lambda_0 = cov(data)*0.9
-=======
-P_param$lambda_0 = cov(data)*0.8
->>>>>>> 1a70f3c9a894f05901e2e72801fd7d2836a007f3
->>>>>>> 7052487b4ad7bad7efe20e2bdddee065115f3406
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)
@@ -118,14 +96,6 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-<<<<<<< HEAD
-
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 12000, 2000, 10)
-save(result, file='country_nicoletta_.RData')
-load('country_nicoletta.RData')
-
-=======
->>>>>>> 1a70f3c9a894f05901e2e72801fd7d2836a007f3
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
                     beta_param, s2igma_param, theta_param, xi_mu, xi_cov, 
                     Q_param, P_param, 6000, 1500, 5)

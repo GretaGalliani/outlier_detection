@@ -56,16 +56,15 @@ P_param = list()
 # Contaminated component
 Q_param$k_0 = 0.7
 Q_param$mu_0 = colMeans(data)
-Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)*0.8
+Q_param$nu_0 = d+4
+Q_param$lambda_0 = diag(d)*0.6
 
 
 # Contaminant diffuse component
-
 P_param$k_0 = 0.05
 P_param$mu_0 = colMeans(data)
 P_param$nu_0 = d+4
-P_param$lambda_0 = diag(d)*0.5
+P_param$lambda_0 = diag(d)*0.6
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)
@@ -96,18 +95,20 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
+#load('modello.RData')
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
-                    beta_param, s2igma_param, theta_param, xi_mu, xi_cov, 
-                    Q_param, P_param, 6000, 1500, 5)
-save(result, file='country_Q08_P005_CovDiv_05_.RData')
+                    beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
+                    Q_param, P_param, 12000, 2000, 10)
+save(result, file='country_Q08_P005_CovDiv_05_12mila.RData')
 
 # Diagnostics
 
 # Sigma
 jpeg("sigma.jpg", width = 500, height = 500)
-plot(result$sigma, type='l', ylim=c(0,1), xlab='iter', ylab=expression(sigma))
+plot(result$sigma, type='l', xlim=c(0,900), ylim=c(0,1), xlab='iter', ylab=expression(sigma))
 lines(rep(mean(result$sigma),length(result$sigma)), type='l', col='red' )
-grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1)
+grid(nx=NA, ny=NULL, lty = 1, col = "gray", lwd = 1)
+abline(v = seq(0, 900, 100), lty = 1, col = "gray", lwd=1)
 dev.off()
 
 plot(density(result$sigma))
@@ -119,7 +120,8 @@ sd(result$sigma)
 jpeg("theta.jpg", width = 500, height = 500)
 plot(result$theta, type='l', xlab='iter', ylab=expression(theta))
 lines(rep(mean(result$theta),length(result$theta)), type='l', col='red' )
-grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1) 
+grid(nx=NA, ny=NULL, lty = 1, col = "gray", lwd = 1)
+abline(v = seq(0, 900, 100), lty = 1, col = "gray", lwd=1) 
 dev.off()
 
 plot(density(result$theta))
@@ -131,7 +133,8 @@ sd(result$theta)
 jpeg("beta.jpg", width = 500, height = 500)
 plot(result$beta, type='l', ylim=c(0,1), xlab='iter', ylab=expression(beta))
 lines(rep(mean(result$beta),length(result$beta)), type='l', col='red' )
-grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1)
+grid(nx=NA, ny=NULL, lty = 1, col = "gray", lwd = 1)
+abline(v = seq(0, 900, 100), lty = 1, col = "gray", lwd=1)
 dev.off()
 
 plot(density(result$beta))
@@ -146,16 +149,13 @@ for(i in 1:dim(result$S)[1])
 jpeg("m1_bar.jpg", width = 500, height = 500)
 plot(result_m1_bar, type='l', xlab='iter', ylab=expression(bar(m[1])))
 lines(rep(mean(result_m1_bar),length(result_m1_bar)), type='l', col='red' )
-grid(nx=NULL, ny=NULL, lty = 1, col = "gray", lwd = 1)
+grid(nx=NA, ny=NULL, lty = 1, col = "gray", lwd = 1)
+abline(v = seq(0, 900, 100), lty = 1, col = "gray", lwd=1)
 dev.off()
 
-plot(density(result$beta))
-mean(result$beta)
-sd(result$beta)
-
-
-
-
+plot(density(result_m1_bar))
+mean(result_m1_bar)
+sd(result_m1_bar)
 
 # Plot of AUTOCORRELATION
 library(coda)
@@ -166,6 +166,8 @@ tmp2 <- acf(result$theta, main='Autocorrelation of theta')
 # ESS
 effectiveSize(result$sigma)
 effectiveSize(result$theta)
+effectiveSize(result$beta)
+effectiveSize(result_m1_bar)
 
 max <- c()
 for (i in 1:1000){
@@ -311,10 +313,10 @@ map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country
                     nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
                     mapResolution = "coarse", projection = NA, verbose = FALSE)
 
-#jpeg("map_Q07_P005_CovDiv_08.jpg", width = 700, height = 700)
+jpeg("mappa_finale.jpg", width = 1000, height = 1000)
 mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
                colourPalette = 'rainbow', mapTitle = 'Country clusters')
-#dev.off()
+dev.off()
 
 
 # Focus on United States, Luxembourg, Haiti and Burundi

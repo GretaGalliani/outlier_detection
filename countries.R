@@ -4,6 +4,7 @@ library(robustbase)
 library(TSstudio)
 library(rworldmap)
 library(countrycode)
+library(BNPmix)
 
 # Dataset location:
 # https://www.kaggle.com/amritachatterjee09/clustering-help-international-ngo-aid/data
@@ -54,28 +55,17 @@ Q_param = list()
 P_param = list()
 
 # Contaminated component
-<<<<<<< HEAD
-Q_param$k_0 = 0.6
-Q_param$mu_0 = colMeans(data)
-Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)*0.9
-=======
 Q_param$k_0 = 0.7
 Q_param$mu_0 = colMeans(data)
-Q_param$nu_0 = d+3
-Q_param$lambda_0 = cov(data)*0.8
->>>>>>> 1a70f3c9a894f05901e2e72801fd7d2836a007f3
+Q_param$nu_0 = d+4
+Q_param$lambda_0 = diag(d)*0.6
+
 
 # Contaminant diffuse component
-
 P_param$k_0 = 0.05
 P_param$mu_0 = colMeans(data)
-P_param$nu_0 = d+3
-<<<<<<< HEAD
-P_param$lambda_0 = cov(data)*0.9
-=======
-P_param$lambda_0 = cov(data)*0.8
->>>>>>> 1a70f3c9a894f05901e2e72801fd7d2836a007f3
+P_param$nu_0 = d+4
+P_param$lambda_0 = diag(d)*0.6
 
 # Initialization of the parameters for the Pitman-Yor and initial partition
 S_init = rep(1, n)
@@ -106,47 +96,124 @@ for (i in 1:dim(data)[1]){
 }
 
 source("main.R")
-<<<<<<< HEAD
+load('modello12.RData')
+#result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
+                    #beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
+                    #Q_param, P_param, 12000, 2000, 10)
+#save(result, file='country_Q08_P005_CovDiv_05_12mila.RData')
 
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 12000, 2000, 10)
-save(result, file='country_nicoletta_.RData')
-load('country_nicoletta.RData')
+# Diagnostics
 
-=======
->>>>>>> 1a70f3c9a894f05901e2e72801fd7d2836a007f3
-result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
-                    beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
-                    Q_param, P_param, 6000, 1500, 5)
-save(result, file='country_Q07_P005_CovDiv_08.RData')
+# Sigma
+jpeg("sigma.jpg", width = 500, height = 500)
+plot(result$sigma, type='l', xlim=c(0,900), ylim=c(0,1), xlab='iter', ylab=expression(sigma))
+abline(h = seq(0, 1, 0.1), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5)
+lines(result$sigma, type='l')
+lines(rep(mean(result$sigma),length(result$sigma)), type='l', col='red' )
+dev.off()
 
-
-tail(result$sigma, 20)
-plot(result$sigma,type='l')
-plot(density(result$sigma))
+result$acc_sigma
 mean(result$sigma)
 sd(result$sigma)
 
-tail(result$theta, 20)
-plot(result$theta, type='l')
+jpeg("sigma_density.jpg", width = 500, height = 500)
+plot(density(result$sigma), xlim = c(0.3,1), ylim = c(0,6), type='l', 
+     xlab = expression(sigma), col = 'blue', 
+     main = expression(paste('Posterior density of ', sigma)))
+abline(v = seq(0.3, 1, 0.05), lty = 1, col = "gray", lwd=0.5)
+abline(h = seq(0, 6, 0.5), lty = 1, col = "gray", lwd=0.5)
+abline(v = mean(result$sigma), lty = 2, col = "blue", lwd=1)
+polygon(density(result$sigma), col = rgb(0, 0, 1, alpha = 0.5))
+lines(density(result$sigma), type='l')
+dev.off()
 
-plot(result$beta, type='l')
-plot(density(result$beta))
+# Theta
+jpeg("theta.jpg", width = 500, height = 500)
+plot(result$theta, type='l', xlab='iter', ylab=expression(theta))
+abline(h = seq(0, 13, 1), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5) 
+lines(result$theta, type='l')
+lines(rep(mean(result$theta),length(result$theta)), type='l', col='red' )
+dev.off()
+
+result$acc_theta
+mean(result$theta)
+sd(result$theta)
+
+#jpeg("theta_density.jpg", width = 500, height = 500)
+plot(density(result$theta), xlim = c(0,15), ylim = c(0,0.3), type='l', 
+     xlab = expression(theta), col = 'blue', 
+     main = expression(paste('Posterior density of ', theta)))
+abline(h = seq(0, 0.3, 0.025), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0, 15, 1), lty = 1, col = "gray", lwd=0.5)
+abline(v = mean(result$theta), lty = 2, col = "blue", lwd=1)
+polygon(density(result$theta), col = rgb(0, 0, 1, alpha = 0.5))
+lines(density(result$theta), type='l')
+dev.off()
+
+# Beta
+jpeg("beta.jpg", width = 500, height = 500)
+plot(result$beta, type='l', ylim=c(0,1), xlab='iter', ylab=expression(beta))
+abline(h = seq(0, 1, 0.1), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5)
+lines(result$beta, type='l')
+lines(rep(mean(result$beta),length(result$beta)), type='l', col='red' )
+dev.off()
+
 mean(result$beta)
 sd(result$beta)
 
-result$S[1:30,]
-plot(data, col=result$S[150,])
+#jpeg('beta_density.jpg', width = 500, height = 500)
+plot(density(result$beta), type='l', xlab = expression(beta), col = 'blue', 
+     main = expression(paste('Posterior density of ', beta)))
+abline(h = seq(0, 11, 1), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0.6, 1, 0.025), lty = 1, col = "gray", lwd=0.5)
+abline(v = mean(result$beta), lty = 2, col = "blue", lwd=1)
+polygon(density(result$beta), col = rgb(0, 0, 1, alpha = 0.5))
+lines(density(result$beta), type='l')
+dev.off()
 
-library(coda)
+
+# M1 bar
+result_m1_bar = {}
+for(i in 1:dim(result$S)[1])
+  result_m1_bar = append(result_m1_bar, m1_bar(result$S[i,]))
+
+#jpeg("m1_bar.jpg", width = 500, height = 500)
+plot(result_m1_bar, type='l', xlab='iter', ylab=expression(bar(m[1])))
+abline(h = seq(5, 35, 2.5), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5)
+lines(result_m1_bar, type='l')
+lines(rep(mean(result_m1_bar),length(result_m1_bar)), type='l', col='red' )
+dev.off()
+
+mean(result_m1_bar)
+sd(result_m1_bar)
+
+#jpeg('m1_bar_density.jpg', width = 500, height = 500)
+plot(NULL, xlim = c(0,40), ylim = c(0,0.12), main = expression(paste('Posterior density of ', bar(m[1]))),
+     xlab = expression(bar(m[1])), ylab = 'Density')
+abline(h = seq(0, 0.12, 0.02), lty = 1, col = "gray", lwd=0.5)
+abline(v = seq(0, 40, 2), lty = 1, col = "gray", lwd=0.5)
+abline(v = mean(result_m1_bar), lty = 2, col = "blue", lwd=1)
+hist(result_m1_bar, col = rgb(0, 0, 1, alpha = 0.5), freq=FALSE, add=TRUE, 
+     xlim = c(0,40),ylim = c(0,0.12), breaks = length(unique(result_m1_bar)))
+dev.off()
 
 # Plot of AUTOCORRELATION
+library(coda)
+
 par(mfrow=c(1,2))
 tmp1 <- acf(result$sigma, main='Autocorrelation of sigma')
 tmp2 <- acf(result$theta, main='Autocorrelation of theta')
+graphics.off()
 
 # ESS
 effectiveSize(result$sigma)
 effectiveSize(result$theta)
+effectiveSize(result$beta)
+effectiveSize(result_m1_bar)
 
 max <- c()
 for (i in 1:1000){
@@ -286,17 +353,30 @@ for (i in 1:length(cl_i)){
 }
 
 # Map plot
+
 map_data = data.frame(country = country, cluster = clust_map)
 
 map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
                     nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
-                    mapResolution = "coarse", projection = NA, verbose = FALSE)
+                    mapResolution = "medium", projection = NA, verbose = FALSE)
 
-#jpeg("map_Q07_P005_CovDiv_08.jpg", width = 700, height = 700)
-x11()
-mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
-               colourPalette = 'rainbow', mapTitle = 'Country clusters')
-#dev.off()
+col = c('black', 'blue', 'red', 'wheat', 'yellow', 'chocolate', 'orange', 
+        'lightblue', 'goldenrod1', 'darkgreen', 'green2', 'magenta')
+
+
+jpeg("mappa.jpg", width = 1000, height = 1000)
+mapParams = mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
+               oceanCol = "azure2", missingCountryCol = 'white', 
+               colourPalette = col, mapTitle = '', 
+               addLegend = FALSE)
+
+do.call(addMapLegendBoxes, c(mapParams,
+                             x = 'bottom',
+                             title = "Clusters (outliers as 0)",
+                             horiz = TRUE,
+                             bg = "transparent",
+                             bty = "n"))
+dev.off()
 
 
 # Focus on United States, Luxembourg, Haiti and Burundi
@@ -310,7 +390,7 @@ red_mark = function(name, countries){
 }
 
 
-p = df[,c(3,4,7,8,10)]
+p = df[,c(2,4,7,8,10)]
 
 
 for (name in out_names){
@@ -320,15 +400,25 @@ for (name in out_names){
 }
 
 US = red_mark('United States', country)
-Lux = red_mark('Luxembourg', country)
+Ven = red_mark('Venezuela', country)
 Ha = red_mark('Haiti', country)
-Bur = red_mark('Burundi', country)
+Ni = red_mark('Nigeria', country)
 
-
+jpeg("US.jpg", width = 500, height = 500)
 plot(p, col=US$col, pch=US$pch, main = 'Focus on United States')
-plot(p, col=Lux$col, pch=Lux$pch, main = 'Focus on Luxembourg')
+dev.off()
+
+jpeg("Venezuela.jpg", width = 500, height = 500)
+plot(p, col=Ven$col, pch=Ven$pch, main = 'Focus on Venezuela')
+dev.off()
+
+plot(p, col=Ni$col, pch=Ni$pch, main = 'Focus on Nigeria')
+
+jpeg("Haiti.jpg", width = 500, height = 500)
 plot(p, col=Ha$col, pch=Ha$pch, main = 'Focus on Haiti')
-plot(p, col=Bur$col, pch=Bur$pch, main = 'Focus on Burundi')
+dev.off()
+
+country[which(df$inflation==max(df$inflation))]
 
 graphics.off()
 
@@ -361,7 +451,7 @@ map_gdpp = joinCountryData2Map(map_data_gdpp, joinCode = "NAME", nameJoinColumn 
                           mapResolution = "coarse", projection = NA, verbose = FALSE)
 
 mapCountryData(map_gdpp, nameColumnToPlot = 'gdpp', catMethod = 'fixedWidth', 
-               colourPalette = 'heat', mapTitle = 'Country clusters')
+               colourPalette = 'heat', mapTitle = 'Country clusters', addLegend = FALSE)
 
 length(unique(result$S[500,]))
 

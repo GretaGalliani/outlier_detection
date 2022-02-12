@@ -3,17 +3,9 @@ library(MASS)
 library(pbapply)
 library(pbmcapply)
 library(future)
-# sim_study <- function(lista_di_merda)
-# {
-#   c <- lista_di_merda$c
-#   d <- lista_di_merda$d
-#   prova <- mvrnorm(1,mu= rep(0,d),Sigma= 3^2*diag(d))
-#   output <- list(prova)
-#   return (output)
-#   
-# }
 
 source("Simulation_study/function_simulation_study.R")
+#Input variable to pass to the function_simulation_study
 
 input_cores <- list("d"=2,"c"=1.25,"k0_Q"=1,"k0_P"=0.25,"m"=90) 
 input <- list("1" = input_cores,
@@ -41,13 +33,10 @@ input <- list("1" = input_cores,
               "23" = input_cores,
               "24" = input_cores)
 
-
-
-#Versione 1
+#Numbers of cores
 numCores <- detectCores()
-# tempo <- system.time({
-# output_model <- mclapply(input, sim_study, mc.cores = numCores,mc.set.seed=TRUE)
-# })
+
+#Parallelizing version of our function
 output_model <- pbmclapply(input, FUN=sim_study, mc.cores = numCores,mc.set.seed=TRUE)
 
 vettore_beta <- NULL
@@ -75,14 +64,8 @@ data <- data.frame("beta"=vettore_beta, "k"=vettore_k, "singletons"=vettore_sing
 #install.packages("xlsx")
 library(xlsx)
 
+#Save the data in a file excell
 percorso <- "Simulation_study/valori_modelli_sim_study.xlsx"
 write.xlsx(data, file=percorso, sheetName = "Sheet3", 
            col.names = TRUE, row.names = FALSE, append = TRUE)
-
-
-
-#Versione 2
-# cl=makeCluster(parallel::detectCores())
-# prova <- parSapply(cl=cl,X=input,FUN=sim_study,USE.NAMES=TRUE)
-
 

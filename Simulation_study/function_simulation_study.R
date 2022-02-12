@@ -1,52 +1,50 @@
-sim_study <- function(input) #in input ho una lista
+#This function implement the algorithm for the simulation study:
+#Generate a set of n data from a mixture of two Gaussian distribution 
+#Generate a set of S outliers from an over-disperse truncated gaussian
+
+#Input = list(d,c,K0_Q,k0_P), we pass this parameters since we want to parallelized this function
+sim_study <- function(input) 
 {
-   # pb <- progress_bar$new(
-   #         format = "  processing [:bar] :percent eta: :eta",
-   #         total = B, clear = FALSE)
-  d <- input$d
-  c <- input$c
-  k0_P <- input$k0_P
-  k0_Q <- input$k0_Q
-  m <- input$m
+  d <- input$d #Dimension: {2,4}
+  c <- input$c # {1,1.25,1.5}
+  k0_P <- input$k0_P #{0.5,0.25}
+  k0_Q <- input$k0_Q #{0.5,1}
+  m <- input$m #Number of samples {90,240}
   
-  mean_a = rep(-3,d)#vector of means
-  sigma_b = diag(d) #sigma
-  m1 = rbinom(1, size=m, prob = 0.5) #number of samples coming from the first gaussian 
-  m2 = m-m1 # from the second one
+  ## SAMPLING FROM THE DENSITY####
+  # BASE MEASURE
+  mean_a = rep(-3,d) #Vector of means
+  sigma_b = diag(d) #Sigma
+  m1 = rbinom(1, size=m, prob = 0.5) #Number of samples coming from the first gaussian distribution 
+  m2 = m-m1 #Number of samples coming from the second gaussian distribution 
   
-  val1 = mvrnorm (m1,mu = mean_a, Sigma = sigma_b) #samples from first multivariate function
-  val2 = mvrnorm (m2,mu = -mean_a, Sigma = sigma_b) #samples from second multivariate function
-  allval = rbind(val1,val2) #combine
+  val1 = mvrnorm (m1,mu = mean_a, Sigma = sigma_b) #Samples from first multivariate function
+  val2 = mvrnorm (m2,mu = -mean_a, Sigma = sigma_b) #Samples from second multivariate function
+  allval = rbind(val1,val2) #Combine
   
-  # allval <- NULL
-  
-  s=10 #number of outliers
+  # CONTAMINATED MEASURE ####
+  s=10 #Number of outliers
   i=0 
   while(i<s){ #cycle to find s outliers
     value=mvrnorm(1,mu= rep(0,d),Sigma= 3^2*diag(d)) #sampling from a multivariate normal distribution
     module = norm(as.matrix(value), type="2")
     chi=qchisq(0.9, df = d)
-    # if(module^2>3*sqrt(chi))
     if(module^2>9*chi) #If we are sampling from the over-disperse truncated Gaussian distribution
     {
       i=i+1
-      value = c*value
+      value = c*value #C has the role to shrink or expand the nuisance observations towards the origin
       allval = rbind(allval,value)
     }
   }
-  # allval = allval[sample(m+s,m+s),] #randomizing rows
   
   rownames(allval)=NULL
   data <- allval
   
-  #### INIZIALIZZAZIONE - P0 DIVERSO DA Q0 ####
-  
+  ##INITIALIZATION for Q0 and P0 ####
   Q_param = list()
   P_param = list()
   
-  d = 2
-  
-  Q_param$k_0 = k0_Q
+  Q_param$k_0 = k0_Q 
   Q_param$mu_0 = c(0,0)
   Q_param$nu_0 = d + 3 # it must be > (p-1)
   Q_param$lambda_0 = diag(diag(cov(data)))
@@ -74,6 +72,7 @@ sim_study <- function(input) #in input ho una lista
   theta_param$a = 2 
   theta_param$b = 1
   
+  #Create two list empty for xi_mu and xi_cov
   xi_mu <- list()
   xi_cov <- list()
   
@@ -85,21 +84,17 @@ sim_study <- function(input) #in input ho una lista
     xi_cov <- append(xi_cov, list(init_var))
   }
   
-  #### RUNNING THE ALGORITHM ####
+  ## RUNNING THE ALGORITHM ####
   source("main.R")
   result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 6000, 1000, 1)
-  #SE VOGLIAMO SALVARE I FILE! BISOGNA PASSARE UN ITERATORE i
-  #nome_file <- paste('output_salvati_prova',as.character(i),sep="_")
-  #nome_file <-paste(nome_file,'dat',sep=".")
-  #save(result,file=nome_file)
-  print("ciao")
+  
   #### CLUSTER ANALYSIS ####
   max <- c()
   for (i in 1:dim(result$S)[1]){
     max <- c(max, max(result$S[i,]))
   }
   
-  # WE COUNT THE NUMBER OF SINGLETONS
+  # Ww count the numbers of singletons
   source("algorithm_v1/auxiliary_functions.R")
   
   n_singletons <- c()
@@ -107,7 +102,8 @@ sim_study <- function(input) #in input ho una lista
     n_singletons <- c(n_singletons, m1(result$S[i,]))
   }
   
-  # IMPLEMENTING MIN BINDER LOSS
+  ## LOSS FUNCTION ####
+  #Binder loss function
   library(mcclust)
   
   aux = result$S
@@ -121,7 +117,6 @@ sim_study <- function(input) #in input ho una lista
     }
   }
   
-  
   # For a sample of clusterings of the same objects the proportion of clusterings 
   # in which observation $i$ and $j$ are together in a cluster is computed and 
   # a matrix containing all proportions is given out. 
@@ -131,15 +126,13 @@ sim_study <- function(input) #in input ho una lista
   # finds the clustering that minimizes the posterior expectation of Binders loss function
   min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
                                                           "laugreen","all"), max.k = NULL, include.lg = FALSE, 
-                         start.cl = NULL, tol = 0.001)
-  
-  
+                                                          start.cl = NULL, tol = 0.001)
   
   # best cluster according binder loss 
   tab_bind <- table(min_bind$cl) 
 
   
-  # IMPLEMENTING MIN VARIATION OF INFORMATION
+  # Variation of Information
   #devtools::install_github("sarawade/mcclust.ext")
   library(mcclust.ext)
   
@@ -152,7 +145,7 @@ sim_study <- function(input) #in input ho una lista
   # best cluster according to binder loss 
   tab_vi <- table(min_vi$cl)
   
- output_model<-list("beta_mean"=mean(result$beta), "k_mean"=mean(max),"singletons_mean"=mean(n_singletons),
+  output_model<-list("beta_mean"=mean(result$beta), "k_mean"=mean(max),"singletons_mean"=mean(n_singletons),
                     "BL_k"=length(which(tab_bind>1)),"VI_k"=length(which(tab_vi>1)),
                    "BL"=length(which(tab_bind==1)),"VI"=length(which(tab_vi==1)))
   

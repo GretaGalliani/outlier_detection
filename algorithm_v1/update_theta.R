@@ -44,7 +44,6 @@ update_theta <- function(n, m1_bar, k, theta_old, sigma, n_acc, theta_param, sd 
   }
 }
 
-
 # Function to change the value of theta so theta_star is in (-inf, +inf) to do MH
 # INPUT: x -> value of theta, x is in (0,+inf)
 # OUTPUT: x_star -> value of transformed theta, x_star is in (-inf, +inf)
@@ -80,25 +79,3 @@ compute_alpha_theta <- function(x, y, k, m1_bar, sigma, n, theta_param) {
   # Computation of alpha 
   return (min(1, exp(log_dens_y - log_dens_x)))
 }
-
-
-
-
-# Function to compute the partial posterior density (up to the normalizing constant) for theta
-# INPUT: x -> point where the partial density is evaluated
-#        k -> number of distinct groups (excluding the groups from the contaminated part)
-#        m1_bar -> number of points in group 0
-#        sigma -> sigma at the current iteration
-#        n -> number of data points
-#        theta_param -> list containing the prior parameter of theta (which is a gamma)
-#                       a -> shape
-#                       b -> rate
-# OUTPUT: f -> the evaluation of the partial posterior density at point x
-
-# dens_theta <- function(x, k, m1_bar, sigma, n, theta_param) {
-#   
-#   # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-#   return (dgamma(x, theta_param$a, rate=theta_param$b) *  gamma(x) * 
-#             gamma(x/sigma + k) / (gamma(x/sigma) * gamma(x + n - m1_bar)) * x)
-# }
-

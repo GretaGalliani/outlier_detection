@@ -36,9 +36,17 @@ sim_study <- function(input)
       allval = rbind(allval,value)
     }
   }
-  
+  # Constructing the dataset
   rownames(allval)=NULL
   data <- allval
+  
+  # Plotting the data with the original groups
+  pal = brewer.pal(n = 9, name = "Set1")
+  col_real = c(rep(pal[1], m1), rep(pal[3], m-m1), rep(pal[2],s))
+  pc = c(rep(16,m), rep(17,s))
+  
+  pairs(data, col = col_real, pch = pc, main = "Real data")
+  
   
   ##INITIALIZATION for Q0 and P0 ####
   Q_param = list()
@@ -144,6 +152,9 @@ sim_study <- function(input)
   
   # best cluster according to binder loss 
   tab_vi <- table(min_vi$cl)
+  
+  #We don't report the diagnostic since when we have the result from the parallelized function
+  #we upload the ouput of the alghoritm in the file simulation_study_d=4 or simulation_study_d=2
   
   output_model<-list("beta_mean"=mean(result$beta), "k_mean"=mean(max),"singletons_mean"=mean(n_singletons),
                     "BL_k"=length(which(tab_bind>1)),"VI_k"=length(which(tab_vi>1)),

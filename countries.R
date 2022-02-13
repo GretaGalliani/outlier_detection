@@ -241,6 +241,8 @@ rel_freq = freq/dim(aux)[1]
 
 # Implementing Binder loss
 library(mcclust)
+# devtools::install_github("sarawade/mcclust.ext")
+library(mcclust.ext)
 
 # These functions needs to have indexes of the groups >=1
 for (i in 1:dim(aux)[1]){
@@ -255,7 +257,7 @@ for (i in 1:dim(aux)[1]){
 # in which observation $i$ and $j$ are together in a cluster is computed and 
 # a matrix containing all proportions is given out. 
 psm <- comp.psm(aux)
-image(psm)
+plotpsm(psm)
 
 # Find the clustering that minimizes the posterior expectation of Binders loss function
 min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
@@ -279,9 +281,6 @@ plot(df$gdpp, df$life_expec, col=col_min_bind, pch = bind_pch, main = "Partition
 
 
 # Implementing Variation of Information loss
-# devtools::install_github("sarawade/mcclust.ext")
-
-library(mcclust.ext)
 
 # Find the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
 min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 

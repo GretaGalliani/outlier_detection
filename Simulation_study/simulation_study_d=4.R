@@ -1,13 +1,24 @@
+#This function implement the algorithm for the simulation study:
+#Generate a set of n data from a mixture of two Gaussian distribution 
+#Generate a set of S outliers from an over-disperse truncated gaussian
+#dimension = 4
+
+#We used this script to developed different models tuning some hyperparameters:
+# c in {1,1.25,1.5}
+#K0_P in {0.5,0.25}
+#K0_Q in {0.5,1}
+#Number of samples without outliers {90,240}
+
 set.seed(04021997)
 library(MASS)
 library(RColorBrewer)
 
-#### SAMPLING FROM THE DENSITY ####
+# SAMPLING FROM THE DENSITY ####
 # BASE MEASURE
 d = 4 #dimension
 mean_a = rep(-3,d) #vector of means
 sigma_b = diag(d) #sigma
-m = 240 #m number of samples (outliers excluded)
+m = 240 #m number of samples (outliers excluded) {90, 240}
 m1 = rbinom(1, size=m, prob = 0.5) #number of samples coming from the first gaussian 
 m2 = m-m1 # from the second one
 
@@ -29,7 +40,8 @@ while(i<s){ # cycle to find s outliers
   if(module^2>9*chi) 
   {
     i=i+1
-    allval = rbind(allval,c*value)
+    allval = rbind(allval,c*value) 
+    #C has the role to shrink or expand the nuisance observations towards the origin
   }
 }
 
@@ -41,26 +53,23 @@ data <- allval
 # Plotting the data with the original groups
 pal = brewer.pal(n = 9, name = "Set1")
 col_real = c(rep(pal[1], m1), rep(pal[3], m-m1), rep(pal[2],s))
-
-
 pc = c(rep(16,m), rep(17,s))
 
 pairs(data, col = col_real, pch = pc, main = "Real data")
 
 
-
-#### INITIALIZATION ####
+# INITIALIZATION for P0 and Q0 ####
 Q_param = list()
 P_param = list()
 
 d = dim(data)[2]
 
-Q_param$k_0 = 0.5
+Q_param$k_0 = 0.5 #{1, 0.5}
 Q_param$mu_0 = rep(0,d)
 Q_param$nu_0 = d + 3 # it must be > (p-1)
 Q_param$lambda_0 = diag(diag(cov(data)))
 
-P_param$k_0 = 0.5
+P_param$k_0 = 0.5 #{0.25,0.5}
 P_param$mu_0 = rep(0,d)
 P_param$nu_0 = d + 3 # it must be > (p-1)
 P_param$lambda_0 = diag(diag(cov(data)))
@@ -93,11 +102,11 @@ for (i in 1:n){
   xi_cov <- append(xi_cov, list(init_var))
 }
 
-#### RUNNING THE ALGORITHM ####
+# RUNNING THE ALGORITHM ####
 source("main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 15000, 1000, 10)
 
-#### PARAMETER ANALYSIS ####
+# PARAMETER ANALYSIS ####
 x11()
 par(mfrow=c(1,3))
 par(mar=c(3,3,1,1),mgp=c(1.75,.75,0))
@@ -107,7 +116,7 @@ plot(result$beta,xlab="iteration",ylab=expression(beta), type = 'l')
 
 dev.off()
 
-## marginal traceplots
+# Marginal traceplots
 x11()
 par(mfrow=c(1,3))
 plot(ts(result$sigma),xlab="iteration",ylab=expression(sigma))
@@ -137,7 +146,7 @@ for (i in 1:1000){
 mean(max) # mean number of clusters by the algorithm 
 
 
-# WE COUNT THE NUMBER OF SINGLETONS
+# NUMBER OF SINGLETONS
 source("auxiliary_functions/auxiliary_functions.R")
 
 n_singletons <- c()
@@ -147,7 +156,9 @@ for (i in 1:dim(result$S)[1]){
 
 n_singletons
 
-# IMPLEMENTING MIN BINDER LOSS
+## LOSS FUNCTION ####
+#Binder loss function
+
 library(mcclust)
 
 aux = result$S
@@ -160,7 +171,6 @@ for (i in 1:dim(aux)[1]){
     }
   }
 }
-
 
 # For a sample of clusterings of the same objects the proportion of clusterings 
 # in which observation $i$ and $j$ are together in a cluster is computed and 
@@ -202,6 +212,7 @@ min_vi <- minVI(psm2, cls.draw=NULL, method=c("avg","comp","draws","greedy","all
 
 
 # best cluster according to iv loss 
+# NOTE: We report only the graph for CPY1, n=100, c=1
 tab_vi <- table(min_vi$cl)
 
 pal = brewer.pal(n = 9, name = "Set1")
@@ -215,26 +226,37 @@ pairs(data, col = col_vi, pch = pc, main = "Clustering minimizing VI loss")
 pairs(data, col = min_vi$cl, pch = pc, main = "Clustering minimizing VI loss")
 
 
-#### RELEVANT PARAMETERS ####
+# RELEVANT PARAMETERS ####
+#Beta (mean and sd)
 mean(result$beta)
 sd(result$beta)
 
+#Theta (mean and sd)
 mean(result$theta)
 sd(result$theta)
 
+#Sigma (mean and sd)
 mean(result$sigma)
 sd(result$sigma)
 
+#Number of clusters (mean and sd)
 mean(max)
 sd(max)
 
+#Numbero fo singletons (mean and sd)
 mean(n_singletons)
 sd(n_singletons)
 
+#Number of singletons estimated by Binder loss function 
 length(which(tab_bind==1))
+#Number of clusters estimated by Binder loss function 
+length(which(tab_bind>1))
 
+#Number of singletons estimated by Variation of information
 length(which(tab_vi==1))
+#Number of clusters estimated by Variation of information 
+length(which(tab_vi>1))
 
+#Acceptance rate for sigma e theta 
 result$acc_theta
 result$acc_sigma
-

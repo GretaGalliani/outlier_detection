@@ -8,14 +8,8 @@ library(BNPmix)
 
 # Dataset location:
 # https://www.kaggle.com/amritachatterjee09/clustering-help-international-ngo-aid/data
-# Import dataset about countries development
-df = read.csv('Country-data.csv')
-df[102,]$country='Federated States of Micronesia'
 
-set.seed(1997)
-rows = sample(nrow(df))
-df = df[rows,]
-
+# Covariates:
 # country:	Name of the country
 # child_mort:	Death of children under 5 years of age per 1000 live births
 # exports:	Exports of goods and services per capita. Given as %age of the GDP 
@@ -32,20 +26,33 @@ df = df[rows,]
 # gdpp:	The GDP per capita. Calculated as the Total GDP divided by the total 
 #       population.
 
-#plot(df)
-#plot(df$gdpp, df$life_expec)
+# Import dataset
+df = read.csv('Country-data.csv')
 
+# Change the namecode for Micronesia, needed when generating maps
+df[102,]$country='Federated States of Micronesia'
+
+# Shuffle rows
+set.seed(1997)
+rows = sample(nrow(df))
+df = df[rows,]
+
+# Data visualization
+plot(df)
+
+# Apply logtransformations where needed
 df$life_expec=log(df$life_expec)
 df$gdpp=log(df$gdpp)
 df$child_mort=log(df$child_mort)
 df$income=log(df$income)
 df$total_fer=log(df$total_fer)
 
+# Hold out country names
 country = df$country
-
 data = df
 data$country = NULL
 
+# Generate data structure to be given as input to the algorithm
 data = as.matrix(scale(data))
 n = dim(data)[1]
 d = dim(data)[2]
@@ -59,7 +66,6 @@ Q_param$k_0 = 0.7
 Q_param$mu_0 = colMeans(data)
 Q_param$nu_0 = d+4
 Q_param$lambda_0 = diag(d)*0.6
-
 
 # Contaminant diffuse component
 P_param$k_0 = 0.05
@@ -89,35 +95,39 @@ xi_cov <- list()
 init_mu <- colMeans(data)
 init_var <- cov(data)
 
-
 for (i in 1:dim(data)[1]){
   xi_mu <- append(xi_mu, list(init_mu))
   xi_cov <- append(xi_cov, list(init_var))
 }
 
+# Import algorithm framework
 source("main.R")
+
 load('modello12.RData')
 #result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
                     #beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
                     #Q_param, P_param, 12000, 2000, 10)
-#save(result, file='country_Q08_P005_CovDiv_05_12mila.RData')
 
-# Diagnostics
+aux = result$S
+
+# MCMC Diagnostics
 
 # Sigma
-jpeg("sigma.jpg", width = 500, height = 500)
-plot(result$sigma, type='l', xlim=c(0,900), ylim=c(0,1), xlab='iter', ylab=expression(sigma))
+
+# Traceplot
+plot(result$sigma, type='l', ylim=c(0,1), xlab='iter', ylab=expression(sigma))
 abline(h = seq(0, 1, 0.1), lty = 1, col = "gray", lwd=0.5)
 abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5)
 lines(result$sigma, type='l')
 lines(rep(mean(result$sigma),length(result$sigma)), type='l', col='red' )
 dev.off()
 
+# Posterior summary
 result$acc_sigma
 mean(result$sigma)
 sd(result$sigma)
 
-jpeg("sigma_density.jpg", width = 500, height = 500)
+# Posterior density
 plot(density(result$sigma), xlim = c(0.3,1), ylim = c(0,6), type='l', 
      xlab = expression(sigma), col = 'blue', 
      main = expression(paste('Posterior density of ', sigma)))
@@ -129,7 +139,8 @@ lines(density(result$sigma), type='l')
 dev.off()
 
 # Theta
-jpeg("theta.jpg", width = 500, height = 500)
+
+# Traceplot
 plot(result$theta, type='l', xlab='iter', ylab=expression(theta))
 abline(h = seq(0, 13, 1), lty = 1, col = "gray", lwd=0.5)
 abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5) 
@@ -137,11 +148,12 @@ lines(result$theta, type='l')
 lines(rep(mean(result$theta),length(result$theta)), type='l', col='red' )
 dev.off()
 
+# Posterior summary
 result$acc_theta
 mean(result$theta)
 sd(result$theta)
 
-#jpeg("theta_density.jpg", width = 500, height = 500)
+# Posterior density
 plot(density(result$theta), xlim = c(0,15), ylim = c(0,0.3), type='l', 
      xlab = expression(theta), col = 'blue', 
      main = expression(paste('Posterior density of ', theta)))
@@ -153,7 +165,8 @@ lines(density(result$theta), type='l')
 dev.off()
 
 # Beta
-jpeg("beta.jpg", width = 500, height = 500)
+
+# Traceplot
 plot(result$beta, type='l', ylim=c(0,1), xlab='iter', ylab=expression(beta))
 abline(h = seq(0, 1, 0.1), lty = 1, col = "gray", lwd=0.5)
 abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5)
@@ -161,10 +174,11 @@ lines(result$beta, type='l')
 lines(rep(mean(result$beta),length(result$beta)), type='l', col='red' )
 dev.off()
 
+# Posterior summary
 mean(result$beta)
 sd(result$beta)
 
-#jpeg('beta_density.jpg', width = 500, height = 500)
+# Posterior density
 plot(density(result$beta), type='l', xlab = expression(beta), col = 'blue', 
      main = expression(paste('Posterior density of ', beta)))
 abline(h = seq(0, 11, 1), lty = 1, col = "gray", lwd=0.5)
@@ -174,13 +188,14 @@ polygon(density(result$beta), col = rgb(0, 0, 1, alpha = 0.5))
 lines(density(result$beta), type='l')
 dev.off()
 
-
 # M1 bar
+
+# M1 bar computation for all the iterations
 result_m1_bar = {}
 for(i in 1:dim(result$S)[1])
   result_m1_bar = append(result_m1_bar, m1_bar(result$S[i,]))
 
-#jpeg("m1_bar.jpg", width = 500, height = 500)
+# Traceplot
 plot(result_m1_bar, type='l', xlab='iter', ylab=expression(bar(m[1])))
 abline(h = seq(5, 35, 2.5), lty = 1, col = "gray", lwd=0.5)
 abline(v = seq(0, 1000, 100), lty = 1, col = "gray", lwd=0.5)
@@ -188,10 +203,11 @@ lines(result_m1_bar, type='l')
 lines(rep(mean(result_m1_bar),length(result_m1_bar)), type='l', col='red' )
 dev.off()
 
+# Posterior summary
 mean(result_m1_bar)
 sd(result_m1_bar)
 
-#jpeg('m1_bar_density.jpg', width = 500, height = 500)
+# Posterior density
 plot(NULL, xlim = c(0,40), ylim = c(0,0.12), main = expression(paste('Posterior density of ', bar(m[1]))),
      xlab = expression(bar(m[1])), ylab = 'Density')
 abline(h = seq(0, 0.12, 0.02), lty = 1, col = "gray", lwd=0.5)
@@ -201,32 +217,18 @@ hist(result_m1_bar, col = rgb(0, 0, 1, alpha = 0.5), freq=FALSE, add=TRUE,
      xlim = c(0,40),ylim = c(0,0.12), breaks = length(unique(result_m1_bar)))
 dev.off()
 
-# Plot of AUTOCORRELATION
+# Plots of autocorrelation
 library(coda)
-
 par(mfrow=c(1,2))
 tmp1 <- acf(result$sigma, main='Autocorrelation of sigma')
 tmp2 <- acf(result$theta, main='Autocorrelation of theta')
 graphics.off()
 
-# ESS
+# Effective Sample Size
 effectiveSize(result$sigma)
 effectiveSize(result$theta)
 effectiveSize(result$beta)
 effectiveSize(result_m1_bar)
-
-max <- c()
-for (i in 1:1000){
-  max <- c(max, max(result$S[i,]))
-}
-
-mean(max) # mean number of clusters by the algorithm 
-
-
-# IMPLEMENTING MIN BINDER LOSS
-library(mcclust)
-
-aux = result$S
 
 # Compute the probability of a single country to be an outlier 
 # based on relative frequency
@@ -237,10 +239,8 @@ for (i in 1:n){
 }
 rel_freq = freq/dim(aux)[1]
 
-# Take the 5 most probable outliers by relative frequencies
-country[order(rel_freq, decreasing = TRUE)[1:10]]
-
-
+# Implementing Binder loss
+library(mcclust)
 
 # These functions needs to have indexes of the groups >=1
 for (i in 1:dim(aux)[1]){
@@ -251,22 +251,18 @@ for (i in 1:dim(aux)[1]){
   }
 }
 
-
 # For a sample of clusterings of the same objects the proportion of clusterings 
 # in which observation $i$ and $j$ are together in a cluster is computed and 
 # a matrix containing all proportions is given out. 
 psm <- comp.psm(aux)
 image(psm)
 
-# finds the clustering that minimizes the posterior expectation of Binders loss function
+# Find the clustering that minimizes the posterior expectation of Binders loss function
 min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
                                                         "laugreen","all"), max.k = NULL, include.lg = FALSE, 
                        start.cl = NULL, tol = 0.001)
 
-par(mfrow=c(1,2)) 
-
-
-# best cluster according to binder loss 
+# Best clustering according to binder loss 
 pal = rainbow(max(min_bind$cl))
 col_min_bind = rep(0,dim(data)[1])
 
@@ -279,16 +275,15 @@ for (i in 1:length(col_min_bind))
   col_min_bind[i] = pal[min_bind$cl[i]]
 }
 
-
 plot(df$gdpp, df$life_expec, col=col_min_bind, pch = bind_pch, main = "Partition minimizing Binder Loss")
 
 
-# IMPLEMENTING MIN VARIATION OF INFORMATION
+# Implementing Variation of Information loss
 # devtools::install_github("sarawade/mcclust.ext")
+
 library(mcclust.ext)
 
-
-# finds the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
+# Find the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
 min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 
                 max.k=NULL, include.greedy=FALSE, start.cl=NULL, maxiter=NULL,
                 l=NULL, suppress.comment=TRUE)
@@ -305,42 +300,15 @@ vi_tab = table(min_vi$cl)
 vi_pch = rep(17,n)
 vi_pch[min_vi$cl %in% which(vi_tab>1)]=16
 
-
 plot(df$gdpp, df$life_expec, col=col_min_vi, pch = vi_pch, main = "Partition minimizing VI Loss")
 
-plot(df, col=col_min_vi, pch=vi_pch)
-
-# Try a logarithmic transformation
-plot(log(df[,c(2,10)]), col=col_min_vi, pch=vi_pch)
-
-# Clusters and outliers
+# Print outliers and clusters
 out_i = as.numeric(which(vi_tab==1))
 cl_i = as.numeric(which(vi_tab>1))
 out_names = country[which(min_vi$cl %in% out_i)]
 
-# NUMBER OF OUTLIERS AND CLUSTERS
 print(paste0('Number of outliers: ', length(out_i)))
 print(paste0('Number of clusters: ', length(cl_i)))
-
-factor(min_vi$cl) 
-table(min_vi$cl)
-
-# Scale outliers
-# clust_map = min_bind$cl
-# out_i = as.numeric(which(bind_tab==1))
-# cl_i = as.numeric(which(bind_tab>1))
-# out_names = country[which(min_bind$cl %in% out_i)]
-clust_map = min_vi$cl 
-clust_map[which(clust_map %in% out_i)] = 0
-
-uniq = 1:length(unique(clust_map))
-levels = as.numeric(levels(factor(clust_map)))
-for (i in uniq){
-  if(levels[i]>uniq[i]-1){
-    clust_map[which(clust_map==levels[i])]=i-1
-  }
-}
-
 
 print("Outliers: ")
 print(out_names)
@@ -352,23 +320,69 @@ for (i in 1:length(cl_i)){
   count = count+1
 }
 
-# Map plot
+# Scale outliers in order to be labeled with 0
+clust_map = min_vi$cl 
+clust_map[which(clust_map %in% out_i)] = 0
+
+uniq = 1:length(unique(clust_map))
+levels = as.numeric(levels(factor(clust_map)))
+for (i in uniq){
+  if(levels[i]>uniq[i]-1){
+    clust_map[which(clust_map==levels[i])]=i-1
+  }
+}
+
+# Produce the map highlighting the outliers
+
+out_map = data.frame(country = out_names, cluster = rep(0, length(out_names)))
+o_map = joinCountryData2Map(out_map, joinCode = "NAME", nameJoinColumn = "country", 
+                          nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
+                          mapResolution = "medium", projection = NA, verbose = FALSE)
+
+out_mapParams = mapCountryData(o_map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
+                           oceanCol = "azure2", missingCountryCol = 'white', 
+                           colourPalette = 'red', mapTitle = '', 
+                           addLegend = FALSE)
+dev.off()
+
+# Focus on United States and Haiti
+
+# Function marking with a red cross the analyzed outlier among the data cloud
+red_mark = function(name, countries){
+  col = rep('#000000', length(countries))
+  pch = rep(20, length(countries))
+  col[which(country==name)] = '#FF0000'
+  pch[which(country==name)] = 8
+  return(list(col=col, pch=pch))
+}
+
+US = red_mark('United States', country)
+Ha = red_mark('Haiti', country)
+
+# Select relevant covariates to be plotted
+p = df[,c(2,4,7,8,10)]
+
+plot(p, col=US$col, pch=US$pch, main = 'Focus on United States')
+dev.off()
+
+plot(p, col=Ha$col, pch=Ha$pch, main = 'Focus on Haiti')
+dev.off()
+
+# Produce the map of the clustering structure
 
 map_data = data.frame(country = country, cluster = clust_map)
 
 map = joinCountryData2Map(map_data, joinCode = "NAME", nameJoinColumn = "country", 
-                    nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
-                    mapResolution = "medium", projection = NA, verbose = FALSE)
+                          nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
+                          mapResolution = "medium", projection = NA, verbose = FALSE)
 
 col = c('black', 'blue', 'red', 'wheat', 'yellow', 'chocolate', 'orange', 
         'lightblue', 'goldenrod1', 'darkgreen', 'green2', 'magenta')
 
-
-jpeg("mappa.jpg", width = 1000, height = 1000)
 mapParams = mapCountryData(map, nameColumnToPlot = 'cluster', catMethod = 'categorical', 
-               oceanCol = "azure2", missingCountryCol = 'white', 
-               colourPalette = col, mapTitle = '', 
-               addLegend = FALSE)
+                           oceanCol = "azure2", missingCountryCol = 'white', 
+                           colourPalette = col, mapTitle = '', 
+                           addLegend = FALSE)
 
 do.call(addMapLegendBoxes, c(mapParams,
                              x = 'bottom',
@@ -378,80 +392,4 @@ do.call(addMapLegendBoxes, c(mapParams,
                              bty = "n"))
 dev.off()
 
-
-# Focus on United States, Luxembourg, Haiti and Burundi
-
-red_mark = function(name, countries){
-  col = rep('#000000', length(countries))
-  pch = rep(20, length(countries))
-  col[which(country==name)] = '#FF0000'
-  pch[which(country==name)] = 8
-  return(list(col=col, pch=pch))
-}
-
-
-p = df[,c(2,4,7,8,10)]
-
-
-for (name in out_names){
-  mark = red_mark(name, country)
-  x11()
-  plot(p, col=mark$col, pch=mark$pch, main = paste0('Focus on ',name))
-}
-
-US = red_mark('United States', country)
-Ven = red_mark('Venezuela', country)
-Ha = red_mark('Haiti', country)
-Ni = red_mark('Nigeria', country)
-
-jpeg("US.jpg", width = 500, height = 500)
-plot(p, col=US$col, pch=US$pch, main = 'Focus on United States')
-dev.off()
-
-jpeg("Venezuela.jpg", width = 500, height = 500)
-plot(p, col=Ven$col, pch=Ven$pch, main = 'Focus on Venezuela')
-dev.off()
-
-plot(p, col=Ni$col, pch=Ni$pch, main = 'Focus on Nigeria')
-
-jpeg("Haiti.jpg", width = 500, height = 500)
-plot(p, col=Ha$col, pch=Ha$pch, main = 'Focus on Haiti')
-dev.off()
-
-country[which(df$inflation==max(df$inflation))]
-
-graphics.off()
-
-# DA QUI IN POI INUTILE
-# Compare outliers value with clusters means
-# Consider the covariate gdpp
-data_ns = df
-data_ns$country = NULL
-data_ns = as.matrix(data_ns)
-
-cl_means <- list()
-for (i in 1:length(cl_i)-1){
-  cl_data = data_ns[which(clust_map==i),]
-  m = colMeans(cl_data)
-  cl_means = append(cl_means, list(m))
-}
-
-gdpp_cl =rep(0,n)
-for (i in 1:n){
-  if (clust_map[i] == 0)
-    gdpp_cl[i]=data_ns[i,9]
-  else
-    gdpp_cl[i]=as.numeric(cl_means[[clust_map[i]]][9])
-}
-
-map_data_gdpp = data.frame(country = country, gdpp = data_ns[,9])
-
-map_gdpp = joinCountryData2Map(map_data_gdpp, joinCode = "NAME", nameJoinColumn = "country", 
-                          nameCountryColumn = "country", suggestForFailedCodes = TRUE, 
-                          mapResolution = "coarse", projection = NA, verbose = FALSE)
-
-mapCountryData(map_gdpp, nameColumnToPlot = 'gdpp', catMethod = 'fixedWidth', 
-               colourPalette = 'heat', mapTitle = 'Country clusters', addLegend = FALSE)
-
-length(unique(result$S[500,]))
 

@@ -1,4 +1,5 @@
-##### UPDATE XIs
+##### UPDATE XI
+
 # Library to sample from an inverse wishart
 library(LaplacesDemon)
 
@@ -37,7 +38,6 @@ update_xi <- function(Y, S, k, Q_param){
       else
         sample_cov = cov(Yj)
       sample_mean = colMeans(Yj)
-      
     }
     
     # Compute the parameters for the marginals
@@ -46,27 +46,19 @@ update_xi <- function(Y, S, k, Q_param){
     nu_n = Q_param$nu_0 + n
     lambda_n = Q_param$lambda_0 + sample_cov + Q_param$k_0*n/k_n*(sample_mean-Q_param$mu_0)%*%t((sample_mean-Q_param$mu_0))
     
-    # computation of degrees of freedom
+    # Compute the degrees of freedom
     df = nu_n-d+1
     
     # Sampling of mu (from a multivariate t-student)
     xi_mu_j = LaplacesDemon::rmvt(1, mu_n, lambda_n/k_n/df, df)
     
-    
-    # Sampling of cov (from an inverse-wishart), based on cholesky decomposition
-    # xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, as.inverse(lambda_n))
+    # Sampling of cov (from an inverse-wishart)
     xi_sigma_j = LaplacesDemon::rinvwishart(nu_n, lambda_n)
     
-    # Appending of the sampled values
+    # Append the sampled values
     xi_mu <- append(xi_mu, list(xi_mu_j))
     xi_sigma <- append(xi_sigma, list(xi_sigma_j))
   }
   
   return(list("xi_mu_star" = xi_mu, "xi_cov_star" = xi_sigma))
 }
-
-
-
-
-
-

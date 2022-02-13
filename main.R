@@ -68,7 +68,6 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
   # Start to iterate
   for (r in 1:n_iter){
     
-    # set.seed(26091998)
     # Step 2a: Updating the clusters
     S_old <- update_clusters(Y, xi_mu_star, xi_cov_star,
                                       S_old, beta_old, theta_old, sigma_old, P_param, Q_param)
@@ -90,9 +89,6 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
       xi_mu_star <- xi$xi_mu_star
       xi_cov_star <- xi$xi_cov_star
     }
-    
-    
-    
     
     # m1 and m1_bar computation
     # further informations about the functions are available in the script
@@ -119,13 +115,6 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
       acc_sigma <- sigma_list$acc
     }
     
-    if(r %% 50 == 0){
-      print(r)
-      print(paste0('Sigma = ', sigma_old))
-    }
-
-
-    
     # Updating theta
     theta_list <- update_theta(n, m1_bar, k_old, theta_old, sigma_old, acc_theta, theta_param)
     # Updating the variables
@@ -142,15 +131,13 @@ algorithm <- function(Y, S_init, sigma_init, theta_init, beta_init, beta_param, 
     # Updating the variables
     beta_old <- beta_new
     if (r >= burnin + 1 && r %% thinning == 0) beta_vec <- append(beta_vec, beta_old)
-    #acc_beta <- beta_list$acc
     
-    #Progress bar
+    # Progress bar
     pb$tick()
     
-  
   }
 
-  #returning all final values in a list
+  # Return all final values in a list
   return (list("S"= S_matrix, "xi_star" = xi, "sigma" = sigma_vec, "theta" = theta_vec,
                "beta" = beta_vec, "acc_sigma" = acc_sigma/n_iter, 
                "acc_theta" = acc_theta/n_iter))

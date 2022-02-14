@@ -1,0 +1,11 @@
+Simulation study d=2:
+
+- Prova_1:k_0_p=1,k_0_q=0.25,c=1,   N=100
+- Prova_2:k_0_p=1,k_0_q=0.25,c=1,   N=250
+- Prova_3:k_0_p=1,k_0_q=0.25,c=1.25,N=100
+- Prova_4:k_0_p=k_0_q=0.5,   c=1,   N=100
+- Prova_5:k_0_p=k_0_q=0.5,   c=1.25,N=100
+- Prova_6:k_0_p=k_0_q=0.5,   c=1.5, N=100
+- Prova_7:k_0_p=1,k_0_q=0.25,c=1.5, N=100
+- Prova_8:k_0_p=1,k_0_q=0.25,c=1.25, N=250 --> da salvare i dati
+- Prova_9:k_0_p=1,k_0_q=0.25,c=1.5, N=250

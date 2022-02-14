@@ -7,7 +7,7 @@ library(TSstudio)
 # https://finance.yahoo.com/quote/DOGE-USD/history/
 
 # Import dataset
-doge = read.csv('DOGE-USD.csv')
+doge = read.csv('Dogecoin_dataset.csv')
 
 # Calculating the log return variable from Adj.Close
 doge$LogReturn = rep(0, dim(doge)[1])

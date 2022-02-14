@@ -1,4 +1,6 @@
-country_function <- function(input) #in input ho una lista
+# Define the function to be called by the different cores
+
+country_function <- function(input)
 {
   
   df = read.csv('Country-data.csv')
@@ -28,16 +30,16 @@ country_function <- function(input) #in input ho una lista
   P_param = list()
   
   # Contaminated component
-  Q_param$k_0 = input$k0_Q ###VARIABILE CHE GLI PASSI IN INPUT
+  Q_param$k_0 = input$k0_Q
   Q_param$mu_0 = colMeans(data)
   Q_param$nu_0 = d+3
-  Q_param$lambda_0 = cov(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  Q_param$lambda_0 = cov(data)*input$const 
   
   # Contaminant diffuse component
-  P_param$k_0 = input$k0_P ###VARIABILE CHE GLI PASSI IN INPUT
+  P_param$k_0 = input$k0_P
   P_param$mu_0 = colMeans(data)
   P_param$nu_0 = d+3
-  P_param$lambda_0 = cov(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  P_param$lambda_0 = cov(data)*input$const
   
   # Initialization of the parameters for the Pitman-Yor and initial partition
   S_init = rep(1, n)
@@ -72,7 +74,7 @@ country_function <- function(input) #in input ho una lista
                       beta_param, sigma_param, theta_param, xi_mu, 
                       xi_cov, Q_param, P_param, 6000, 1500, 5)
   
-  output_model<-list("Result"=result)
+  output_model<-list("result"=result)
   
   return (output_model)
 }

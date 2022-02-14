@@ -27,7 +27,7 @@ library(BNPmix)
 #       population.
 
 # Import dataset
-df = read.csv('Country-data.csv')
+df = read.csv('countries_dataset.csv')
 
 # Change the namecode for Micronesia, needed when generating maps
 df[102,]$country='Federated States of Micronesia'
@@ -103,10 +103,13 @@ for (i in 1:dim(data)[1]){
 # Import algorithm framework
 source("main.R")
 
-load('modello12.RData')
-#result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
-                    #beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
-                    #Q_param, P_param, 12000, 2000, 10)
+# Run the MCMC
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
+                    beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
+                    Q_param, P_param, 12000, 2000, 10)
+
+# Import the results for the best model
+load('countries_result.RData')
 
 aux = result$S
 
@@ -241,6 +244,8 @@ rel_freq = freq/dim(aux)[1]
 
 # Implementing Binder loss
 library(mcclust)
+# devtools::install_github("sarawade/mcclust.ext")
+library(mcclust.ext)
 
 # These functions needs to have indexes of the groups >=1
 for (i in 1:dim(aux)[1]){
@@ -255,7 +260,7 @@ for (i in 1:dim(aux)[1]){
 # in which observation $i$ and $j$ are together in a cluster is computed and 
 # a matrix containing all proportions is given out. 
 psm <- comp.psm(aux)
-image(psm)
+plotpsm(psm)
 
 # Find the clustering that minimizes the posterior expectation of Binders loss function
 min_bind <-  minbinder(psm, cls.draw = NULL, method = c("avg", "comp", "draws", 
@@ -279,9 +284,6 @@ plot(df$gdpp, df$life_expec, col=col_min_bind, pch = bind_pch, main = "Partition
 
 
 # Implementing Variation of Information loss
-# devtools::install_github("sarawade/mcclust.ext")
-
-library(mcclust.ext)
 
 # Find the clustering that minimizes  the lower bound to the posterior expected Variation of Information from Jensen's Inequality
 min_vi <- minVI(psm, cls.draw=NULL, method=c("avg","comp","draws","greedy","all"), 

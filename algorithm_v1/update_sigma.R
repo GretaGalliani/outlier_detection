@@ -17,11 +17,8 @@
 # OUTPUT: sigma -> value of the parameter sigma at the current iteration
 #         acc -> number of accepted proposals at the current iteration
 
-<<<<<<< HEAD
 update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 1) { 
-=======
-update_sigma <- function(m1, m1_bar, k, sigma_old, theta, freq, n_acc, sigma_param, sd = 0.8) { 
->>>>>>> eac8242c61349b830642cf484126be3051fd89a1
+
   # METROPOLIS HASTINGS RANDOM WALK
   
   # Extraction of a new value from the proposal distribution, doing an appropriate transformation 
@@ -95,45 +92,3 @@ compute_alpha_sigma <- function(x, y, k, m1, m1_bar, theta, freq, sigma_param) {
   # Computation of alpha 
   return (min(1, exp(log_dens_y - log_dens_x)))
 }
-
-
-# Function to compute the partial posterior density (up to the normalizing constant) for sigma
-# INPUT: x -> point where the partial density is evaluated
-#        k -> number of distinct groups (excluding the groups from the contaminated part)
-#        m1 -> number of singletons (number of points in group 0 + number of groups with one point)
-#        m1_bar -> number of points in group 0
-#        theta -> theta at the current iteration
-#        freq -> vector containing the number of points for each group j=1,...k
-#        sigma_param -> list containing the parameters of the prior for sigma (which is a beta)
-#                       a -> shape1
-#                       b -> shape2
-
-# OUTPUT: f -> the evaluation of the partial posterior density at point x
-
-# dens_sigma <- function(x, k, m1, m1_bar, theta, freq, sigma_param) {
-#   
-#   # single needs to be equal to true if all the groups are singletons
-#   # single is false if there is at least a group which is not a singleton
-#   single = TRUE
-#   for (elem in freq){
-#     if (elem > 1){
-#       single = FALSE
-#       break
-#     }
-#   }
-#   
-#   # If single = TRUE, all the groups are singleton and the computation of the prod part is skipped
-#   if(single){
-#     
-#     # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-#     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * gamma(theta/x + k)/gamma(theta/x) * ((x*(1-x))))
-#   }
-#   else{
-#     # I compute the frequencies of all the groups which are not singletons
-#     freq_m1 = freq[freq>1]
-#     
-#     # Computation of the partial posterior density, corrected to account for the reparameterization of MH
-#     return ( dbeta(x, sigma_param$a, sigma_param$b) * x^(k) * (gamma(theta/x + k)/gamma(theta/x)) * prod(gamma(freq_m1-x)/gamma(1-x)) * ((x*(1-x))))
-#   }  
-# }
-

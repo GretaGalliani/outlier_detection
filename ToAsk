@@ -1,9 +1,0 @@
-To ask:
-- Se nel dataset avessi due dati uguali, devo esplicitamente considerare che questi
-  due dati non possono essere samplati in j=0? 
-- È giusto nel passo (a) samplare dalla marginal prior? O è troppo pesante computazionalmente
-- nel punto 2b invertire la matrice delta ha costo computazionale elevato, che fare?
-- quando usiamo InvWishart mettiamo nei parametri inv(lambda) ? 
-- sample degli outliers è stato fatto con una barbara moltiplicazione , c'è modo di creare gli outliers in modo piu' professionale usando normale multivariata troncata ?
-- (NEW) Per variation of information, bisogna considerare gruppi degli outliers o solo parte dei gruppi di Q? Perchè 
-considerando gli outliers non funziona bene la minimizzazione della variation of information (binder sembra più o meno ok senza togliere outliers)

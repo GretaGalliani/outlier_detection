@@ -1,43 +1,34 @@
-country_function <- function(input) #in input ho una lista
+# Define the function to be called by the different cores
+
+doge_function <- function(input)
 {
   
-  df = read.csv('Country-data.csv')
-  df[102,]$country='Federated States of Micronesia'
-  
-  set.seed(1997)
-  rows = sample(nrow(df))
-  df = df[rows,]
-  
-  df$life_expec=log(df$life_expec)
-  df$gdpp=log(df$gdpp)
-  df$child_mort=log(df$child_mort)
-  df$income=log(df$income)
-  df$total_fer=log(df$total_fer)
-  
-  country = df$country
-  
-  data = df
-  data$country = NULL
-  
-  data = as.matrix(scale(data))
+  doge = read.csv('Dogecoin_dataset.csv')
+  date = as.Date.character(doge$Date)
+  doge$LogReturn = rep(0, dim(doge)[1])
+  for (i in 2:dim(doge)[1]){doge$LogReturn[i] = 
+    log(doge$Adj.Close[i]/doge$Adj.Close[i-1])*100}
+  data = as.matrix(doge$LogReturn)
+  data=data[1:365,]
+  data= scale(data)
   n = dim(data)[1]
   d = dim(data)[2]
-  
+
   # Initialization of the parameters for the priors
   Q_param = list()
   P_param = list()
-  
+
   # Contaminated component
   Q_param$k_0 = input$k0_Q ###VARIABILE CHE GLI PASSI IN INPUT
-  Q_param$mu_0 = colMeans(data)
+  Q_param$mu_0 = mean(data)
   Q_param$nu_0 = d+3
-  Q_param$lambda_0 = cov(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  Q_param$lambda_0 = var(data)/input$costante ###VARIABILE CHE GLI PASSI IN INPUT
   
   # Contaminant diffuse component
   P_param$k_0 = input$k0_P ###VARIABILE CHE GLI PASSI IN INPUT
-  P_param$mu_0 = colMeans(data)
+  P_param$mu_0 = mean(data)
   P_param$nu_0 = d+3
-  P_param$lambda_0 = cov(data)*input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  P_param$lambda_0 = var(data)/input$costante ###VARIABILE CHE GLI PASSI IN INPUT
   
   # Initialization of the parameters for the Pitman-Yor and initial partition
   S_init = rep(1, n)
@@ -58,9 +49,9 @@ country_function <- function(input) #in input ho una lista
   xi_mu <- list()
   xi_cov <- list()
   
-  init_mu <- colMeans(data)
-  init_var <- cov(data)
-  
+  init_mu <- mean(data)
+  init_var <- var(data)
+
   
   for (i in 1:dim(data)[1]){
     xi_mu <- append(xi_mu, list(init_mu))
@@ -69,10 +60,10 @@ country_function <- function(input) #in input ho una lista
   
   source("main.R")
   result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
-                      beta_param, sigma_param, theta_param, xi_mu, 
-                      xi_cov, Q_param, P_param, 6000, 1500, 5)
+                      beta_param, sigma_param, theta_param, xi_mu, xi_cov,
+                      Q_param, P_param, 2000, 100, 1)
   
-  output_model<-list("Result"=result)
+    output_model<-list("Result"=result)
   
   return (output_model)
 }

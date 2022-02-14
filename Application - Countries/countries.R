@@ -27,7 +27,7 @@ library(BNPmix)
 #       population.
 
 # Import dataset
-df = read.csv('Country-data.csv')
+df = read.csv('countries_dataset.csv')
 
 # Change the namecode for Micronesia, needed when generating maps
 df[102,]$country='Federated States of Micronesia'
@@ -103,10 +103,13 @@ for (i in 1:dim(data)[1]){
 # Import algorithm framework
 source("main.R")
 
-load('modello12.RData')
-#result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
-                    #beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
-                    #Q_param, P_param, 12000, 2000, 10)
+# Run the MCMC
+result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
+                    beta_param, sigma_param, theta_param, xi_mu, xi_cov, 
+                    Q_param, P_param, 12000, 2000, 10)
+
+# Import the results for the best model
+load('countries_result.RData')
 
 aux = result$S
 

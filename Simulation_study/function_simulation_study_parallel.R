@@ -93,7 +93,7 @@ sim_study <- function(input)
   }
   
   ## RUNNING THE ALGORITHM ####
-  source("main.R")
+  source("algorithm_v1/main.R")
   result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 6000, 1000, 1)
   
   #### CLUSTER ANALYSIS ####

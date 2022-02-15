@@ -103,7 +103,7 @@ for (i in 1:n){
 }
 
 # RUNNING THE ALGORITHM ####
-source("main.R")
+source("algorithm_v1/main.R")
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, beta_param, sigma_param, theta_param, xi_mu, xi_cov, Q_param, P_param, 10, 0, 1)
 #save(result,file='output_salvati/prova_1.dat')
 load('output_salvati/prova_1.dat')

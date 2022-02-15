@@ -69,7 +69,7 @@ country_function <- function(input)
     xi_cov <- append(xi_cov, list(init_var))
   }
   
-  source("main.R")
+  source("algorithm_v1/main.R")
   result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
                       beta_param, sigma_param, theta_param, xi_mu, 
                       xi_cov, Q_param, P_param, 6000, 1500, 5)

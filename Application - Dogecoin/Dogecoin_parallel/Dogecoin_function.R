@@ -3,7 +3,7 @@
 doge_function <- function(input)
 {
   
-  doge = read.csv('Dogecoin_dataset.csv')
+  doge = read.csv('Application - Dogecoin/Dogecoin_dataset.csv')
   date = as.Date.character(doge$Date)
   doge$LogReturn = rep(0, dim(doge)[1])
   for (i in 2:dim(doge)[1]){doge$LogReturn[i] = 
@@ -19,16 +19,16 @@ doge_function <- function(input)
   P_param = list()
 
   # Contaminated component
-  Q_param$k_0 = input$k0_Q ###VARIABILE CHE GLI PASSI IN INPUT
+  Q_param$k_0 = input$k0_Q 
   Q_param$mu_0 = mean(data)
   Q_param$nu_0 = d+3
-  Q_param$lambda_0 = var(data)/input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  Q_param$lambda_0 = var(data)/input$costante
   
   # Contaminant diffuse component
-  P_param$k_0 = input$k0_P ###VARIABILE CHE GLI PASSI IN INPUT
+  P_param$k_0 = input$k0_P
   P_param$mu_0 = mean(data)
   P_param$nu_0 = d+3
-  P_param$lambda_0 = var(data)/input$costante ###VARIABILE CHE GLI PASSI IN INPUT
+  P_param$lambda_0 = var(data)/input$costante
   
   # Initialization of the parameters for the Pitman-Yor and initial partition
   S_init = rep(1, n)
@@ -58,7 +58,7 @@ doge_function <- function(input)
     xi_cov <- append(xi_cov, list(init_var))
   }
   
-  source("main.R")
+  source("algorithm_v1/main.R")
   result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
                       beta_param, sigma_param, theta_param, xi_mu, xi_cov,
                       Q_param, P_param, 2000, 100, 1)

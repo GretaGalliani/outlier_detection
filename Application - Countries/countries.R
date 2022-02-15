@@ -101,7 +101,7 @@ for (i in 1:dim(data)[1]){
 }
 
 # Import algorithm framework
-source("main.R")
+source("algorithm_v1/main.R")
 
 # Run the MCMC
 result <- algorithm(data, S_init, sigma_init, theta_init, beta_init, 
